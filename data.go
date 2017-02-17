@@ -3,15 +3,16 @@ package kaa
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 )
 
 const ( // iota is reset to 0
-	up    = iota // c0 == 0
-	down  = iota // c1 == 1
-	left  = iota // c2 == 2
-	right = iota // c2 == 2
+	UP    = "up"    // c0 == 0
+	DOWN  = "down"  // c1 == 1
+	LEFT  = "left"  // c2 == 2
+	RIGHT = "right" // c2 == 2
 )
 
 type GameStartRequest struct {
@@ -45,6 +46,19 @@ type MoveRequest struct {
 	Food   []Point `json:"food"`
 	Snakes []Snake `json:"snakes"`
 	You    string  `json:"you"`
+
+	// added by me
+	// lists all the points that are hazards this turn
+	Hazards map[string]bool
+}
+
+func (m *MoveRequest) GenHazards() {
+	m.Hazards = make(map[string]bool)
+	for _, snake := range m.Snakes {
+		for _, coord := range snake.Coords {
+			m.Hazards[coord.String()] = true
+		}
+	}
 }
 
 type MoveResponse struct {
@@ -88,6 +102,56 @@ func (point *Point) UnmarshalJSON(data []byte) error {
 	}
 	*point = Point{X: coords[0], Y: coords[1]}
 	return nil
+}
+
+func (point *Point) String() string {
+	return fmt.Sprintf("{%d,%d}", point.X, point.Y)
+}
+
+// directional functions return a new point or nil if the point is out of the
+// board
+func (point *Point) Up(data *MoveRequest) *Point {
+	if point.Y == 0 {
+		return nil
+	}
+	ret := &Point{point.X, point.Y - 1}
+	if data.Hazards[ret.String()] {
+		return nil
+	}
+	return ret
+}
+
+func (point *Point) Down(data *MoveRequest) *Point {
+	if point.Y == data.Height-1 {
+		return nil
+	}
+	ret := &Point{point.X, point.Y + 1}
+	if data.Hazards[ret.String()] {
+		return nil
+	}
+	return ret
+}
+
+func (point *Point) Left(data *MoveRequest) *Point {
+	if point.X == 0 {
+		return nil
+	}
+	ret := &Point{point.X - 1, point.Y}
+	if data.Hazards[ret.String()] {
+		return nil
+	}
+	return ret
+}
+
+func (point *Point) Right(data *MoveRequest) *Point {
+	if point.X == data.Width-1 {
+		return nil
+	}
+	ret := &Point{point.X + 1, point.Y}
+	if data.Hazards[ret.String()] {
+		return nil
+	}
+	return ret
 }
 
 // Allows decoding a string or number identifier in JSON

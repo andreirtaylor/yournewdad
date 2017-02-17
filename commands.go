@@ -48,6 +48,9 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
+	// must generate the hazards map on every request
+	data.GenHazards()
+
 	SaveMove(data, req)
 	move, err := getMove(data, req)
 	if err != nil {
@@ -67,6 +70,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
 	log.Infof(ctx, "Data %#v", data)
+
 	metadata, err := GenerateMetaData(data)
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
