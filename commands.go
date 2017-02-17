@@ -3,6 +3,8 @@ package kaa
 import (
 	"encoding/json"
 	"fmt"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 	"net/http"
 )
 
@@ -13,7 +15,9 @@ func respond(res http.ResponseWriter, obj interface{}) {
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	data, err := NewGameStartRequest(req)
+
 	saveGame(data, req)
+
 	if err != nil {
 		respond(res, GameStartResponse{
 			Taunt:   toStringPointer("battlesnake-go!"),
@@ -45,9 +49,33 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	SaveMove(data, req)
+	move, err := getMove(data, req)
+	if err != nil {
+		respond(res, MoveResponse{
+			Move:  "up",
+			Taunt: toStringPointer("can't parse this!"),
+		})
+		return
+	}
 
 	respond(res, MoveResponse{
-		Move:  "left",
+		Move:  move,
 		Taunt: &data.You,
 	})
+}
+
+func getMove(data *MoveRequest, req *http.Request) (string, error) {
+	ctx := appengine.NewContext(req)
+	log.Infof(ctx, "Data %#v", data)
+	metadata, err := GenerateMetaData(data)
+	if err != nil {
+		log.Errorf(ctx, "generating MetaData: %v", err)
+		return "", err
+	}
+
+	for _, direcData := range metadata {
+
+		log.Infof(ctx, "Meta data %v", direcData)
+	}
+	return "right", err
 }

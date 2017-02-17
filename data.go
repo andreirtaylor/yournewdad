@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+const ( // iota is reset to 0
+	up    = iota // c0 == 0
+	down  = iota // c1 == 1
+	left  = iota // c2 == 2
+	right = iota // c2 == 2
+)
+
 type GameStartRequest struct {
 	GameId string `json:"game_id"`
 	Height int    `json:"height"`
@@ -18,6 +25,13 @@ type GameStartResponse struct {
 	HeadUrl *string `json:"head_url,omitempty"`
 	Name    string  `json:"name"`
 	Taunt   *string `json:"taunt,omitempty"`
+}
+
+type MetaData struct {
+	Food   float64
+	Snakes float64
+	moves  float64
+	score  float64
 }
 
 type MoveRequest struct {
