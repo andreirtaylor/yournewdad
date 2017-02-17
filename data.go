@@ -28,9 +28,9 @@ type GameStartResponse struct {
 }
 
 type MetaData struct {
-	Food   float64
-	Snakes float64
-	moves  float64
+	Food   int
+	Snakes int
+	Moves  int
 	score  float64
 }
 

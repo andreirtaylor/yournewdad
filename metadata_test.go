@@ -31,5 +31,18 @@ func TestMetaData(t *testing.T) {
 	}
 
 	data, _ := GenerateMetaData(req)
+
+	for _, dirData := range data {
+		if dirData.Snakes != 0 {
+			t.Errorf("Expected %v to be %v", dirData.Snakes, 0)
+		}
+		// all moves are possible
+		moves := req.Width*req.Height - len(req.Snakes[0].Coords)
+		fmt.Printf("%v", moves)
+
+		if dirData.Moves != moves {
+			t.Errorf("Expected %v to be %v", dirData.Moves, moves)
+		}
+	}
 	fmt.Printf("%#v", data)
 }

@@ -149,8 +149,13 @@ func SaveMove(bo *MoveRequest, req *http.Request) {
 
 }
 
-func GenerateMetaData(data *MoveRequest) ([]MetaData, error) {
-	return []MetaData{}, nil
+func GenerateMetaData(data *MoveRequest) (map[string]MetaData, error) {
+	metad := make(map[string]MetaData)
+	metad["up"] = MetaData{}
+	metad["down"] = MetaData{}
+	metad["right"] = MetaData{}
+	metad["left"] = MetaData{}
+	return metad, nil
 }
 
 func mustGetenv(k string) string {
