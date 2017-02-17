@@ -39,28 +39,100 @@ func saveGame(g *GameStartRequest, req *http.Request) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO Games(GameId, Width, Height) VALUES(?,?,?)")
+	stmt, err := db.Prepare(
+		`INSERT INTO Games(GameId, Width, Height)
+			VALUES(?,?,?)`)
 
 	if err != nil {
 		log.Errorf(ctx, "Unable to prepare game saving statement: %v", err)
+		return
 	}
 	_, err = stmt.Exec(g.GameId, g.Width, g.Height)
 	if err != nil {
 		log.Errorf(ctx, "Error executing game save statement: %v", err)
+		return
 	}
 }
 
 func SaveMove(bo *MoveRequest, req *http.Request) {
-	//	lastId, err := res.LastInsertId()
-	//	if err != nil {
-	//		log.Errorf(ctx, "Could not get lask %v", err)
-	//	}
-	//	rowCnt, err := res.RowsAffected()
-	//	if err != nil {
-	//		log.Errorf(ctx, "Could not get lask %v", err)
-	//		log.Fatal(err)
-	//	}
-	//	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+	ctx := appengine.NewContext(req)
+
+	db, err := getDB(req)
+	if err != nil {
+		log.Errorf(ctx, "Could not get DB %v", err)
+		return
+	}
+	defer db.Close()
+
+	var id int
+	err = db.QueryRow(
+		`SELECT id FROM Games
+		WHERE gameid = ?`, bo.GameId).Scan(&id)
+
+	if err != nil {
+		log.Errorf(ctx, "Could not retrieve game Id %v", err)
+		return
+	}
+
+	stmt, err := db.Prepare(
+		`INSERT INTO MoveReq(g_id, turn)
+			VALUES(?,?)`)
+
+	if err != nil {
+		log.Errorf(ctx, "Unable to prepare move saving statement: %v", err)
+		return
+	}
+
+	res, err := stmt.Exec(id, bo.Turn)
+	if err != nil {
+		log.Errorf(ctx, "Error executing move save statement: %v", err)
+		return
+	}
+
+	m_id, err := res.LastInsertId()
+	if err != nil {
+		log.Errorf(ctx, "Error getting last move statement: %v", err)
+		return
+	}
+
+	for _, snake := range bo.Snakes {
+		// store snakes
+		stmt, err := db.Prepare(
+			`INSERT INTO Snakes(name_, health, m_id, len)
+				VALUES(?,?,?,?)`)
+
+		if err != nil {
+			log.Errorf(ctx, "Unable to prepare move saving statement: %v", err)
+			return
+		}
+
+		_, err = stmt.Exec(snake.Name[:15], snake.HealthPoints, m_id, len(snake.Coords))
+		if err != nil {
+			log.Errorf(ctx, "Error executing move save statement: %v", err)
+			return
+		}
+
+		for _, coords := range snake.Coords {
+			stmt, err := db.Prepare(
+				`INSERT INTO Body(x,y,m_id)
+				VALUES(?,?,?)`)
+
+			if err != nil {
+				log.Errorf(ctx, "preparing coordinate save:\n%v", err)
+				return
+			}
+
+			_, err = stmt.Exec(coords.X, coords.Y, m_id)
+			if err != nil {
+				log.Errorf(ctx, "executing coordinate save:\n%v", err)
+				return
+			}
+		}
+	}
+
+	//for _, food := range bo.Food {
+	//}
+
 }
 
 func mustGetenv(k string) string {

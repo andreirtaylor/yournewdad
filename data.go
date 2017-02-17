@@ -21,11 +21,14 @@ type GameStartResponse struct {
 }
 
 type MoveRequest struct {
+	// static
+	GameId string `json:"game_id"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
+	Turn   int    `json:"turn"`
+
+	// dynamic
 	Food   []Point `json:"food"`
-	GameId string  `json:"game_id"`
-	Height int     `json:"height"`
-	Width  int     `json:"width"`
-	Turn   int     `json:"turn"`
 	Snakes []Snake `json:"snakes"`
 	You    string  `json:"you"`
 }
