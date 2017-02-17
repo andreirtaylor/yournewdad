@@ -48,7 +48,7 @@ func TestPoint(t *testing.T) {
 
 }
 
-func TestMetaData(t *testing.T) {
+func TestMetaDataOnlyOneSnake(t *testing.T) {
 	req := &MoveRequest{
 		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
 		Height: 20,
@@ -73,6 +73,7 @@ func TestMetaData(t *testing.T) {
 		You: "639fb7cd-2590-4418-abcc-3da577559fc6",
 	}
 
+	// need to make the hazards manually
 	req.GenHazards()
 
 	data, err := GenerateMetaData(req)

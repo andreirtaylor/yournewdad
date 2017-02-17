@@ -48,8 +48,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
-	// must generate the hazards map on every request
-	data.GenHazards()
 
 	SaveMove(data, req)
 	move, err := getMove(data, req)
@@ -77,9 +75,8 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 		return "", err
 	}
 
-	for _, direcData := range metadata {
-
-		log.Infof(ctx, "Meta data %v", direcData)
+	for direc, direcData := range metadata {
+		log.Infof(ctx, "Meta data %v\ndirec %#v", direcData, direc)
 	}
 	return "right", err
 }

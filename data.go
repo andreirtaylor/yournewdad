@@ -82,6 +82,7 @@ type Snake struct {
 func NewMoveRequest(req *http.Request) (*MoveRequest, error) {
 	decoded := MoveRequest{}
 	err := json.NewDecoder(req.Body).Decode(&decoded)
+	decoded.GenHazards()
 	return &decoded, err
 }
 
