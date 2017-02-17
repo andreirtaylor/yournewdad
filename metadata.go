@@ -130,8 +130,22 @@ func SaveMove(bo *MoveRequest, req *http.Request) {
 		}
 	}
 
-	//for _, food := range bo.Food {
-	//}
+	for _, food := range bo.Food {
+		stmt, err := db.Prepare(
+			`INSERT INTO Food(x,y,m_id)
+			VALUES(?,?,?)`)
+
+		if err != nil {
+			log.Errorf(ctx, "preparing food save:\n%v", err)
+			return
+		}
+
+		_, err = stmt.Exec(food.X, food.Y, m_id)
+		if err != nil {
+			log.Errorf(ctx, "executing food save:\n%v", err)
+			return
+		}
+	}
 
 }
 
