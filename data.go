@@ -9,10 +9,14 @@ import (
 )
 
 const ( // iota is reset to 0
-	UP    = "up"    // c0 == 0
-	DOWN  = "down"  // c1 == 1
-	LEFT  = "left"  // c2 == 2
-	RIGHT = "right" // c2 == 2
+	UP    = "up"
+	DOWN  = "down"
+	LEFT  = "left"
+	RIGHT = "right"
+
+	MOVE_ONE   = iota
+	MOVE_THREE = iota
+	MOVE_FIVE  = iota
 )
 
 type GameStartRequest struct {
@@ -28,11 +32,17 @@ type GameStartResponse struct {
 	Taunt   *string `json:"taunt,omitempty"`
 }
 
-type MetaData struct {
+type StaticData struct {
 	Food   int
 	Snakes int
 	Moves  int
-	score  float64
+}
+
+type MetaData struct {
+	StaticData
+	score float64
+	// definied by the itoa above
+	movesAway []StaticData
 }
 
 type MoveRequest struct {

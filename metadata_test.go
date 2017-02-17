@@ -63,6 +63,9 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 					Point{X: 14, Y: 12},
 					Point{X: 13, Y: 12},
 					Point{X: 13, Y: 13},
+					// snake layout
+					//   | x | x |
+					//   | x |   |
 				},
 				HealthPoints: 96,
 				Id:           "639fb7cd-2590-4418-abcc-3da577559fc6",
@@ -104,5 +107,57 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 				t.Errorf("expected %v to be %v", dirData.Moves, 0)
 			}
 		}
+	}
+}
+
+func TestMetaDataWithMoves(t *testing.T) {
+	req := &MoveRequest{
+		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
+		Height: 20,
+		Width:  20,
+		Turn:   4,
+		Food: []Point{
+			Point{X: 14, Y: 9},
+		},
+		Snakes: []Snake{
+			Snake{
+				Coords: []Point{
+					Point{X: 14, Y: 12},
+					Point{X: 13, Y: 12},
+					Point{X: 13, Y: 13},
+					// snake layout
+					//   | x | x |
+					//   | x |   |
+				},
+				HealthPoints: 96,
+				Id:           "639fb7cd-2590-4418-abcc-3da577559fc6",
+				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
+				Taunt:        "639fb7cd-2590-4418-abcc-3da577559fc6",
+			},
+		},
+		You: "639fb7cd-2590-4418-abcc-3da577559fc6",
+	}
+
+	// need to make the hazards manually
+	req.GenHazards()
+
+	data, err := GenerateMetaData(req)
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+
+	// all moves are possible except moving onto yourself
+	if len(data[UP].movesAway) == 3 {
+		movesAway := data[UP].movesAway
+
+		m_1 := movesAway[MOVE_ONE]
+		if m_1.Food != 0 {
+			t.Errorf("move 1 should have 0 food, got ", m_1.Food)
+		}
+		//m_3 := movesAway[MOVE_THREE]
+		//m_5 := movesAway[MOVE_FIVE]
+
+	} else {
+		t.Errorf("Moves away should not be nil")
 	}
 }
