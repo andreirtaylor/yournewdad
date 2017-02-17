@@ -147,9 +147,10 @@ func TestMetaDataWithMoves(t *testing.T) {
 	}
 
 	// all moves are possible except moving onto yourself
-	if len(data[UP].movesAway) == 3 {
-		movesAway := data[UP].movesAway
+	if len(data[UP].MovesAway) == 3 {
+		movesAway := data[UP].MovesAway
 
+		fmt.Printf("%v", movesAway)
 		m_1 := movesAway[MOVE_ONE]
 		if m_1.Food != 0 {
 			t.Errorf("move 1 should have 0 food, got ", m_1.Food)

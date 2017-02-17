@@ -9,15 +9,19 @@ import (
 )
 
 const ( // iota is reset to 0
-	UP    = "up"
-	DOWN  = "down"
-	LEFT  = "left"
-	RIGHT = "right"
-
 	MOVE_ONE   = iota
 	MOVE_THREE = iota
 	MOVE_FIVE  = iota
 )
+
+const (
+	UP    = "up"
+	DOWN  = "down"
+	LEFT  = "left"
+	RIGHT = "right"
+)
+
+var moves_to_depth = [...]int{1, 3, 5}
 
 type GameStartRequest struct {
 	GameId string `json:"game_id"`
@@ -40,9 +44,9 @@ type StaticData struct {
 
 type MetaData struct {
 	StaticData
-	score float64
+	Score float64
 	// definied by the itoa above
-	movesAway []StaticData
+	MovesAway []*StaticData
 }
 
 type MoveRequest struct {

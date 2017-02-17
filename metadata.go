@@ -159,59 +159,61 @@ func getMyHead(data *MoveRequest) (Point, error) {
 	return Point{}, errors.New("Could not get head")
 }
 
-func getMoves(data *MoveRequest, direc string) (int, error) {
+func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	head, err := getMyHead(data)
 	if err != nil {
-		return 0, errors.New(fmt.Sprintf("Unable to get head of your snake"))
+		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
 	}
 
-	seen := make(map[string]bool)
 	switch direc {
 	case UP:
-		return possibleMoves(head.Up(data), data, seen), nil
+		return graphSearch(head.Up(data), data), nil
 	case DOWN:
-		return possibleMoves(head.Down(data), data, seen), nil
+		return graphSearch(head.Down(data), data), nil
 	case LEFT:
-		return possibleMoves(head.Left(data), data, seen), nil
+		return graphSearch(head.Left(data), data), nil
 	case RIGHT:
-		return possibleMoves(head.Right(data), data, seen), nil
+		return graphSearch(head.Right(data), data), nil
 	}
-	return 0, errors.New(fmt.Sprintf("invalid direction", direc))
+	return nil, errors.New(fmt.Sprintf("invalid direction", direc))
 }
 
 func graphSearchRec(pos *Point, data *MoveRequest, seen map[string]bool, depth, max int) *StaticData {
-	if depth == max {
-		return nil
-	}
-	return nil
-
-}
-
-func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
-	seen := make(map[string]bool)
-	sd := graphSearchRec(pos, data, seen, 0, -1)
-	return []*StaticData{
-		sd,
-	}
-}
-
-func possibleMoves(pos *Point, data *MoveRequest, seen map[string]bool) int {
-	if pos == nil || seen[pos.String()] {
-		return 0
+	if depth == max || pos == nil || seen[pos.String()] {
+		return &StaticData{}
 	}
 	seen[pos.String()] = true
 
-	ret := 1
-	ret += possibleMoves(pos.Up(data), data, seen)
-	ret += possibleMoves(pos.Down(data), data, seen)
-	ret += possibleMoves(pos.Left(data), data, seen)
-	ret += possibleMoves(pos.Right(data), data, seen)
+	ret := &StaticData{}
+	ret_up := graphSearchRec(pos.Up(data), data, seen, depth+1, max)
+	ret_down := graphSearchRec(pos.Down(data), data, seen, depth+1, max)
+	ret_left := graphSearchRec(pos.Left(data), data, seen, depth+1, max)
+	ret_right := graphSearchRec(pos.Right(data), data, seen, depth+1, max)
 
+	ret.Moves = ret_up.Moves + ret_down.Moves + ret_left.Moves + ret_right.Moves + 1
+	return ret
+}
+
+// returns an array of static data, the final static data is
+// the maximum depth and the other depths, are defined in moves_to_depth
+// in data.go. Will search from the point pos to the maximum depth provided
+// a depth of any positive integer will max out at that integer and a depth of
+// any negative integer will allow any negative number
+func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
+	ret := []*StaticData{}
+
+	for _, depth := range moves_to_depth {
+		seen := make(map[string]bool)
+		sd := graphSearchRec(pos, data, seen, 0, depth)
+		ret = append(ret, sd)
+	}
+	seen := make(map[string]bool)
+	sd := graphSearchRec(pos, data, seen, 0, -1)
+	ret = append(ret, sd)
 	return ret
 }
 
 func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
-	var err error
 	metad := make(map[string]*MetaData)
 	metad["up"] = &MetaData{}
 	metad["down"] = &MetaData{}
@@ -219,10 +221,13 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 	metad["left"] = &MetaData{}
 
 	for direc, direcMD := range metad {
-		direcMD.Moves, err = getMoves(data, direc)
+		sd, err := getStaticData(data, direc)
 		if err != nil {
 			return metad, err
 		}
+
+		direcMD.Moves = sd[len(sd)-1:][0].Moves
+		direcMD.MovesAway = sd[:len(sd)-1]
 	}
 	return metad, nil
 }
