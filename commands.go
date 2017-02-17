@@ -3,9 +3,7 @@ package kaa
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
-	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -45,18 +43,10 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
-
-	directions := []string{
-		"up",
-		"down",
-		"left",
-		"right",
-	}
-
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	SaveMove(data, req)
 
 	respond(res, MoveResponse{
-		Move:  directions[r.Intn(4)],
+		Move:  "left",
 		Taunt: &data.You,
 	})
 }
