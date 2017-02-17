@@ -29,15 +29,38 @@ func getDB(req *http.Request) (*sql.DB, error) {
 	return db, err
 }
 
-func SaveMove(bo *MoveRequest, req *http.Request) {
+func saveGame(g *GameStartRequest, req *http.Request) {
 	ctx := appengine.NewContext(req)
 
 	db, err := getDB(req)
-	defer db.Close()
 	if err != nil {
 		log.Errorf(ctx, "Could not get DB %v", err)
 		return
 	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("INSERT INTO Games(GameId, Width, Height) VALUES(?,?,?)")
+
+	if err != nil {
+		log.Errorf(ctx, "Unable to prepare game saving statement: %v", err)
+	}
+	_, err = stmt.Exec(g.GameId, g.Width, g.Height)
+	if err != nil {
+		log.Errorf(ctx, "Error executing game save statement: %v", err)
+	}
+}
+
+func SaveMove(bo *MoveRequest, req *http.Request) {
+	//	lastId, err := res.LastInsertId()
+	//	if err != nil {
+	//		log.Errorf(ctx, "Could not get lask %v", err)
+	//	}
+	//	rowCnt, err := res.RowsAffected()
+	//	if err != nil {
+	//		log.Errorf(ctx, "Could not get lask %v", err)
+	//		log.Fatal(err)
+	//	}
+	//	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
 
 func mustGetenv(k string) string {

@@ -13,6 +13,7 @@ func respond(res http.ResponseWriter, obj interface{}) {
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	data, err := NewGameStartRequest(req)
+	saveGame(data, req)
 	if err != nil {
 		respond(res, GameStartResponse{
 			Taunt:   toStringPointer("battlesnake-go!"),

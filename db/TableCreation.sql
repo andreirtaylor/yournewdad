@@ -1,0 +1,8 @@
+CREATE TABLE Games
+(
+ID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+GameId VARCHAR(40),
+Width INT,
+Height INT
+);
+
