@@ -179,6 +179,22 @@ func getMoves(data *MoveRequest, direc string) (int, error) {
 	return 0, errors.New(fmt.Sprintf("invalid direction", direc))
 }
 
+func graphSearchRec(pos *Point, data *MoveRequest, seen map[string]bool, depth, max int) *StaticData {
+	if depth == max {
+		return nil
+	}
+	return nil
+
+}
+
+func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
+	seen := make(map[string]bool)
+	sd := graphSearchRec(pos, data, seen, 0, -1)
+	return []*StaticData{
+		sd,
+	}
+}
+
 func possibleMoves(pos *Point, data *MoveRequest, seen map[string]bool) int {
 	if pos == nil || seen[pos.String()] {
 		return 0
