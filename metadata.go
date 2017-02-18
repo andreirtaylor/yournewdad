@@ -18,23 +18,30 @@ func getMyHead(data *MoveRequest) (Point, error) {
 	return Point{}, errors.New("Could not get head")
 }
 
+func GetPointInDirection(p Point, direc string, data *MoveRequest) (*Point, error) {
+	switch direc {
+	case UP:
+		return p.Up(data), nil
+	case DOWN:
+		return p.Down(data), nil
+	case LEFT:
+		return p.Left(data), nil
+	case RIGHT:
+		return p.Right(data), nil
+	}
+	return nil, errors.New(fmt.Sprintf("could not find direction %v", direc))
+}
+
 func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	head, err := getMyHead(data)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
 	}
-
-	switch direc {
-	case UP:
-		return graphSearch(head.Up(data), data), nil
-	case DOWN:
-		return graphSearch(head.Down(data), data), nil
-	case LEFT:
-		return graphSearch(head.Left(data), data), nil
-	case RIGHT:
-		return graphSearch(head.Right(data), data), nil
+	p, err := GetPointInDirection(head, direc, data)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New(fmt.Sprintf("invalid direction", direc))
+	return graphSearch(p, data), nil
 }
 
 // returns an array of static data, the final static data is
@@ -165,7 +172,19 @@ func bestMoves(metaD map[string]*MetaData) ([]string, error) {
 	return moves, nil
 }
 
+func numNeighbours(data *MoveRequest, direc string) (int, error) {
+	head, err := getMyHead(data)
+	if err != nil {
+		return 0, err
+	}
+	_, err = GetPointInDirection(head, direc, data)
+	if err != nil {
+		return 0, err
+	}
+	return 0, nil
+}
 func FilterMinimizeSpace(data *MoveRequest, moves []string) string {
+
 	return ""
 }
 
