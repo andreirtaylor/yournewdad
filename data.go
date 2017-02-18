@@ -14,14 +14,18 @@ const ( // iota is reset to 0
 	MOVE_FIVE  = iota
 )
 
+var moves_to_depth = [...]int{1, 3, 5, -1}
+
+const ( // iota is reset to 0
+	SNAKE_HAZARD = iota
+)
+
 const (
 	UP    = "up"
 	DOWN  = "down"
 	LEFT  = "left"
 	RIGHT = "right"
 )
-
-var moves_to_depth = [...]int{1, 3, 5}
 
 type GameStartRequest struct {
 	GameId string `json:"game_id"`
@@ -64,6 +68,12 @@ type MoveRequest struct {
 	// added by me
 	// lists all the points that are hazards this turn
 	Hazards map[string]bool
+	FoodMap map[string]bool
+}
+
+func (m *MoveRequest) init() {
+	m.GenHazards()
+	m.GenFoodMap()
 }
 
 func (m *MoveRequest) GenHazards() {
@@ -72,6 +82,13 @@ func (m *MoveRequest) GenHazards() {
 		for _, coord := range snake.Coords {
 			m.Hazards[coord.String()] = true
 		}
+	}
+}
+
+func (m *MoveRequest) GenFoodMap() {
+	m.FoodMap = make(map[string]bool)
+	for _, food := range m.Food {
+		m.FoodMap[food.String()] = true
 	}
 }
 

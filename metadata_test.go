@@ -118,6 +118,8 @@ func TestMetaDataWithMoves(t *testing.T) {
 		Turn:   4,
 		Food: []Point{
 			Point{X: 14, Y: 9},
+			Point{X: 11, Y: 10},
+			Point{X: 11, Y: 9},
 		},
 		Snakes: []Snake{
 			Snake{
@@ -139,7 +141,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 	}
 
 	// need to make the hazards manually
-	req.GenHazards()
+	req.init()
 
 	data, err := GenerateMetaData(req)
 	if err != nil {
@@ -150,14 +152,22 @@ func TestMetaDataWithMoves(t *testing.T) {
 	if len(data[UP].MovesAway) == 3 {
 		movesAway := data[UP].MovesAway
 
-		fmt.Printf("%v", movesAway)
 		m_1 := movesAway[MOVE_ONE]
 		if m_1.Food != 0 {
 			t.Errorf("move 1 should have 0 food, got ", m_1.Food)
 		}
-		//m_3 := movesAway[MOVE_THREE]
-		//m_5 := movesAway[MOVE_FIVE]
-
+		m_3 := movesAway[MOVE_THREE]
+		if m_3.Food != 1 {
+			t.Errorf("move 3 should have 1 food, got %v", m_3.Food)
+		}
+		m_5 := movesAway[MOVE_FIVE]
+		if m_5.Food != 2 {
+			t.Errorf("move 5 should have 2 food, got %v", m_5.Food)
+		}
+		all_food := data[UP].Food
+		if all_food != len(req.Food) {
+			t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
+		}
 	} else {
 		t.Errorf("Moves away should not be nil")
 	}

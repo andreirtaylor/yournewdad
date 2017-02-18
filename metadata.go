@@ -191,6 +191,11 @@ func graphSearchRec(pos *Point, data *MoveRequest, seen map[string]bool, depth, 
 	ret_right := graphSearchRec(pos.Right(data), data, seen, depth+1, max)
 
 	ret.Moves = ret_up.Moves + ret_down.Moves + ret_left.Moves + ret_right.Moves + 1
+
+	ret.Food = ret_up.Food + ret_down.Food + ret_left.Food + ret_right.Food
+	if data.FoodMap[pos.String()] {
+		ret.Food += 1
+	}
 	return ret
 }
 
@@ -207,9 +212,6 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 		sd := graphSearchRec(pos, data, seen, 0, depth)
 		ret = append(ret, sd)
 	}
-	seen := make(map[string]bool)
-	sd := graphSearchRec(pos, data, seen, 0, -1)
-	ret = append(ret, sd)
 	return ret
 }
 
@@ -226,7 +228,9 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 			return metad, err
 		}
 
-		direcMD.Moves = sd[len(sd)-1:][0].Moves
+		whole_board := sd[len(sd)-1:][0]
+		direcMD.Moves = whole_board.Moves
+		direcMD.Food = whole_board.Food
 		direcMD.MovesAway = sd[:len(sd)-1]
 	}
 	return metad, nil
