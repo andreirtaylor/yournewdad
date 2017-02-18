@@ -1,6 +1,7 @@
 package kaa
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -39,10 +40,27 @@ type StaticData struct {
 }
 
 type MetaData struct {
-	Score       float64
+	// denotes the number of moves until you reach the closest piece of food
 	ClosestFood int
+
+	// totals up your length and the ammount of food in a direction
+	// if you would fill up the space make it unlikely to go that direction
+	MovesVsSpace int
 	// definied by the itoa above
 	MovesAway []*StaticData
+}
+
+func (m *MetaData) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("\n{")
+	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
+	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v\n", m.MovesVsSpace))
+	for _, x := range m.MovesAway {
+		buffer.WriteString(fmt.Sprintf("%#v\n", x))
+	}
+	buffer.WriteString("}\n")
+
+	return buffer.String()
 }
 
 // returns the meta data for the maximum distance you can travel i.e. the whole board
@@ -52,6 +70,8 @@ func (m *MetaData) moveMax() (*StaticData, error) {
 	}
 	return m.MovesAway[len(m.MovesAway)-1], nil
 }
+
+type MoveMetaData map[string]*MetaData
 
 type MoveRequest struct {
 	// static
@@ -67,15 +87,25 @@ type MoveRequest struct {
 
 	// added by me
 	// lists all the points that are hazards this turn
-	Hazards map[string]bool
-	FoodMap map[string]bool
+	Hazards  map[string]bool
+	FoodMap  map[string]bool
+	MyLength int
+	MD       MoveMetaData
 }
 
 func (m *MoveRequest) init() {
 	m.GenHazards()
 	m.GenFoodMap()
+	m.SetMyLength()
 }
 
+func (m *MoveRequest) SetMyLength() {
+	for _, snake := range m.Snakes {
+		if snake.Id == m.You && len(m.You) > 0 {
+			m.MyLength = len(snake.Coords)
+		}
+	}
+}
 func (m *MoveRequest) GenHazards() {
 	m.Hazards = make(map[string]bool)
 	for _, snake := range m.Snakes {

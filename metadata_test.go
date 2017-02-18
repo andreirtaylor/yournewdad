@@ -162,15 +162,16 @@ func TestMetaDataWithMoves(t *testing.T) {
 	//	fmt.Printf("%v\n", x)
 	//}
 
-	m_1 := movesAway[1]
+	// movesAway is indexed from 0
+	m_1 := movesAway[0]
 	if m_1.Food != 0 {
 		t.Errorf("move 1 should have 0 food, got ", m_1.Food)
 	}
-	m_3 := movesAway[3]
+	m_3 := movesAway[2]
 	if m_3.Food != 1 {
 		t.Errorf("move 3 should have 1 food, got %v", m_3.Food)
 	}
-	m_5 := movesAway[5]
+	m_5 := movesAway[4]
 	if m_5.Food != 2 {
 		t.Errorf("move 5 should have 2 food, got %v", m_5.Food)
 	}
@@ -218,21 +219,21 @@ func TestClosestFood(t *testing.T) {
 		t.Errorf("Unexpected Errror %v", err)
 	}
 
-	if data[LEFT].ClosestFood != 4 {
+	if data[LEFT].ClosestFood != 3 {
 		t.Errorf(
-			"closest food to the left is 4 moves away, got %v",
+			"closest food to the left is 3 moves away, got %v",
 			data[LEFT].ClosestFood)
 	}
 
-	if data[RIGHT].ClosestFood != 6 {
+	if data[RIGHT].ClosestFood != 5 {
 		t.Errorf(
-			"closest food to the right should be 6 moves away got %v",
+			"closest food to the right should be 5 moves away got %v",
 			data[RIGHT].ClosestFood)
 	}
 
-	if data[UP].ClosestFood != 4 {
+	if data[UP].ClosestFood != 3 {
 		t.Errorf(
-			"expected the closest food up to be 4 moves away, got %v",
+			"expected the closest food up to be 3 moves away, got %v",
 			data[UP].ClosestFood)
 	}
 
@@ -262,6 +263,38 @@ func TestClosestFood(t *testing.T) {
 
 }
 
+func TestSmallSpaceWithFood(t *testing.T) {
+	// in this test moving down will result in certain death
+	// if the snake wants to move down it is wrong!
+	req := &MoveRequest{GameId: "d3684dd4-975b-4449-91ea-7051ea3f47da", Height: 8, Width: 8, Turn: 17, Food: []Point{Point{X: 0, Y: 3}, Point{X: 6, Y: 0}, Point{X: 1, Y: 3}, Point{X: 0, Y: 7}, Point{X: 7, Y: 7}, Point{X: 5, Y: 0}, Point{X: 7, Y: 5}, Point{X: 7, Y: 3}, Point{X: 6, Y: 6}, Point{X: 5, Y: 4}}, Snakes: []Snake{Snake{Coords: []Point{Point{X: 0, Y: 6}, Point{X: 1, Y: 6}, Point{X: 2, Y: 6}, Point{X: 2, Y: 5}, Point{X: 2, Y: 4}, Point{X: 2, Y: 3}, Point{X: 2, Y: 2}, Point{X: 1, Y: 2}, Point{X: 1, Y: 2}}, HealthPoints: 100, Id: "be171270-8030-412d-81d7-72e2e1e97895", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "be171270-8030-412d-81d7-72e2e1e97895"}, Snake{Coords: []Point{Point{X: 5, Y: 7}, Point{X: 4, Y: 7}, Point{X: 3, Y: 7}, Point{X: 3, Y: 6}, Point{X: 3, Y: 5}, Point{X: 3, Y: 4}, Point{X: 3, Y: 3}, Point{X: 3, Y: 2}, Point{X: 3, Y: 1}, Point{X: 3, Y: 0}}, HealthPoints: 99, Id: "f220e2b6-7e02-4857-97e8-a5831d79ba78", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "f220e2b6-7e02-4857-97e8-a5831d79ba78"}}, You: "be171270-8030-412d-81d7-72e2e1e97895"}
+
+	req.init()
+
+	data, err := GenerateMetaData(req)
+
+	//fmt.Printf("%v", data)
+
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+	moves, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("Unexpected Errror whlie getting best moves %v", err)
+	}
+	if len(moves) > 1 {
+		t.Errorf("There is only one good move")
+	}
+
+	move, err := bestMove(data)
+	if err != nil {
+		t.Errorf("Unexpected Errror whlie getting best move %v", err)
+	}
+	if move == DOWN {
+		t.Errorf("There is only one good move, and its UP, you gave me: %v", move)
+	}
+}
+
+// not really a test, this is for checking out if the snake works as expected
 func TestRandom(t *testing.T) {
 	req := &MoveRequest{
 		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
@@ -294,7 +327,10 @@ func TestRandom(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
-	moves := bestMoves(data)
+	moves, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("Unexpected Errror whlie getting best move %v", err)
+	}
 	if len(moves) > 1 {
 		t.Errorf("The best move is left")
 	}

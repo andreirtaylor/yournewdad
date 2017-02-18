@@ -69,8 +69,7 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
 	heap.Init(&pq)
-	// start with priority 0
-	priority := 0
+	priority := 1
 	seen := make(map[string]bool)
 
 	// make the first item priority 1 so that if statement
@@ -81,6 +80,17 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
+		if item.priority > priority {
+			//	fmt.Printf("%v\n", item)
+			//	for _, x := range ret {
+			//		fmt.Printf("%v", x)
+			//	}
+			priority = item.priority
+			ret = append(ret, accumulator)
+			// copy accumulator
+			tmp := *accumulator
+			accumulator = &tmp
+		}
 		p := item.value
 		//fmt.Printf("%v", p)
 
@@ -90,31 +100,16 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 		pushOntoPQ(p.Right(data), seen, &pq, item.priority)
 
 		if data.FoodMap[p.String()] {
+			//fmt.Printf("food\n")
 			accumulator.Food += 1
 		}
 
 		accumulator.Moves += 1
 
-		if item.priority > priority {
-			priority = item.priority
-			ret = append(ret, accumulator)
-			// copy accumulator
-			tmp := *accumulator
-			accumulator = &tmp
-			//fmt.Printf("\n")
-		}
 	}
-	return ret
-}
-
-func ClosestFood(data []*StaticData) int {
-	for i, staticData := range data {
-		//fmt.Printf("direction : %v\ndata for move %v: %#v\n", direc, i, staticData)
-		if staticData.Food > 0 {
-			return i + 1
-		}
-	}
-	return math.MaxInt64
+	ret = append(ret, accumulator)
+	// cut off extra accumulated value
+	return ret[1:]
 }
 
 func FilterPossibleMoves(metaD map[string]*MetaData) []string {
@@ -143,36 +138,90 @@ func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string 
 	return directions
 }
 
-// not necessairily the best move but the move that we are going with
-func bestMoves(metaD map[string]*MetaData) []string {
-	moves := FilterPossibleMoves(metaD)
-	rand.Seed(time.Now().Unix()) // initialize global pseudorandom generator
-	moves = ClosestFoodDirections(metaD, moves)
-	return moves
+func FilterMovesVsSpace(metaD map[string]*MetaData, moves []string) []string {
+	ret := []string{}
+	for _, direc := range moves {
+		if metaD[direc].MovesVsSpace > -2 {
+			//fmt.Printf("%v\n", ret)
+			ret = append(ret, direc)
+		}
+	}
+	if len(ret) == 0 {
+		max := math.MinInt64
+		for _, direc := range moves {
+			if metaD[direc].MovesVsSpace < max {
+				ret = []string{direc}
+			} else if metaD[direc].MovesVsSpace < max {
+				ret = append(ret, direc)
+			}
+		}
+	}
+	return ret
 }
 
-func bestMove(metaD map[string]*MetaData) string {
-	moves := bestMoves(metaD)
-	return moves[rand.Intn(len(moves))]
+// not necessairily the best move but the move that we are going with
+func bestMoves(metaD map[string]*MetaData) ([]string, error) {
+	moves := FilterPossibleMoves(metaD)
+	moves = FilterMovesVsSpace(metaD, moves)
+	moves = ClosestFoodDirections(metaD, moves)
+	return moves, nil
+}
+
+func bestMove(metaD map[string]*MetaData) (string, error) {
+	moves, err := bestMoves(metaD)
+	if err != nil {
+		return "", err
+	}
+	if len(moves) == 0 {
+		return "", errors.New("Unable to give you a good Move")
+	}
+	rand.Seed(time.Now().Unix()) // initialize global pseudorandom generator
+	return moves[rand.Intn(len(moves))], nil
+}
+
+func GetMovesVsSpace(data *MoveRequest, direc string) int {
+	last, err := data.MD[direc].moveMax()
+	if err != nil {
+		return 0
+	}
+	excessMoves := last.Moves - data.MyLength - last.Food
+	if excessMoves > 0 {
+		// do something clever here to account for food
+	}
+
+	return excessMoves
+}
+
+func ClosestFood(data []*StaticData) int {
+	for i, staticData := range data {
+		//fmt.Printf("direction : %v\ndata for move %v: %#v\n", direc, i, staticData)
+		if staticData.Food > 0 {
+			// the first entry is always empty
+			return i + 1
+		}
+	}
+	return math.MaxInt64
 }
 
 func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
-	metad := make(map[string]*MetaData)
-	metad["up"] = &MetaData{}
-	metad["down"] = &MetaData{}
-	metad["right"] = &MetaData{}
-	metad["left"] = &MetaData{}
+	metaD := make(map[string]*MetaData)
+	metaD["up"] = &MetaData{}
+	metaD["down"] = &MetaData{}
+	metaD["right"] = &MetaData{}
+	metaD["left"] = &MetaData{}
+	data.MD = metaD
 
-	for direc, direcMD := range metad {
+	for direc, direcMD := range metaD {
 		sd, err := getStaticData(data, direc)
 		if err != nil {
-			return metad, err
+			return metaD, err
 		}
 
 		direcMD.MovesAway = sd
 		direcMD.ClosestFood = ClosestFood(sd)
+		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 	}
-	return metad, nil
+	return metaD, nil
 }
 
 func mustGetenv(k string) string {
