@@ -10,14 +10,16 @@ import (
 
 // Used to nicely index the
 const ( // iota is reset to 0
-	MOVE_ONE   = iota
-	MOVE_TWO   = iota
-	MOVE_THREE = iota
-	MOVE_FIVE  = iota
-	MOVE_MAX   = iota
+	MOVE_ONE     = iota
+	MOVE_TWO     = iota
+	MOVE_THREE   = iota
+	MOVE_FIVE    = iota
+	MOVE_TEN     = iota
+	MOVE_FIFTEEN = iota
+	MOVE_MAX     = iota
 )
 
-var moves_to_depth = [...]int{1, 2, 3, 5, -1}
+var moves_to_depth = [...]int{1, 2, 3, 5, 10, 15, -1}
 
 const ( // iota is reset to 0
 	SNAKE_HAZARD = iota
@@ -121,7 +123,7 @@ type Snake struct {
 func NewMoveRequest(req *http.Request) (*MoveRequest, error) {
 	decoded := MoveRequest{}
 	err := json.NewDecoder(req.Body).Decode(&decoded)
-	decoded.GenHazards()
+	decoded.init()
 	return &decoded, err
 }
 

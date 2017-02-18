@@ -7,8 +7,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
+	"math"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 )
 
 // remember to defer db.close
@@ -222,11 +225,46 @@ func ClosestFood(data []*StaticData) int {
 			return i + 1
 		}
 	}
-	return -1
+	return math.MaxInt64
 }
 
-func Score(metaD map[string]*MetaData) {
+func FilterPossibleMoves(metaD map[string]*MetaData) []string {
+	directions := []string{UP, DOWN, LEFT, RIGHT}
+	ret := []string{}
+	for _, direc := range directions {
+		if metaD[direc].moveMax().Moves > 0 {
+			ret = append(ret, direc)
+		}
+	}
+	return directions
+}
 
+func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string {
+	directions := []string{}
+	min := math.MaxInt64
+	for _, direc := range moves {
+		if metaD[direc].ClosestFood < min {
+			directions = []string{}
+			directions = append(directions, direc)
+			min = metaD[direc].ClosestFood
+		} else if metaD[direc].ClosestFood == min {
+			directions = append(directions, direc)
+		}
+	}
+	return directions
+}
+
+// not necessairily the best move but the move that we are going with
+func bestMoves(metaD map[string]*MetaData) []string {
+	moves := FilterPossibleMoves(metaD)
+	rand.Seed(time.Now().Unix()) // initialize global pseudorandom generator
+	moves = ClosestFoodDirections(metaD, moves)
+	return moves
+}
+
+func bestMove(metaD map[string]*MetaData) string {
+	moves := bestMoves(metaD)
+	return moves[rand.Intn(len(moves))]
 }
 
 func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
@@ -245,8 +283,6 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 		direcMD.MovesAway = sd
 		direcMD.ClosestFood = ClosestFood(sd)
 	}
-
-	Score(metad)
 	return metad, nil
 }
 

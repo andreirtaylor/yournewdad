@@ -50,7 +50,9 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 
 	SaveMove(data, req)
+
 	move, err := getMove(data, req)
+
 	if err != nil {
 		respond(res, MoveResponse{
 			Move:  "up",
@@ -75,8 +77,11 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 		return "", err
 	}
 
-	for direc, direcData := range metadata {
-		log.Infof(ctx, "Meta data %v\ndirec %#v", direcData, direc)
-	}
-	return "right", err
+	move := bestMove(metadata)
+	log.Infof(ctx, "Data %v", move)
+
+	//for direc, direcData := range metadata {
+	//	log.Infof(ctx, "Meta data %v\ndirec %#v", direcData, direc)
+	//}
+	return move, err
 }

@@ -2,7 +2,9 @@ package kaa
 
 import (
 	"fmt"
+	"math"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -202,7 +204,58 @@ func TestClosestFood(t *testing.T) {
 		t.Errorf("expected the closest food to the left to be 3, got %v", data[UP].ClosestFood)
 	}
 
-	if data[DOWN].ClosestFood != -1 {
-		t.Errorf("expected the closest food to the left to be 3, got %v", data[DOWN].ClosestFood)
+	if data[DOWN].ClosestFood != math.MaxInt64 {
+		t.Errorf("expected the closest food to the left to be max int, got %v", data[DOWN].ClosestFood)
 	}
+
+	directions := FilterPossibleMoves(data)
+	all := []string{LEFT, DOWN, UP, RIGHT}
+	sort.Strings(all)
+	sort.Strings(directions)
+
+	if !reflect.DeepEqual(directions, all) {
+		t.Errorf("expected all directions got %v", directions)
+	}
+
+	foodDirections := ClosestFoodDirections(data, directions)
+	expectedFoodDirections := []string{LEFT, UP}
+	sort.Strings(foodDirections)
+	sort.Strings(expectedFoodDirections)
+
+	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
+		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
+	}
+
+}
+
+func TestRandom(t *testing.T) {
+	req := &MoveRequest{
+		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
+		Height: 20,
+		Width:  20,
+		Turn:   20,
+		Food: []Point{
+			Point{X: 19, Y: 15}},
+		Snakes: []Snake{Snake{
+			Coords: []Point{
+				Point{X: 7, Y: 12},
+				Point{X: 7, Y: 13},
+				Point{X: 7, Y: 14},
+			},
+			HealthPoints: 80,
+			Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
+			Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
+			Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
+		},
+		You:     "6db6f851-635b-4534-b882-6f219e0a1f6a",
+		Hazards: map[string]bool{"{7,12}": true, "{7,13}": true, "{7,14}": true},
+		FoodMap: map[string]bool(nil)}
+	req.init()
+
+	data, err := GenerateMetaData(req)
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+	moves := bestMoves(data)
+	fmt.Println(moves)
 }
