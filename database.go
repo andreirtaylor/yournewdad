@@ -7,7 +7,16 @@ import (
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 	"net/http"
+	"os"
 )
+
+func mustGetenv(k string) string {
+	v := os.Getenv(k)
+	if v == "" {
+		//log.Errorf("%s environment variable not set.", k)
+	}
+	return v
+}
 
 // remember to defer db.close
 func getDB(req *http.Request) (*sql.DB, error) {

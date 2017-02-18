@@ -4,33 +4,11 @@ import (
 	"container/heap"
 	"errors"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"math"
-	"os"
 )
 
-func getMyHead(data *MoveRequest) (Point, error) {
-	for _, snake := range data.Snakes {
-		if snake.Id == data.You && len(data.You) > 0 {
-			return snake.Head(), nil
-		}
-	}
-	return Point{}, errors.New("Could not get head")
-}
-
-func GetPointInDirection(p Point, direc string, data *MoveRequest) (*Point, error) {
-	switch direc {
-	case UP:
-		return p.Up(data), nil
-	case DOWN:
-		return p.Down(data), nil
-	case LEFT:
-		return p.Left(data), nil
-	case RIGHT:
-		return p.Right(data), nil
-	}
-	return nil, errors.New(fmt.Sprintf("could not find direction %v", direc))
-}
+// This file contains all of the functions which build
+// the metadata in each direction
 
 func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	head, err := getMyHead(data)
@@ -43,12 +21,6 @@ func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	}
 	return graphSearch(p, data), nil
 }
-
-// returns an array of static data, the final static data is
-// the maximum depth and the other depths, are defined in moves_to_depth
-// in data.go. Will search from the point pos to the maximum depth provided
-// a depth of any positive integer will max out at that integer and a depth of
-// any negative integer will allow any negative number
 
 func pushOntoPQ(
 	p *Point,
@@ -68,6 +40,13 @@ func pushOntoPQ(
 	}
 }
 
+// returns an array of static data, Each value represents the
+// things available in that number of moves.
+//	i.e. the first value in the array are the things that"
+//	     one move away, the second is 2 moves
+// Will search from the point pos to the maximum depth provided
+// a depth of any positive integer will max out at that integer and a depth of
+// any negative integer will allow any negative number
 func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	ret := []*StaticData{}
 	// Create a priority queue, put the items in it, and
@@ -117,17 +96,6 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	return ret[1:]
 }
 
-func FilterPossibleMoves(metaD map[string]*MetaData) []string {
-	directions := []string{UP, DOWN, LEFT, RIGHT}
-	ret := []string{}
-	for _, direc := range directions {
-		if len(metaD[direc].MovesAway) == 0 {
-			ret = append(ret, direc)
-		}
-	}
-	return directions
-}
-
 func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string {
 	directions := []string{}
 	min := math.MaxInt64
@@ -141,78 +109,6 @@ func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string 
 		}
 	}
 	return directions
-}
-
-func FilterMovesVsSpace(metaD map[string]*MetaData, moves []string) []string {
-	ret := []string{}
-	for _, direc := range moves {
-		if metaD[direc].MovesVsSpace > -2 {
-			//fmt.Printf("%v\n", ret)
-			ret = append(ret, direc)
-		}
-	}
-	if len(ret) == 0 {
-		max := math.MinInt64
-		for _, direc := range moves {
-			if metaD[direc].MovesVsSpace < max {
-				ret = []string{direc}
-			} else if metaD[direc].MovesVsSpace < max {
-				ret = append(ret, direc)
-			}
-		}
-	}
-	return ret
-}
-
-// not necessairily the best move but the move that we are going with
-func bestMoves(metaD map[string]*MetaData) ([]string, error) {
-	moves := FilterPossibleMoves(metaD)
-	moves = FilterMovesVsSpace(metaD, moves)
-	moves = ClosestFoodDirections(metaD, moves)
-	return moves, nil
-}
-
-func GetNumNeighbours(data *MoveRequest, direc string) (int, error) {
-	head, err := getMyHead(data)
-	if err != nil {
-		return 0, err
-	}
-	newHead, err := GetPointInDirection(head, direc, data)
-	if err != nil {
-		return 0, err
-	}
-
-	if newHead == nil {
-		return 0, nil
-	}
-	neighbours := 0
-	for _, d := range []string{UP, DOWN, LEFT, RIGHT} {
-		p, err := GetPointInDirection(*newHead, d, data)
-		if err != nil {
-			return 0, err
-		}
-		//fmt.Printf("In Loop neighbour %v, %v\n", p, d)
-		if p != nil {
-			neighbours += 1
-		}
-	}
-	//fmt.Printf("getting neighbours %v, %v\n", direc, neighbours)
-	return neighbours, nil
-}
-func FilterMinimizeSpace(data *MoveRequest, moves []string) (string, error) {
-	min := math.MaxInt64
-	ret := ""
-	for _, direc := range moves {
-		neighbours, err := GetNumNeighbours(data, direc)
-		if err != nil {
-			return "", err
-		}
-		if neighbours < min {
-			ret = direc
-			min = neighbours
-		}
-	}
-	return ret, nil
 }
 
 func bestMove(data *MoveRequest) (string, error) {
@@ -274,12 +170,4 @@ func GenerateMetaData(data *MoveRequest) (*MoveRequest, error) {
 		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 	}
 	return data, nil
-}
-
-func mustGetenv(k string) string {
-	v := os.Getenv(k)
-	if v == "" {
-		//log.Errorf("%s environment variable not set.", k)
-	}
-	return v
 }
