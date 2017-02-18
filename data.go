@@ -8,11 +8,13 @@ import (
 	"strings"
 )
 
+// Used to nicely index the
 const ( // iota is reset to 0
 	MOVE_ONE   = iota
 	MOVE_TWO   = iota
 	MOVE_THREE = iota
 	MOVE_FIVE  = iota
+	MOVE_MAX   = iota
 )
 
 var moves_to_depth = [...]int{1, 2, 3, 5, -1}
@@ -48,10 +50,14 @@ type StaticData struct {
 }
 
 type MetaData struct {
-	StaticData
 	Score float64
 	// definied by the itoa above
 	MovesAway []*StaticData
+}
+
+// returns the meta data for the maximum distance you can travel i.e. the whole board
+func (m *MetaData) moveMax() *StaticData {
+	return m.MovesAway[MOVE_MAX]
 }
 
 type MoveRequest struct {

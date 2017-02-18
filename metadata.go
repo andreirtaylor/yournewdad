@@ -228,10 +228,7 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 			return metad, err
 		}
 
-		whole_board := sd[len(sd)-1:][0]
-		direcMD.Moves = whole_board.Moves
-		direcMD.Food = whole_board.Food
-		direcMD.MovesAway = sd[:len(sd)-1]
+		direcMD.MovesAway = sd
 	}
 	return metad, nil
 }

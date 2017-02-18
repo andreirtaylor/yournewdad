@@ -93,18 +93,19 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 
 	moves := req.Width*req.Height - len(req.Snakes[0].Coords)
 	for direc, dirData := range data {
-		if dirData.Snakes != 0 {
-			t.Errorf("Expected %v to be %v", dirData.Snakes, 0)
+		moveMax := dirData.moveMax()
+		if moveMax.Snakes != 0 {
+			t.Errorf("Expected %v to be %v", moveMax.Snakes, 0)
 		}
 
 		// all moves are possible except for moving onto yourself
 		if direc != LEFT {
-			if dirData.Moves != moves {
-				t.Errorf("expected %v to be %v", dirData.Moves, moves)
+			if moveMax.Moves != moves {
+				t.Errorf("expected %v to be %v", moveMax.Moves, moves)
 			}
 		} else {
-			if dirData.Moves != 0 {
-				t.Errorf("expected %v to be %v", dirData.Moves, 0)
+			if moveMax.Moves != 0 {
+				t.Errorf("expected %v to be %v", moveMax.Moves, 0)
 			}
 		}
 	}
@@ -149,7 +150,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 	}
 
 	// all moves are possible except moving onto yourself
-	if len(data[UP].MovesAway) == len(moves_to_depth)-1 {
+	if len(data[UP].MovesAway) == len(moves_to_depth) {
 		movesAway := data[UP].MovesAway
 
 		m_1 := movesAway[MOVE_ONE]
@@ -164,7 +165,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 		if m_5.Food != 2 {
 			t.Errorf("move 5 should have 2 food, got %v", m_5.Food)
 		}
-		all_food := data[UP].Food
+		all_food := data[UP].moveMax().Food
 		if all_food != len(req.Food) {
 			t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
 		}
