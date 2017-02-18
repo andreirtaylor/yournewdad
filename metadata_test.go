@@ -184,6 +184,22 @@ func TestMetaDataWithMoves(t *testing.T) {
 	if all_food != len(req.Food) {
 		t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
 	}
+
+	num_neighbours, err := GetNumNeighbours(data, UP)
+	if err != nil {
+		t.Errorf("getting NumNeighbours up,  %v", err)
+	}
+
+	if num_neighbours != 3 {
+		t.Errorf("expected 3 neighbours got, %v", err)
+	}
+
+	num_neighbours, err = GetNumNeighbours(data, DOWN)
+	if err != 2 {
+		t.Errorf("expected 2 neighbours got, %v", err)
+	}
+	fmt.Printf("%v", num_neighbours)
+
 }
 
 func TestClosestFood(t *testing.T) {

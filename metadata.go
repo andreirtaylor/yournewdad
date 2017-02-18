@@ -172,19 +172,24 @@ func bestMoves(metaD map[string]*MetaData) ([]string, error) {
 	return moves, nil
 }
 
-func numNeighbours(data *MoveRequest, direc string) (int, error) {
+func GetNumNeighbours(data *MoveRequest, direc string) (int, error) {
 	head, err := getMyHead(data)
 	if err != nil {
 		return 0, err
 	}
-	_, err = GetPointInDirection(head, direc, data)
-	if err != nil {
-		return 0, err
+	neighbours := 0
+	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
+		p, err := GetPointInDirection(head, direc, data)
+		if err != nil {
+			return 0, err
+		}
+		if p != nil {
+			neighbours += 1
+		}
 	}
-	return 0, nil
+	return neighbours, nil
 }
 func FilterMinimizeSpace(data *MoveRequest, moves []string) string {
-
 	return ""
 }
 
