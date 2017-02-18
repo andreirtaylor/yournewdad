@@ -218,22 +218,28 @@ func TestClosestFood(t *testing.T) {
 		t.Errorf("Unexpected Errror %v", err)
 	}
 
-	if data[LEFT].ClosestFood != 3 {
+	if data[LEFT].ClosestFood != 4 {
 		t.Errorf(
-			"expected the closest food to the left to be 3, got %v",
+			"closest food to the left is 4 moves away, got %v",
 			data[LEFT].ClosestFood)
 	}
 
-	if data[RIGHT].ClosestFood != 5 {
-		t.Errorf("expected the closest food to the right to be 5, got %v", data[RIGHT].ClosestFood)
+	if data[RIGHT].ClosestFood != 6 {
+		t.Errorf(
+			"closest food to the right should be 6 moves away got %v",
+			data[RIGHT].ClosestFood)
 	}
 
-	if data[UP].ClosestFood != 3 {
-		t.Errorf("expected the closest food up to be 3, got %v", data[UP].ClosestFood)
+	if data[UP].ClosestFood != 4 {
+		t.Errorf(
+			"expected the closest food up to be 4 moves away, got %v",
+			data[UP].ClosestFood)
 	}
 
 	if data[DOWN].ClosestFood != math.MaxInt64 {
-		t.Errorf("expected the closest food down to be max int, got %v", data[DOWN].ClosestFood)
+		t.Errorf(
+			"Going down is invalid should be max int, got %v",
+			data[DOWN].ClosestFood)
 	}
 
 	directions := FilterPossibleMoves(data)
