@@ -6,9 +6,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"math"
-	"math/rand"
 	"os"
-	"time"
 )
 
 func getMyHead(data *MoveRequest) (Point, error) {
@@ -167,16 +165,21 @@ func bestMoves(metaD map[string]*MetaData) ([]string, error) {
 	return moves, nil
 }
 
-func bestMove(metaD map[string]*MetaData) (string, error) {
-	moves, err := bestMoves(metaD)
+func FilterMinimizeSpace(data *MoveRequest, moves []string) string {
+	return ""
+}
+
+func bestMove(data *MoveRequest) (string, error) {
+	moves, err := bestMoves(data.MD)
 	if err != nil {
 		return "", err
 	}
 	if len(moves) == 0 {
 		return "", errors.New("Unable to give you a good Move")
 	}
-	rand.Seed(time.Now().Unix()) // initialize global pseudorandom generator
-	return moves[rand.Intn(len(moves))], nil
+
+	move := FilterMinimizeSpace(data, moves)
+	return move, nil
 }
 
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
@@ -203,8 +206,8 @@ func ClosestFood(data []*StaticData) int {
 	return math.MaxInt64
 }
 
-func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
-	metaD := make(map[string]*MetaData)
+func GenerateMetaData(data *MoveRequest) (*MoveRequest, error) {
+	metaD := make(MoveMetaData)
 	metaD["up"] = &MetaData{}
 	metaD["down"] = &MetaData{}
 	metaD["right"] = &MetaData{}
@@ -214,14 +217,14 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 	for direc, direcMD := range metaD {
 		sd, err := getStaticData(data, direc)
 		if err != nil {
-			return metaD, err
+			return data, err
 		}
 
 		direcMD.MovesAway = sd
 		direcMD.ClosestFood = ClosestFood(sd)
 		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 	}
-	return metaD, nil
+	return data, nil
 }
 
 func mustGetenv(k string) string {

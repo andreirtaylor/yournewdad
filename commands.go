@@ -72,13 +72,13 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
 
 	log.Infof(ctx, "%#v", data)
-	metadata, err := GenerateMetaData(data)
+	_, err := GenerateMetaData(data)
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
 	}
 
-	move, err := bestMove(metadata)
+	move, err := bestMove(data)
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
