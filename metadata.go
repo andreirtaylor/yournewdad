@@ -177,20 +177,42 @@ func GetNumNeighbours(data *MoveRequest, direc string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	newHead, err := GetPointInDirection(head, direc, data)
+	if err != nil {
+		return 0, err
+	}
+
+	if newHead == nil {
+		return 0, nil
+	}
 	neighbours := 0
-	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
-		p, err := GetPointInDirection(head, direc, data)
+	for _, d := range []string{UP, DOWN, LEFT, RIGHT} {
+		p, err := GetPointInDirection(*newHead, d, data)
 		if err != nil {
 			return 0, err
 		}
+		//fmt.Printf("In Loop neighbour %v, %v\n", p, d)
 		if p != nil {
 			neighbours += 1
 		}
 	}
+	//fmt.Printf("getting neighbours %v, %v\n", direc, neighbours)
 	return neighbours, nil
 }
-func FilterMinimizeSpace(data *MoveRequest, moves []string) string {
-	return ""
+func FilterMinimizeSpace(data *MoveRequest, moves []string) (string, error) {
+	min := math.MaxInt64
+	ret := ""
+	for _, direc := range moves {
+		neighbours, err := GetNumNeighbours(data, direc)
+		if err != nil {
+			return "", err
+		}
+		if neighbours < min {
+			ret = direc
+			min = neighbours
+		}
+	}
+	return ret, nil
 }
 
 func bestMove(data *MoveRequest) (string, error) {
@@ -202,7 +224,10 @@ func bestMove(data *MoveRequest) (string, error) {
 		return "", errors.New("Unable to give you a good Move")
 	}
 
-	move := FilterMinimizeSpace(data, moves)
+	move, err := FilterMinimizeSpace(data, moves)
+	if err != nil {
+		return "", err
+	}
 	return move, nil
 }
 

@@ -185,7 +185,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 		t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
 	}
 
-	num_neighbours, err := GetNumNeighbours(data, UP)
+	num_neighbours, err := GetNumNeighbours(req, UP)
 	if err != nil {
 		t.Errorf("getting NumNeighbours up,  %v", err)
 	}
@@ -194,8 +194,8 @@ func TestMetaDataWithMoves(t *testing.T) {
 		t.Errorf("expected 3 neighbours got, %v", err)
 	}
 
-	num_neighbours, err = GetNumNeighbours(data, DOWN)
-	if err != 2 {
+	num_neighbours, err = GetNumNeighbours(req, DOWN)
+	if num_neighbours != 2 {
 		t.Errorf("expected 2 neighbours got, %v", err)
 	}
 	fmt.Printf("%v", num_neighbours)
