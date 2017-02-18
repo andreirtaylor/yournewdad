@@ -50,7 +50,8 @@ type StaticData struct {
 }
 
 type MetaData struct {
-	Score float64
+	Score       float64
+	ClosestFood int
 	// definied by the itoa above
 	MovesAway []*StaticData
 }

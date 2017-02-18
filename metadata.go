@@ -215,6 +215,20 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	return ret
 }
 
+func ClosestFood(data []*StaticData) int {
+	for i, staticData := range data {
+		//fmt.Printf("direction : %v\ndata for move %v: %#v\n", direc, i, staticData)
+		if staticData.Food > 0 {
+			return i + 1
+		}
+	}
+	return -1
+}
+
+func Score(metaD map[string]*MetaData) {
+
+}
+
 func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 	metad := make(map[string]*MetaData)
 	metad["up"] = &MetaData{}
@@ -229,7 +243,10 @@ func GenerateMetaData(data *MoveRequest) (map[string]*MetaData, error) {
 		}
 
 		direcMD.MovesAway = sd
+		direcMD.ClosestFood = ClosestFood(sd)
 	}
+
+	Score(metad)
 	return metad, nil
 }
 

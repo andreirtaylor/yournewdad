@@ -50,10 +50,8 @@ func TestPoint(t *testing.T) {
 
 func TestMetaDataOnlyOneSnake(t *testing.T) {
 	req := &MoveRequest{
-		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
 		Height: 20,
 		Width:  20,
-		Turn:   4,
 		Food: []Point{
 			Point{X: 5, Y: 13},
 		},
@@ -67,13 +65,8 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 					//   | x | x |
 					//   | x |   |
 				},
-				HealthPoints: 96,
-				Id:           "639fb7cd-2590-4418-abcc-3da577559fc6",
-				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-				Taunt:        "639fb7cd-2590-4418-abcc-3da577559fc6",
 			},
 		},
-		You: "639fb7cd-2590-4418-abcc-3da577559fc6",
 	}
 
 	// need to make the hazards manually
@@ -113,10 +106,8 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 
 func TestMetaDataWithMoves(t *testing.T) {
 	req := &MoveRequest{
-		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
 		Height: 20,
 		Width:  20,
-		Turn:   4,
 		Food: []Point{
 			Point{X: 14, Y: 9},
 			Point{X: 11, Y: 10},
@@ -132,13 +123,8 @@ func TestMetaDataWithMoves(t *testing.T) {
 					//   | x | x |
 					//   | x |   |
 				},
-				HealthPoints: 96,
-				Id:           "639fb7cd-2590-4418-abcc-3da577559fc6",
-				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-				Taunt:        "639fb7cd-2590-4418-abcc-3da577559fc6",
 			},
 		},
-		You: "639fb7cd-2590-4418-abcc-3da577559fc6",
 	}
 
 	// need to make the hazards manually
@@ -171,5 +157,52 @@ func TestMetaDataWithMoves(t *testing.T) {
 		}
 	} else {
 		t.Errorf("Moves away should  be length %d got %d", len(moves_to_depth), len(data[UP].MovesAway))
+	}
+}
+
+func TestClosestFood(t *testing.T) {
+	req := &MoveRequest{
+		Height: 20,
+		Width:  20,
+		Food: []Point{
+			Point{X: 11, Y: 9},
+			Point{X: 11, Y: 10},
+			Point{X: 14, Y: 8},
+			Point{X: 12, Y: 11},
+		},
+		Snakes: []Snake{
+			Snake{
+				Coords: []Point{
+					Point{X: 14, Y: 12},
+					Point{X: 14, Y: 13},
+					// snake layout
+					//   | x |
+				},
+			},
+		},
+	}
+
+	// need to make the hazards manually
+	req.init()
+
+	data, err := GenerateMetaData(req)
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+
+	if data[LEFT].ClosestFood != 3 {
+		t.Errorf("expected the closest food to the left to be 3, got %v", data[LEFT].ClosestFood)
+	}
+
+	if data[RIGHT].ClosestFood != 5 {
+		t.Errorf("expected the closest food to the left to be 5, got %v", data[RIGHT].ClosestFood)
+	}
+
+	if data[UP].ClosestFood != 3 {
+		t.Errorf("expected the closest food to the left to be 3, got %v", data[UP].ClosestFood)
+	}
+
+	if data[DOWN].ClosestFood != -1 {
+		t.Errorf("expected the closest food to the left to be 3, got %v", data[DOWN].ClosestFood)
 	}
 }
