@@ -81,9 +81,9 @@ type MoveRequest struct {
 	Turn   int    `json:"turn"`
 
 	// dynamic
-	Food   []Point `json:"food"`
-	Snakes []Snake `json:"snakes"`
-	You    string  `json:"you"`
+	Food   []Point  `json:"food"`
+	Snakes []*Snake `json:"snakes"`
+	You    string   `json:"you"`
 
 	// added by me
 	// lists all the points that are hazards this turn
@@ -97,6 +97,7 @@ func (m *MoveRequest) init() {
 	m.GenHazards()
 	m.GenFoodMap()
 	m.SetMyLength()
+	m.GenSnakeHash()
 }
 
 func (m *MoveRequest) SetMyLength() {
@@ -106,6 +107,17 @@ func (m *MoveRequest) SetMyLength() {
 		}
 	}
 }
+
+func (m *MoveRequest) GenSnakeHash() {
+	for _, snake := range m.Snakes {
+		snake.hash = make(map[string]bool)
+		for _, coord := range snake.Coords {
+			fmt.Printf("snake hash\n")
+			snake.hash[coord.String()] = true
+		}
+	}
+}
+
 func (m *MoveRequest) GenHazards() {
 	m.Hazards = make(map[string]bool)
 	for _, snake := range m.Snakes {
@@ -138,6 +150,7 @@ type Snake struct {
 	Id           string  `json:"id"`
 	Name         string  `json:"name"`
 	Taunt        string  `json:"taunt"`
+	hash         map[string]bool
 }
 
 func NewMoveRequest(req *http.Request) (*MoveRequest, error) {

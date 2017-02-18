@@ -59,8 +59,8 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 			Point{X: 5, Y: 13},
 			Point{X: 5, Y: 8},
 		},
-		Snakes: []Snake{
-			Snake{
+		Snakes: []*Snake{
+			&Snake{
 				Coords: []Point{
 					Point{X: 14, Y: 12},
 					Point{X: 13, Y: 12},
@@ -131,8 +131,8 @@ func TestMetaDataWithMoves(t *testing.T) {
 			Point{X: 11, Y: 10},
 			Point{X: 11, Y: 9},
 		},
-		Snakes: []Snake{
-			Snake{
+		Snakes: []*Snake{
+			&Snake{
 				Coords: []Point{
 					Point{X: 14, Y: 12},
 					Point{X: 13, Y: 12},
@@ -185,7 +185,12 @@ func TestMetaDataWithMoves(t *testing.T) {
 		t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
 	}
 
-	num_neighbours, err := GetNumNeighbours(req, UP)
+	head, err := getMyHead(req)
+	if err != nil {
+		t.Errorf("getting NumNeighbours up,  %v", err)
+	}
+
+	num_neighbours, err := GetNumNeighbours(req, head.Up(req))
 	if err != nil {
 		t.Errorf("getting NumNeighbours up,  %v", err)
 	}
@@ -194,7 +199,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 		t.Errorf("expected 3 neighbours got, %v", err)
 	}
 
-	num_neighbours, err = GetNumNeighbours(req, DOWN)
+	num_neighbours, err = GetNumNeighbours(req, head.Down(req))
 	if num_neighbours != 2 {
 		t.Errorf("expected 2 neighbours got, %v", err)
 	}
@@ -211,8 +216,8 @@ func TestClosestFood(t *testing.T) {
 			Point{X: 14, Y: 8},
 			Point{X: 12, Y: 11},
 		},
-		Snakes: []Snake{
-			Snake{
+		Snakes: []*Snake{
+			&Snake{
 				Coords: []Point{
 					Point{X: 14, Y: 12},
 					Point{X: 14, Y: 13},
@@ -287,13 +292,13 @@ func TestClosestFood(t *testing.T) {
 func TestSmallSpaceWithFood(t *testing.T) {
 	// in this test moving down will result in certain death
 	// if the snake wants to move down it is wrong!
-	req := &MoveRequest{GameId: "d3684dd4-975b-4449-91ea-7051ea3f47da", Height: 8, Width: 8, Turn: 17, Food: []Point{Point{X: 0, Y: 3}, Point{X: 6, Y: 0}, Point{X: 1, Y: 3}, Point{X: 0, Y: 7}, Point{X: 7, Y: 7}, Point{X: 5, Y: 0}, Point{X: 7, Y: 5}, Point{X: 7, Y: 3}, Point{X: 6, Y: 6}, Point{X: 5, Y: 4}}, Snakes: []Snake{Snake{Coords: []Point{Point{X: 0, Y: 6}, Point{X: 1, Y: 6}, Point{X: 2, Y: 6}, Point{X: 2, Y: 5}, Point{X: 2, Y: 4}, Point{X: 2, Y: 3}, Point{X: 2, Y: 2}, Point{X: 1, Y: 2}, Point{X: 1, Y: 2}}, HealthPoints: 100, Id: "be171270-8030-412d-81d7-72e2e1e97895", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "be171270-8030-412d-81d7-72e2e1e97895"}, Snake{Coords: []Point{Point{X: 5, Y: 7}, Point{X: 4, Y: 7}, Point{X: 3, Y: 7}, Point{X: 3, Y: 6}, Point{X: 3, Y: 5}, Point{X: 3, Y: 4}, Point{X: 3, Y: 3}, Point{X: 3, Y: 2}, Point{X: 3, Y: 1}, Point{X: 3, Y: 0}}, HealthPoints: 99, Id: "f220e2b6-7e02-4857-97e8-a5831d79ba78", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "f220e2b6-7e02-4857-97e8-a5831d79ba78"}}, You: "be171270-8030-412d-81d7-72e2e1e97895"}
+	req := &MoveRequest{GameId: "d3684dd4-975b-4449-91ea-7051ea3f47da", Height: 8, Width: 8, Turn: 17, Food: []Point{Point{X: 0, Y: 3}, Point{X: 6, Y: 0}, Point{X: 1, Y: 3}, Point{X: 0, Y: 7}, Point{X: 7, Y: 7}, Point{X: 5, Y: 0}, Point{X: 7, Y: 5}, Point{X: 7, Y: 3}, Point{X: 6, Y: 6}, Point{X: 5, Y: 4}}, Snakes: []*Snake{&Snake{Coords: []Point{Point{X: 0, Y: 6}, Point{X: 1, Y: 6}, Point{X: 2, Y: 6}, Point{X: 2, Y: 5}, Point{X: 2, Y: 4}, Point{X: 2, Y: 3}, Point{X: 2, Y: 2}, Point{X: 1, Y: 2}, Point{X: 1, Y: 2}}, HealthPoints: 100, Id: "be171270-8030-412d-81d7-72e2e1e97895", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "be171270-8030-412d-81d7-72e2e1e97895"}, &Snake{Coords: []Point{Point{X: 5, Y: 7}, Point{X: 4, Y: 7}, Point{X: 3, Y: 7}, Point{X: 3, Y: 6}, Point{X: 3, Y: 5}, Point{X: 3, Y: 4}, Point{X: 3, Y: 3}, Point{X: 3, Y: 2}, Point{X: 3, Y: 1}, Point{X: 3, Y: 0}}, HealthPoints: 99, Id: "f220e2b6-7e02-4857-97e8-a5831d79ba78", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "f220e2b6-7e02-4857-97e8-a5831d79ba78"}}, You: "be171270-8030-412d-81d7-72e2e1e97895"}
 
 	req.init()
 
 	req, err := GenerateMetaData(req)
 
-	//fmt.Printf("%v", data)
+	fmt.Printf("%#v", req.Snakes[0])
 
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
@@ -329,7 +334,7 @@ func TestRandom(t *testing.T) {
 			Point{X: 4, Y: 4},
 			Point{X: 3, Y: 2},
 		},
-		Snakes: []Snake{Snake{
+		Snakes: []*Snake{&Snake{
 			Coords: []Point{
 				Point{X: 1, Y: 0},
 				Point{X: 1, Y: 1},

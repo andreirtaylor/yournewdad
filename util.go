@@ -6,27 +6,18 @@ import (
 )
 
 // returns the number of valid neighbours to a point p
-func GetNumNeighbours(data *MoveRequest, direc string) (int, error) {
-	head, err := getMyHead(data)
-	if err != nil {
-		return 0, err
-	}
-	newHead, err := GetPointInDirection(head, direc, data)
-	if err != nil {
-		return 0, err
-	}
-
-	if newHead == nil {
+func GetNumNeighbours(data *MoveRequest, p *Point) (int, error) {
+	if p == nil {
 		return 0, nil
 	}
 	neighbours := 0
 	for _, d := range []string{UP, DOWN, LEFT, RIGHT} {
-		p, err := GetPointInDirection(*newHead, d, data)
+		neighbour, err := GetPointInDirection(p, d, data)
 		if err != nil {
 			return 0, err
 		}
 		//fmt.Printf("In Loop neighbour %v, %v\n", p, d)
-		if p != nil {
+		if neighbour != nil {
 			neighbours += 1
 		}
 	}
@@ -38,7 +29,10 @@ func GetNumNeighbours(data *MoveRequest, direc string) (int, error) {
 // i.e. if you pass in direc "up" it will give you the point
 // that is above p
 // will only return points that are valid moves
-func GetPointInDirection(p Point, direc string, data *MoveRequest) (*Point, error) {
+func GetPointInDirection(p *Point, direc string, data *MoveRequest) (*Point, error) {
+	if p == nil {
+		return nil, nil
+	}
 	switch direc {
 	case UP:
 		return p.Up(data), nil

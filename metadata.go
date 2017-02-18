@@ -15,7 +15,7 @@ func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
 	}
-	p, err := GetPointInDirection(head, direc, data)
+	p, err := GetPointInDirection(&head, direc, data)
 	if err != nil {
 		return nil, err
 	}
