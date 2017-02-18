@@ -198,7 +198,6 @@ func TestMetaDataWithMoves(t *testing.T) {
 	if num_neighbours != 2 {
 		t.Errorf("expected 2 neighbours got, %v", err)
 	}
-	fmt.Printf("%v", num_neighbours)
 
 }
 
