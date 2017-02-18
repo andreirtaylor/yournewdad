@@ -69,7 +69,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
-	log.Infof(ctx, "Data %#v", data)
 
 	metadata, err := GenerateMetaData(data)
 	if err != nil {
@@ -78,8 +77,9 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	}
 
 	move := bestMove(metadata)
-	log.Infof(ctx, "Data %v", move)
+	//moves := bestMoves(metadata)
 
+	//log.Infof(ctx, "%v", moves)
 	//for direc, direcData := range metadata {
 	//	log.Infof(ctx, "Meta data %v\ndirec %#v", direcData, direc)
 	//}

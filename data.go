@@ -8,19 +8,6 @@ import (
 	"strings"
 )
 
-// Used to nicely index the
-const ( // iota is reset to 0
-	MOVE_ONE     = iota
-	MOVE_TWO     = iota
-	MOVE_THREE   = iota
-	MOVE_FIVE    = iota
-	MOVE_TEN     = iota
-	MOVE_FIFTEEN = iota
-	MOVE_MAX     = iota
-)
-
-var moves_to_depth = [...]int{1, 2, 3, 5, 10, 15, -1}
-
 const ( // iota is reset to 0
 	SNAKE_HAZARD = iota
 )
@@ -59,8 +46,11 @@ type MetaData struct {
 }
 
 // returns the meta data for the maximum distance you can travel i.e. the whole board
-func (m *MetaData) moveMax() *StaticData {
-	return m.MovesAway[MOVE_MAX]
+func (m *MetaData) moveMax() (*StaticData, error) {
+	if len(m.MovesAway) == 0 {
+		return nil, errors.New("Array is empty")
+	}
+	return m.MovesAway[len(m.MovesAway)-1], nil
 }
 
 type MoveRequest struct {

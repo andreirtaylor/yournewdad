@@ -1,6 +1,7 @@
 package kaa
 
 import (
+	"container/heap"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -110,7 +111,8 @@ func SaveMove(bo *MoveRequest, req *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(snake.Name[:15], snake.HealthPoints, m_id, len(snake.Coords))
+		log.Infof(ctx, "%v", snake.Name)
+		_, err = stmt.Exec(snake.Name, snake.HealthPoints, m_id, len(snake.Coords))
 		if err != nil {
 			log.Errorf(ctx, "Error executing move save statement: %v", err)
 			return
@@ -155,7 +157,7 @@ func SaveMove(bo *MoveRequest, req *http.Request) {
 
 func getMyHead(data *MoveRequest) (Point, error) {
 	for _, snake := range data.Snakes {
-		if snake.Id == data.You {
+		if snake.Id == data.You && len(data.You) > 0 {
 			return snake.Head(), nil
 		}
 	}
@@ -181,39 +183,70 @@ func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	return nil, errors.New(fmt.Sprintf("invalid direction", direc))
 }
 
-func graphSearchRec(pos *Point, data *MoveRequest, seen map[string]bool, depth, max int) *StaticData {
-	if depth == max || pos == nil || seen[pos.String()] {
-		return &StaticData{}
-	}
-	seen[pos.String()] = true
-
-	ret := &StaticData{}
-	ret_up := graphSearchRec(pos.Up(data), data, seen, depth+1, max)
-	ret_down := graphSearchRec(pos.Down(data), data, seen, depth+1, max)
-	ret_left := graphSearchRec(pos.Left(data), data, seen, depth+1, max)
-	ret_right := graphSearchRec(pos.Right(data), data, seen, depth+1, max)
-
-	ret.Moves = ret_up.Moves + ret_down.Moves + ret_left.Moves + ret_right.Moves + 1
-
-	ret.Food = ret_up.Food + ret_down.Food + ret_left.Food + ret_right.Food
-	if data.FoodMap[pos.String()] {
-		ret.Food += 1
-	}
-	return ret
-}
-
 // returns an array of static data, the final static data is
 // the maximum depth and the other depths, are defined in moves_to_depth
 // in data.go. Will search from the point pos to the maximum depth provided
 // a depth of any positive integer will max out at that integer and a depth of
 // any negative integer will allow any negative number
+
+func pushOntoPQ(
+	p *Point,
+	seen map[string]bool,
+	pq *PriorityQueue,
+	priority int) {
+
+	if p != nil {
+		if !seen[p.String()] {
+			seen[p.String()] = true
+
+			heap.Push(pq, &Item{
+				value:    *p,
+				priority: priority + 1,
+			})
+		}
+	}
+}
+
 func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	ret := []*StaticData{}
+	// Create a priority queue, put the items in it, and
+	// establish the priority queue (heap) invariants.
+	pq := make(PriorityQueue, 0)
+	heap.Init(&pq)
+	// start with priority 0
+	priority := 0
+	seen := make(map[string]bool)
 
-	for _, depth := range moves_to_depth {
-		seen := make(map[string]bool)
-		sd := graphSearchRec(pos, data, seen, 0, depth)
-		ret = append(ret, sd)
+	// make the first item priority 1 so that if statement
+	// at the end of the loop is executed
+	pushOntoPQ(pos, seen, &pq, 1)
+
+	accumulator := &StaticData{}
+
+	for pq.Len() > 0 {
+		item := heap.Pop(&pq).(*Item)
+		p := item.value
+		//fmt.Printf("%v", p)
+
+		pushOntoPQ(p.Up(data), seen, &pq, item.priority)
+		pushOntoPQ(p.Down(data), seen, &pq, item.priority)
+		pushOntoPQ(p.Left(data), seen, &pq, item.priority)
+		pushOntoPQ(p.Right(data), seen, &pq, item.priority)
+
+		if data.FoodMap[p.String()] {
+			accumulator.Food += 1
+		}
+
+		accumulator.Moves += 1
+
+		if item.priority > priority {
+			priority = item.priority
+			ret = append(ret, accumulator)
+			// copy accumulator
+			tmp := *accumulator
+			accumulator = &tmp
+			//fmt.Printf("\n")
+		}
 	}
 	return ret
 }
@@ -232,7 +265,7 @@ func FilterPossibleMoves(metaD map[string]*MetaData) []string {
 	directions := []string{UP, DOWN, LEFT, RIGHT}
 	ret := []string{}
 	for _, direc := range directions {
-		if metaD[direc].moveMax().Moves > 0 {
+		if len(metaD[direc].MovesAway) == 0 {
 			ret = append(ret, direc)
 		}
 	}
