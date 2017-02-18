@@ -2,9 +2,9 @@ package kaa
 
 import (
 	"fmt"
-	//"math"
+	"math"
 	"reflect"
-	//"sort"
+	"sort"
 	"testing"
 )
 
@@ -184,106 +184,112 @@ func TestMetaDataWithMoves(t *testing.T) {
 	}
 }
 
-//func TestClosestFood(t *testing.T) {
-//	req := &MoveRequest{
-//		Height: 20,
-//		Width:  20,
-//		Food: []Point{
-//			Point{X: 11, Y: 9},
-//			Point{X: 11, Y: 10},
-//			Point{X: 14, Y: 8},
-//			Point{X: 12, Y: 11},
-//		},
-//		Snakes: []Snake{
-//			Snake{
-//				Coords: []Point{
-//					Point{X: 14, Y: 12},
-//					Point{X: 14, Y: 13},
-//					// snake layout
-//					//   | x |
-//				},
-//			},
-//		},
-//	}
-//
-//	// need to make the hazards manually
-//	req.init()
-//
-//	data, err := GenerateMetaData(req)
-//	if err != nil {
-//		t.Errorf("Unexpected Errror %v", err)
-//	}
-//
-//	if data[LEFT].ClosestFood != 3 {
-//		t.Errorf("expected the closest food to the left to be 3, got %v", data[LEFT].ClosestFood)
-//	}
-//
-//	if data[RIGHT].ClosestFood != 5 {
-//		t.Errorf("expected the closest food to the left to be 5, got %v", data[RIGHT].ClosestFood)
-//	}
-//
-//	if data[UP].ClosestFood != 3 {
-//		t.Errorf("expected the closest food to the left to be 3, got %v", data[UP].ClosestFood)
-//	}
-//
-//	if data[DOWN].ClosestFood != math.MaxInt64 {
-//		t.Errorf("expected the closest food to the left to be max int, got %v", data[DOWN].ClosestFood)
-//	}
-//
-//	directions := FilterPossibleMoves(data)
-//	all := []string{LEFT, DOWN, UP, RIGHT}
-//	sort.Strings(all)
-//	sort.Strings(directions)
-//
-//	if !reflect.DeepEqual(directions, all) {
-//		t.Errorf("expected all directions got %v", directions)
-//	}
-//
-//	foodDirections := ClosestFoodDirections(data, directions)
-//	expectedFoodDirections := []string{LEFT, UP}
-//	sort.Strings(foodDirections)
-//	sort.Strings(expectedFoodDirections)
-//
-//	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
-//		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
-//	}
-//
-//}
-//
-//func TestRandom(t *testing.T) {
-//	req := &MoveRequest{
-//		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
-//		Height: 5,
-//		Width:  5,
-//		Turn:   20,
-//		Food: []Point{
-//			Point{X: 0, Y: 0},
-//			Point{X: 4, Y: 4},
-//			Point{X: 3, Y: 2},
-//		},
-//		Snakes: []Snake{Snake{
-//			Coords: []Point{
-//				Point{X: 1, Y: 0},
-//				Point{X: 1, Y: 1},
-//				Point{X: 1, Y: 2},
-//				Point{X: 1, Y: 3},
-//				Point{X: 1, Y: 4},
-//			},
-//			HealthPoints: 80,
-//			Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
-//			Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-//			Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
-//		},
-//		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
-//	}
-//	req.init()
-//
-//	data, err := GenerateMetaData(req)
-//	if err != nil {
-//		t.Errorf("Unexpected Errror %v", err)
-//	}
-//	moves := bestMoves(data)
-//	if len(moves) > 1 {
-//		t.Errorf("The best move is left")
-//	}
-//}
+func TestClosestFood(t *testing.T) {
+	req := &MoveRequest{
+		Height: 20,
+		Width:  20,
+		Food: []Point{
+			Point{X: 11, Y: 9},
+			Point{X: 11, Y: 10},
+			Point{X: 14, Y: 8},
+			Point{X: 12, Y: 11},
+		},
+		Snakes: []Snake{
+			Snake{
+				Coords: []Point{
+					Point{X: 14, Y: 12},
+					Point{X: 14, Y: 13},
+					// snake layout
+					//   | x |
+				},
+				HealthPoints: 80,
+				Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
+				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
+				Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
+		},
+		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
+	}
+
+	// need to make the hazards manually
+	req.init()
+
+	data, err := GenerateMetaData(req)
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+
+	if data[LEFT].ClosestFood != 3 {
+		t.Errorf(
+			"expected the closest food to the left to be 3, got %v",
+			data[LEFT].ClosestFood)
+	}
+
+	if data[RIGHT].ClosestFood != 5 {
+		t.Errorf("expected the closest food to the right to be 5, got %v", data[RIGHT].ClosestFood)
+	}
+
+	if data[UP].ClosestFood != 3 {
+		t.Errorf("expected the closest food up to be 3, got %v", data[UP].ClosestFood)
+	}
+
+	if data[DOWN].ClosestFood != math.MaxInt64 {
+		t.Errorf("expected the closest food down to be max int, got %v", data[DOWN].ClosestFood)
+	}
+
+	directions := FilterPossibleMoves(data)
+	all := []string{LEFT, DOWN, UP, RIGHT}
+	sort.Strings(all)
+	sort.Strings(directions)
+
+	if !reflect.DeepEqual(directions, all) {
+		t.Errorf("expected all directions got %v", directions)
+	}
+
+	foodDirections := ClosestFoodDirections(data, directions)
+	expectedFoodDirections := []string{LEFT, UP}
+	sort.Strings(foodDirections)
+	sort.Strings(expectedFoodDirections)
+
+	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
+		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
+	}
+
+}
+
+func TestRandom(t *testing.T) {
+	req := &MoveRequest{
+		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
+		Height: 5,
+		Width:  5,
+		Turn:   20,
+		Food: []Point{
+			Point{X: 0, Y: 0},
+			Point{X: 4, Y: 4},
+			Point{X: 3, Y: 2},
+		},
+		Snakes: []Snake{Snake{
+			Coords: []Point{
+				Point{X: 1, Y: 0},
+				Point{X: 1, Y: 1},
+				Point{X: 1, Y: 2},
+				Point{X: 1, Y: 3},
+				Point{X: 1, Y: 4},
+			},
+			HealthPoints: 80,
+			Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
+			Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
+			Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
+		},
+		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
+	}
+	req.init()
+
+	data, err := GenerateMetaData(req)
+	if err != nil {
+		t.Errorf("Unexpected Errror %v", err)
+	}
+	moves := bestMoves(data)
+	if len(moves) > 1 {
+		t.Errorf("The best move is left")
+	}
+}
