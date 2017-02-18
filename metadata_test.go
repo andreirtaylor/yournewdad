@@ -260,7 +260,11 @@ func TestClosestFood(t *testing.T) {
 			data[DOWN].ClosestFood)
 	}
 
-	directions := FilterPossibleMoves(data)
+	directions, err := FilterPossibleMoves(data)
+	if err != nil {
+		t.Errorf("Unexpected error in filtering possible directions %v", err)
+	}
+
 	all := []string{LEFT, DOWN, UP, RIGHT}
 	sort.Strings(all)
 	sort.Strings(directions)
