@@ -149,7 +149,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 	}
 
 	// all moves are possible except moving onto yourself
-	if len(data[UP].MovesAway) == 3 {
+	if len(data[UP].MovesAway) == len(moves_to_depth)-1 {
 		movesAway := data[UP].MovesAway
 
 		m_1 := movesAway[MOVE_ONE]
@@ -169,6 +169,6 @@ func TestMetaDataWithMoves(t *testing.T) {
 			t.Errorf("Total food should be %v, got %v", len(req.Food), all_food)
 		}
 	} else {
-		t.Errorf("Moves away should not be nil")
+		t.Errorf("Moves away should  be length %d got %d", len(moves_to_depth), len(data[UP].MovesAway))
 	}
 }

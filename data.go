@@ -10,11 +10,12 @@ import (
 
 const ( // iota is reset to 0
 	MOVE_ONE   = iota
+	MOVE_TWO   = iota
 	MOVE_THREE = iota
 	MOVE_FIVE  = iota
 )
 
-var moves_to_depth = [...]int{1, 3, 5, -1}
+var moves_to_depth = [...]int{1, 2, 3, 5, -1}
 
 const ( // iota is reset to 0
 	SNAKE_HAZARD = iota
