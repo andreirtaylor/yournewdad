@@ -49,7 +49,8 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	SaveMove(data, req)
+	// its tooooooooo sloooooooooooooooww :(
+	//SaveMove(data, req)
 
 	move, err := getMove(data, req)
 
