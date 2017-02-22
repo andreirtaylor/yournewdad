@@ -30,8 +30,16 @@ type StaticData struct {
 
 type MetaData struct {
 	// denotes the number of moves until you reach the closest piece of food
-	ClosestFood int
+	MyLength  int
+	Hazards   map[string]bool
+	FoodMap   map[string]bool
+	SnakeHash map[string]SnakeData
+	Direcs    MoveMetaData
+}
 
+type MetaDataDirec struct {
+	// denotes the number of moves until you reach the closest piece of food
+	ClosestFood int
 	// totals up your length and the ammount of food in a direction
 	// if you would fill up the space make it unlikely to go that direction
 	MovesVsSpace int
@@ -39,7 +47,7 @@ type MetaData struct {
 	MovesAway []*StaticData
 }
 
-func (m *MetaData) String() string {
+func (m *MetaDataDirec) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("\n{")
 	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
@@ -53,14 +61,14 @@ func (m *MetaData) String() string {
 }
 
 // returns the meta data for the maximum distance you can travel i.e. the whole board
-func (m *MetaData) moveMax() (*StaticData, error) {
+func (m *MetaDataDirec) moveMax() (*StaticData, error) {
 	if len(m.MovesAway) == 0 {
 		return nil, errors.New("Array is empty")
 	}
 	return m.MovesAway[len(m.MovesAway)-1], nil
 }
 
-type MoveMetaData map[string]*MetaData
+type MoveMetaData map[string]*MetaDataDirec
 
 type MoveRequest struct {
 	// static
@@ -74,25 +82,19 @@ type MoveRequest struct {
 	Snakes []Snake `json:"snakes"`
 	You    string  `json:"you"`
 
-	// added by me
-	// lists all the points that are hazards this turn
-	MyLength  int
-	Hazards   map[string]bool
-	FoodMap   map[string]bool
-	SnakeHash map[string]SnakeData
-	MD        MoveMetaData
+	MetaData
 }
 
 func (m *MoveRequest) init() {
-	m.SetMyLength()
-	m.GenHazards()
-	m.GenFoodMap()
-	m.GenSnakeHash()
+	m.SetMyLength(m)
+	m.GenHazards(m)
+	m.GenFoodMap(m)
+	m.GenSnakeHash(m)
 }
 
-func (m *MoveRequest) SetMyLength() {
-	for _, snake := range m.Snakes {
-		if snake.Id == m.You && len(m.You) > 0 {
+func (m *MetaData) SetMyLength(data *MoveRequest) {
+	for _, snake := range data.Snakes {
+		if snake.Id == data.You && len(data.You) > 0 {
 			m.MyLength = len(snake.Coords)
 		}
 	}
@@ -103,9 +105,9 @@ type SnakeData struct {
 	lengthLeft int
 }
 
-func (m *MoveRequest) GenSnakeHash() {
+func (m *MetaData) GenSnakeHash(data *MoveRequest) {
 	m.SnakeHash = make(map[string]SnakeData)
-	for _, snake := range m.Snakes {
+	for _, snake := range data.Snakes {
 		for i, coord := range snake.Coords {
 			m.SnakeHash[coord.String()] = *&SnakeData{
 				id:         i,
@@ -115,24 +117,24 @@ func (m *MoveRequest) GenSnakeHash() {
 	}
 }
 
-func (m *MoveRequest) GenHazards() {
+func (m *MetaData) GenHazards(data *MoveRequest) {
 	m.Hazards = make(map[string]bool)
-	for _, snake := range m.Snakes {
-		if len(snake.Coords) >= m.MyLength && m.You != snake.Id {
+	for _, snake := range data.Snakes {
+		if len(snake.Coords) >= m.MyLength && data.You != snake.Id {
 			head := snake.Head()
-			d := head.Down(m)
+			d := head.Down(data)
 			if d != nil {
 				m.Hazards[d.String()] = true
 			}
-			d = head.Up(m)
+			d = head.Up(data)
 			if d != nil {
 				m.Hazards[d.String()] = true
 			}
-			d = head.Right(m)
+			d = head.Right(data)
 			if d != nil {
 				m.Hazards[d.String()] = true
 			}
-			d = head.Left(m)
+			d = head.Left(data)
 			if d != nil {
 				m.Hazards[d.String()] = true
 			}
@@ -144,9 +146,9 @@ func (m *MoveRequest) GenHazards() {
 	}
 }
 
-func (m *MoveRequest) GenFoodMap() {
+func (m *MetaData) GenFoodMap(data *MoveRequest) {
 	m.FoodMap = make(map[string]bool)
-	for _, food := range m.Food {
+	for _, food := range data.Food {
 		m.FoodMap[food.String()] = true
 	}
 }
@@ -167,7 +169,6 @@ type Snake struct {
 func NewMoveRequest(req *http.Request) (*MoveRequest, error) {
 	decoded := MoveRequest{}
 	err := json.NewDecoder(req.Body).Decode(&decoded)
-	decoded.init()
 	return &decoded, err
 }
 

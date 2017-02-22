@@ -96,9 +96,10 @@ func graphSearch(pos *Point, data *MoveRequest) []*StaticData {
 	return ret[1:]
 }
 
-func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string {
+func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	directions := []string{}
 	min := math.MaxInt64
+	metaD := data.Direcs
 	for _, direc := range moves {
 		if metaD[direc].ClosestFood < min {
 			directions = []string{}
@@ -112,7 +113,7 @@ func ClosestFoodDirections(metaD map[string]*MetaData, moves []string) []string 
 }
 
 func bestMove(data *MoveRequest) (string, error) {
-	moves, err := bestMoves(data.MD)
+	moves, err := bestMoves(data)
 	if err != nil {
 		return "", err
 	}
@@ -128,7 +129,7 @@ func bestMove(data *MoveRequest) (string, error) {
 }
 
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
-	last, err := data.MD[direc].moveMax()
+	last, err := data.Direcs[direc].moveMax()
 	if err != nil {
 		return 0
 	}
@@ -152,14 +153,14 @@ func ClosestFood(data []*StaticData) int {
 }
 
 func GenerateMetaData(data *MoveRequest) (*MoveRequest, error) {
-	metaD := make(MoveMetaData)
-	metaD["up"] = &MetaData{}
-	metaD["down"] = &MetaData{}
-	metaD["right"] = &MetaData{}
-	metaD["left"] = &MetaData{}
-	data.MD = metaD
+	data.init()
+	data.Direcs = make(MoveMetaData)
+	data.Direcs[UP] = &MetaDataDirec{}
+	data.Direcs[DOWN] = &MetaDataDirec{}
+	data.Direcs[LEFT] = &MetaDataDirec{}
+	data.Direcs[RIGHT] = &MetaDataDirec{}
 
-	for direc, direcMD := range metaD {
+	for direc, direcMD := range data.Direcs {
 		sd, err := getStaticData(data, direc)
 		if err != nil {
 			return data, err

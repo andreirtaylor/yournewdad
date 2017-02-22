@@ -40,6 +40,7 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 }
 
 func handleMove(res http.ResponseWriter, req *http.Request) {
+	ctx := appengine.NewContext(req)
 	data, err := NewMoveRequest(req)
 	if err != nil {
 		respond(res, MoveResponse{
@@ -59,6 +60,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			Move:  "up",
 			Taunt: toStringPointer("can't parse this!"),
 		})
+		log.Errorf(ctx, "Could not find a move for this data")
 		return
 	}
 
@@ -70,13 +72,13 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
+	log.Infof(ctx, "Incoming data: %#v", data)
 
 	_, err := GenerateMetaData(data)
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
 	}
-	log.Infof(ctx, "%#v", data)
 
 	move, err := bestMove(data)
 	if err != nil {

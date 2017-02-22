@@ -81,7 +81,6 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 	}
 
 	// need to make the hazards manually
-	req.init()
 
 	data, err := GenerateMetaData(req)
 	if err != nil {
@@ -101,7 +100,7 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 
 	moves := req.Width*req.Height - len(req.Snakes[0].Coords)
 
-	for direc, dirData := range data.MD {
+	for direc, dirData := range data.Direcs {
 		// all moves are possible except for moving onto yourself
 		moveMax, err := dirData.moveMax()
 		if direc != LEFT {
@@ -152,16 +151,13 @@ func TestMetaDataWithMoves(t *testing.T) {
 		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
 	}
 
-	// need to make the hazards manually
-	req.init()
-
 	req, err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
 
-	data := req.MD
-	movesAway := data[UP].MovesAway
+	direcs := req.Direcs
+	movesAway := direcs[UP].MovesAway
 	//for _, x := range movesAway {
 	//	fmt.Printf("%v\n", x)
 	//}
@@ -179,7 +175,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 	if m_5.Food != 2 {
 		t.Errorf("move 5 should have 2 food, got %v", m_5.Food)
 	}
-	maxMove, err := data[UP].moveMax()
+	maxMove, err := direcs[UP].moveMax()
 	if err != nil {
 		t.Errorf("getting moveMax %v", err)
 	}
@@ -236,39 +232,37 @@ func TestClosestFood(t *testing.T) {
 	}
 
 	// need to make the hazards manually
-	req.init()
-
 	req, err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
-	data := req.MD
+	direcs := req.Direcs
 
-	if data[LEFT].ClosestFood != 3 {
+	if direcs[LEFT].ClosestFood != 3 {
 		t.Errorf(
 			"closest food to the left is 3 moves away, got %v",
-			data[LEFT].ClosestFood)
+			direcs[LEFT].ClosestFood)
 	}
 
-	if data[RIGHT].ClosestFood != 5 {
+	if direcs[RIGHT].ClosestFood != 5 {
 		t.Errorf(
 			"closest food to the right should be 5 moves away got %v",
-			data[RIGHT].ClosestFood)
+			direcs[RIGHT].ClosestFood)
 	}
 
-	if data[UP].ClosestFood != 3 {
+	if direcs[UP].ClosestFood != 3 {
 		t.Errorf(
 			"expected the closest food up to be 3 moves away, got %v",
-			data[UP].ClosestFood)
+			direcs[UP].ClosestFood)
 	}
 
-	if data[DOWN].ClosestFood != math.MaxInt64 {
+	if direcs[DOWN].ClosestFood != math.MaxInt64 {
 		t.Errorf(
 			"Going down is invalid should be max int, got %v",
-			data[DOWN].ClosestFood)
+			direcs[DOWN].ClosestFood)
 	}
 
-	directions, err := FilterPossibleMoves(data)
+	directions, err := FilterPossibleMoves(req)
 	if err != nil {
 		t.Errorf("Unexpected error in filtering possible directions %v", err)
 	}
@@ -281,7 +275,7 @@ func TestClosestFood(t *testing.T) {
 		t.Errorf("expected all directions got %v", directions)
 	}
 
-	foodDirections := ClosestFoodDirections(data, directions)
+	foodDirections := ClosestFoodDirections(req, directions)
 	expectedFoodDirections := []string{LEFT, UP}
 	sort.Strings(foodDirections)
 	sort.Strings(expectedFoodDirections)
@@ -297,8 +291,6 @@ func TestSmallSpaceWithFood(t *testing.T) {
 	// if the snake wants to move down it is wrong!
 	req := &MoveRequest{GameId: "d3684dd4-975b-4449-91ea-7051ea3f47da", Height: 8, Width: 8, Turn: 17, Food: []Point{Point{X: 0, Y: 3}, Point{X: 6, Y: 0}, Point{X: 1, Y: 3}, Point{X: 0, Y: 7}, Point{X: 7, Y: 7}, Point{X: 5, Y: 0}, Point{X: 7, Y: 5}, Point{X: 7, Y: 3}, Point{X: 6, Y: 6}, Point{X: 5, Y: 4}}, Snakes: []Snake{Snake{Coords: []Point{Point{X: 0, Y: 6}, Point{X: 1, Y: 6}, Point{X: 2, Y: 6}, Point{X: 2, Y: 5}, Point{X: 2, Y: 4}, Point{X: 2, Y: 3}, Point{X: 2, Y: 2}, Point{X: 1, Y: 2}, Point{X: 1, Y: 2}}, HealthPoints: 100, Id: "be171270-8030-412d-81d7-72e2e1e97895", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "be171270-8030-412d-81d7-72e2e1e97895"}, Snake{Coords: []Point{Point{X: 5, Y: 7}, Point{X: 4, Y: 7}, Point{X: 3, Y: 7}, Point{X: 3, Y: 6}, Point{X: 3, Y: 5}, Point{X: 3, Y: 4}, Point{X: 3, Y: 3}, Point{X: 3, Y: 2}, Point{X: 3, Y: 1}, Point{X: 3, Y: 0}}, HealthPoints: 99, Id: "f220e2b6-7e02-4857-97e8-a5831d79ba78", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "f220e2b6-7e02-4857-97e8-a5831d79ba78"}}, You: "be171270-8030-412d-81d7-72e2e1e97895"}
 
-	req.init()
-
 	req, err := GenerateMetaData(req)
 
 	//fmt.Printf("%#v", req.Snakes[0])
@@ -306,8 +298,7 @@ func TestSmallSpaceWithFood(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
-	data := req.MD
-	moves, err := bestMoves(data)
+	moves, err := bestMoves(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror whlie getting best moves %v", err)
 	}
@@ -352,14 +343,12 @@ func TestRandom(t *testing.T) {
 		},
 		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
 	}
-	req.init()
 
 	req, err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
-	data := req.MD
-	moves, err := bestMoves(data)
+	moves, err := bestMoves(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror whlie getting best move %v", err)
 	}

@@ -7,13 +7,13 @@ import (
 // A file for all of the filtering of moves
 
 // not necessairily the best move but the move that we are going with
-func bestMoves(metaD map[string]*MetaData) ([]string, error) {
-	moves, err := FilterPossibleMoves(metaD)
+func bestMoves(data *MoveRequest) ([]string, error) {
+	moves, err := FilterPossibleMoves(data)
 	if err != nil {
 		return nil, err
 	}
-	moves = FilterMovesVsSpace(metaD, moves)
-	moves = ClosestFoodDirections(metaD, moves)
+	moves = FilterMovesVsSpace(data, moves)
+	moves = ClosestFoodDirections(data, moves)
 	return moves, nil
 }
 
@@ -43,10 +43,10 @@ func FilterMinimizeSpace(data *MoveRequest, moves []string) (string, error) {
 }
 
 // Filters out moves that will put you into tight places.
-func FilterMovesVsSpace(metaD map[string]*MetaData, moves []string) []string {
+func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 	ret := []string{}
 	for _, direc := range moves {
-		if metaD[direc].MovesVsSpace > -2 {
+		if data.Direcs[direc].MovesVsSpace > -2 {
 			//fmt.Printf("%v\n", ret)
 			ret = append(ret, direc)
 		}
@@ -54,9 +54,9 @@ func FilterMovesVsSpace(metaD map[string]*MetaData, moves []string) []string {
 	if len(ret) == 0 {
 		max := math.MinInt64
 		for _, direc := range moves {
-			if metaD[direc].MovesVsSpace < max {
+			if data.Direcs[direc].MovesVsSpace < max {
 				ret = []string{direc}
-			} else if metaD[direc].MovesVsSpace < max {
+			} else if data.Direcs[direc].MovesVsSpace < max {
 				ret = append(ret, direc)
 			}
 		}
@@ -64,11 +64,11 @@ func FilterMovesVsSpace(metaD map[string]*MetaData, moves []string) []string {
 	return ret
 }
 
-func FilterPossibleMoves(metaD map[string]*MetaData) ([]string, error) {
+func FilterPossibleMoves(data *MoveRequest) ([]string, error) {
 	directions := []string{UP, DOWN, LEFT, RIGHT}
 	ret := []string{}
 	for _, direc := range directions {
-		if len(metaD[direc].MovesAway) == 0 {
+		if len(data.Direcs[direc].MovesAway) == 0 {
 			ret = append(ret, direc)
 		}
 	}
