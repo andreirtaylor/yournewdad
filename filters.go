@@ -1,12 +1,24 @@
 package kaa
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"reflect"
+	"runtime"
 )
 
 func keepFMTFilters() {
 	fmt.Printf("")
+}
+
+func GetFunctionName(i interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()[29:]
+}
+
+var GROW_FUNCS = []func(*MoveRequest, []string) []string{
+	FilterMovesVsSpace,
+	ClosestFoodDirections,
 }
 
 // A file for all of the filtering of moves
@@ -17,8 +29,14 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	moves = FilterMovesVsSpace(data, moves)
-	moves = ClosestFoodDirections(data, moves)
+	for _, filt := range GROW_FUNCS {
+		moves = filt(data, moves)
+		if len(moves) == 0 {
+			return []string{}, errors.New(
+				fmt.Sprintf(
+					"0 results returned from %v", GetFunctionName(filt)))
+		}
+	}
 	return moves, nil
 }
 
