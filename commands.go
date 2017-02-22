@@ -44,6 +44,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	ctx := appengine.NewContext(req)
 	str := getMoveRequestString(req)
 
+	// log each and every json blob that comes in
 	log.Infof(ctx, str)
 
 	data, err := NewMoveRequest(str)
@@ -78,22 +79,8 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
 
-	//str, err := getJson(data)
-	//if err != nil {
-	//log.Errorf(ctx, "Unable to Unmarshal JSON")
-	//}
-
-	//	if str != "" {
-	//		log.Infof(ctx, "Incoming data: %v", str)
-	//	}
-	//
-	_, err := GenerateMetaData(data)
-	if err != nil {
-		log.Errorf(ctx, "generating MetaData: %v", err)
-		return "", err
-	}
-
 	move, err := bestMove(data)
+
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err

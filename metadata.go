@@ -152,7 +152,7 @@ func ClosestFood(data []*StaticData) int {
 	return math.MaxInt64
 }
 
-func GenerateMetaData(data *MoveRequest) (*MoveRequest, error) {
+func GenerateMetaData(data *MoveRequest) error {
 	data.init()
 	data.Direcs = make(MoveMetaData)
 	data.Direcs[UP] = &MetaDataDirec{}
@@ -163,12 +163,12 @@ func GenerateMetaData(data *MoveRequest) (*MoveRequest, error) {
 	for direc, direcMD := range data.Direcs {
 		sd, err := getStaticData(data, direc)
 		if err != nil {
-			return data, err
+			return err
 		}
 
 		direcMD.MovesAway = sd
 		direcMD.ClosestFood = ClosestFood(sd)
 		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 	}
-	return data, nil
+	return nil
 }

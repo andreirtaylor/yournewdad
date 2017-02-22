@@ -79,7 +79,7 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 
 	// need to make the hazards manually
 
-	data, err := GenerateMetaData(req)
+	err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
@@ -97,7 +97,7 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 
 	moves := req.Width*req.Height - len(req.Snakes[0].Coords)
 
-	for direc, dirData := range data.Direcs {
+	for direc, dirData := range req.Direcs {
 		// all moves are possible except for moving onto yourself
 		moveMax, err := dirData.moveMax()
 		if direc != LEFT {
@@ -148,7 +148,7 @@ func TestMetaDataWithMoves(t *testing.T) {
 		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
 	}
 
-	req, err := GenerateMetaData(req)
+	err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
@@ -229,7 +229,7 @@ func TestClosestFood(t *testing.T) {
 	}
 
 	// need to make the hazards manually
-	req, err := GenerateMetaData(req)
+	err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
@@ -288,7 +288,7 @@ func TestSmallSpaceWithFood(t *testing.T) {
 	// if the snake wants to move down it is wrong!
 	req := &MoveRequest{GameId: "d3684dd4-975b-4449-91ea-7051ea3f47da", Height: 8, Width: 8, Turn: 17, Food: []Point{Point{X: 0, Y: 3}, Point{X: 6, Y: 0}, Point{X: 1, Y: 3}, Point{X: 0, Y: 7}, Point{X: 7, Y: 7}, Point{X: 5, Y: 0}, Point{X: 7, Y: 5}, Point{X: 7, Y: 3}, Point{X: 6, Y: 6}, Point{X: 5, Y: 4}}, Snakes: []Snake{Snake{Coords: []Point{Point{X: 0, Y: 6}, Point{X: 1, Y: 6}, Point{X: 2, Y: 6}, Point{X: 2, Y: 5}, Point{X: 2, Y: 4}, Point{X: 2, Y: 3}, Point{X: 2, Y: 2}, Point{X: 1, Y: 2}, Point{X: 1, Y: 2}}, HealthPoints: 100, Id: "be171270-8030-412d-81d7-72e2e1e97895", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "be171270-8030-412d-81d7-72e2e1e97895"}, Snake{Coords: []Point{Point{X: 5, Y: 7}, Point{X: 4, Y: 7}, Point{X: 3, Y: 7}, Point{X: 3, Y: 6}, Point{X: 3, Y: 5}, Point{X: 3, Y: 4}, Point{X: 3, Y: 3}, Point{X: 3, Y: 2}, Point{X: 3, Y: 1}, Point{X: 3, Y: 0}}, HealthPoints: 99, Id: "f220e2b6-7e02-4857-97e8-a5831d79ba78", Name: "d3684dd4-975b-4449-91ea-7051ea3f47da (8x8)", Taunt: "f220e2b6-7e02-4857-97e8-a5831d79ba78"}}, You: "be171270-8030-412d-81d7-72e2e1e97895"}
 
-	req, err := GenerateMetaData(req)
+	err := GenerateMetaData(req)
 
 	//fmt.Printf("%#v", req.Snakes[0])
 
@@ -341,7 +341,7 @@ func TestRandom(t *testing.T) {
 		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
 	}
 
-	req, err := GenerateMetaData(req)
+	err := GenerateMetaData(req)
 	if err != nil {
 		t.Errorf("Unexpected Errror %v", err)
 	}
@@ -355,74 +355,16 @@ func TestRandom(t *testing.T) {
 }
 
 func TestStrangeDeath(t *testing.T) {
-	//	data, err := fromJSON(`{
-	//  "game_id": "06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0",
-	//  "height": 20,
-	//  "width": 20,
-	//  "turn": 642,
-	//  "food": [
-	//    { "x": 14, "y": 5 }, { "x": 3, "y": 3 }, { "x": 8, "y": 3 },
-	//    { "x": 2, "y": 14 }, { "x": 19, "y": 18 }, { "x": 2, "y": 19 },
-	//    { "x": 13, "y": 19 }, { "x": 4, "y": 11 }, { "x": 1, "y": 0 },
-	//    { "x": 7, "y": 6 }
-	//  ],
-	//  "snakes": [
-	//    {
-	//      "coords": [
-	//        { "x": 15, "y": 7 }, { "x": 15, "y": 6 }, { "x": 15, "y": 5 },
-	//	{ "x": 15, "y": 4 }, { "x": 15, "y": 3 }, { "x": 16, "y": 3 },
-	//        { "x": 16, "y": 2 }, { "x": 15, "y": 2 }, { "x": 15, "y": 1 },
-	//        { "x": 14, "y": 1 }, { "x": 13, "y": 1 }, { "x": 13, "y": 0 },
-	//        { "x": 12, "y": 0 }, { "x": 11, "y": 0 }, { "x": 10, "y": 0 },
-	//        { "x": 9, "y": 0 }, { "x": 9, "y": 1 }, { "x": 10, "y": 1 },
-	//        { "x": 11, "y": 1 }, { "x": 12, "y": 1 }, { "x": 12, "y": 2 },
-	//        { "x": 13, "y": 2 }, { "x": 14, "y": 2 }, { "x": 14, "y": 3 },
-	//        { "x": 13, "y": 3 }, { "x": 12, "y": 3 }, { "x": 12, "y": 4 },
-	//        { "x": 12, "y": 5 }, { "x": 12, "y": 6 }, { "x": 12, "y": 7 },
-	//        { "x": 11, "y": 7 }, { "x": 11, "y": 8 }, { "x": 10, "y": 8 },
-	//	{ "x": 9, "y": 8 }, { "x": 9, "y": 9 }, { "x": 9, "y": 10 },
-	//	{ "x": 9, "y": 11 }, { "x": 9, "y": 12 }, { "x": 10, "y": 12 },
-	//	{ "x": 11, "y": 12 }, { "x": 12, "y": 12 }, { "x": 13, "y": 12 },
-	//	{ "x": 14, "y": 12 }, { "x": 15, "y": 12 }, { "x": 16, "y": 12 },
-	//        { "x": 17, "y": 12 }, { "x": 17, "y": 11 }, { "x": 17, "y": 10 },
-	//        { "x": 17, "y": 9 }, { "x": 18, "y": 9 }, { "x": 18, "y": 10 },
-	//        { "x": 18, "y": 11 }, { "x": 18, "y": 12 }, { "x": 18, "y": 13 },
-	//        { "x": 18, "y": 14 }, { "x": 18, "y": 15 }, { "x": 18, "y": 16 },
-	//        { "x": 18, "y": 17 }, { "x": 17, "y": 17 }, { "x": 16, "y": 17 },
-	//        { "x": 16, "y": 18 }, { "x": 15, "y": 18 }, { "x": 14, "y": 18 },
-	//        { "x": 13, "y": 18 }, { "x": 12, "y": 18 }, { "x": 11, "y": 18 },
-	//        { "x": 10, "y": 18 }, { "x": 9, "y": 18 }, { "x": 8, "y": 18 },
-	//        { "x": 7, "y": 18 }, { "x": 6, "y": 18 }, { "x": 5, "y": 18 },
-	//        { "x": 5, "y": 17 }, { "x": 5, "y": 16 }, { "x": 4, "y": 16 },
-	//        { "x": 4, "y": 17 }, { "x": 4, "y": 18 }, { "x": 3, "y": 18 },
-	//        { "x": 3, "y": 17 }, { "x": 3, "y": 16 }, { "x": 3, "y": 15 },
-	//        { "x": 3, "y": 14 }, { "x": 3, "y": 13 }, { "x": 2, "y": 13 },
-	//        { "x": 1, "y": 13 }, { "x": 1, "y": 12 }, { "x": 1, "y": 11 },
-	//        { "x": 1, "y": 10 }, { "x": 1, "y": 9 }, { "x": 1, "y": 8 },
-	//        { "x": 0, "y": 8 }, { "x": 0, "y": 7 }, { "x": 1, "y": 7 },
-	//        { "x": 2, "y": 7 }, { "x": 2, "y": 8 }, { "x": 2, "y": 9 },
-	//        { "x": 2, "y": 10 }, { "x": 2, "y": 11 }, { "x": 2, "y": 12 },
-	//        { "x": 3, "y": 12 }, { "x": 4, "y": 12 }, { "x": 5, "y": 12 },
-	//        { "x": 6, "y": 12 }, { "x": 6, "y": 11 }, { "x": 6, "y": 10 },
-	//        { "x": 6, "y": 9 }, { "x": 6, "y": 8 }, { "x": 5, "y": 8 },
-	//        { "x": 4, "y": 8 }, { "x": 4, "y": 7 }, { "x": 4, "y": 6 },
-	//        { "x": 4, "y": 5 }, { "x": 4, "y": 4 }, { "x": 4, "y": 3 },
-	//        { "x": 4, "y": 2 }, { "x": 3, "y": 2 }, { "x": 2, "y": 2 },
-	//        { "x": 2, "y": 1 }, { "x": 2, "y": 1 }
-	//      ],
-	//      "health_points": 100,
-	//      "id": "89d8690a-d3ee-49ea-a272-968c7bf467d2",
-	//      "name": "06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0 (20x20)",
-	//      "taunt": "battlesnake-go!"
-	//    }
-	//  ],
-	//  "you": "89d8690a-d3ee-49ea-a272-968c7bf467d2",
-	//  "MyLength": 0}`)
 	data, err := NewMoveRequest(`{"you":"89d8690a-d3ee-49ea-a272-968c7bf467d2","width":20,"turn":642,"snakes":[{"taunt":"battlesnake-go!","name":"06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0 (20x20)","id":"89d8690a-d3ee-49ea-a272-968c7bf467d2","health_points":100,"coords":[[15,7],[15,6],[15,5],[15,4],[15,3],[16,3],[16,2],[15,2],[15,1],[14,1],[13,1],[13,0],[12,0],[11,0],[10,0],[9,0],[9,1],[10,1],[11,1],[12,1],[12,2],[13,2],[14,2],[14,3],[13,3],[12,3],[12,4],[12,5],[12,6],[12,7],[11,7],[11,8],[10,8],[9,8],[9,9],[9,10],[9,11],[9,12],[10,12],[11,12],[12,12],[13,12],[14,12],[15,12],[16,12],[17,12],[17,11],[17,10],[17,9],[18,9],[18,10],[18,11],[18,12],[18,13],[18,14],[18,15],[18,16],[18,17],[17,17],[16,17],[16,18],[15,18],[14,18],[13,18],[12,18],[11,18],[10,18],[9,18],[8,18],[7,18],[6,18],[5,18],[5,17],[5,16],[4,16],[4,17],[4,18],[3,18],[3,17],[3,16],[3,15],[3,14],[3,13],[2,13],[1,13],[1,12],[1,11],[1,10],[1,9],[1,8],[0,8],[0,7],[1,7],[2,7],[2,8],[2,9],[2,10],[2,11],[2,12],[3,12],[4,12],[5,12],[6,12],[6,11],[6,10],[6,9],[6,8],[5,8],[4,8],[4,7],[4,6],[4,5],[4,4],[4,3],[4,2],[3,2],[2,2],[2,1],[2,1]]}],"height":20,"game_id":"06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0","food":[[2,5],[3,3],[8,3],[2,14],[19,18],[2,19],[13,19],[4,11],[1,0],[7,6]],"dead_snakes":[]}`)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
 	}
 	data.init()
-	fmt.Printf("%#v\n", data)
+
+	//moves, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("Unexpected Errror whlie getting best move %v", err)
+	}
+	//fmt.Printf("%v", moves)
 }

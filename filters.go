@@ -1,8 +1,13 @@
 package kaa
 
 import (
+	"fmt"
 	"math"
 )
+
+func keepFMTFilters() {
+	fmt.Printf("")
+}
 
 // A file for all of the filtering of moves
 

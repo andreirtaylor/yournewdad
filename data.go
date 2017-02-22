@@ -104,6 +104,11 @@ func NewMoveRequest(str string) (*MoveRequest, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = GenerateMetaData(res)
+	if err != nil {
+		return nil, err
+	}
+
 	return res, nil
 }
 
