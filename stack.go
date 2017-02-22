@@ -1,15 +1,15 @@
-import (
-	"fmt"
-)
+package kaa
+
+import ()
 
 type Stack struct {
-	top *Element
+	top  *Element
 	size int
 }
 
 type Element struct {
-	value interface{} // All types satisfy the empty interface, so we can store anything here.
-	next *Element
+	value *Point
+	next  *Element
 }
 
 // Return the stack's length
@@ -18,7 +18,10 @@ func (s *Stack) Len() int {
 }
 
 // Push a new element onto the stack
-func (s *Stack) Push(value interface{}) {
+func (s *Stack) Push(value *Point) {
+	if value == nil {
+		return
+	}
 	s.top = &Element{value, s.top}
 	s.size++
 }
@@ -32,19 +35,4 @@ func (s *Stack) Pop() (value interface{}) {
 		return
 	}
 	return nil
-}
-
-func main() {
-	stack := new(Stack)
-	
-	stack.Push("Things")
-	stack.Push("and")
-	stack.Push("Stuff")
-	
-	for stack.Len() > 0 {
-		// We have to do a type assertion because we get back a variable of type
-		// interface{} while the underlying type is a string.
-		fmt.Printf("%s ", stack.Pop().(string))
-	}
-	fmt.Println()
 }
