@@ -92,6 +92,21 @@ func (m *MoveRequest) init() {
 	m.GenSnakeHash(m)
 }
 
+func getMoveRequestString(req *http.Request) string {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(req.Body)
+	return buf.String()
+}
+
+func NewMoveRequest(str string) (*MoveRequest, error) {
+	res := new(MoveRequest)
+	err := json.Unmarshal([]byte(str), res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (m *MetaData) SetMyLength(data *MoveRequest) {
 	for _, snake := range data.Snakes {
 		if snake.Id == data.You && len(data.You) > 0 {
@@ -166,10 +181,12 @@ type Snake struct {
 	Taunt        string  `json:"taunt"`
 }
 
-func NewMoveRequest(req *http.Request) (*MoveRequest, error) {
-	decoded := MoveRequest{}
-	err := json.NewDecoder(req.Body).Decode(&decoded)
-	return &decoded, err
+func getJson(data *MoveRequest) (string, error) {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
 
 func NewGameStartRequest(req *http.Request) (*GameStartRequest, error) {

@@ -27,21 +27,26 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 		})
 	}
 
-	scheme := "http"
-	if req.TLS != nil {
-		scheme = "https"
+	color := "gold"
+	if appengine.IsDevAppServer() {
+		color = "gold"
 	}
+
 	respond(res, GameStartResponse{
 		Taunt:   toStringPointer("battlesnake-go!"),
-		Color:   "#00FF00",
+		Color:   color,
 		Name:    fmt.Sprintf("%v (%vx%v)", data.GameId, data.Width, data.Height),
-		HeadUrl: toStringPointer(fmt.Sprintf("%v://%v/static/head.png", scheme, req.Host)),
+		HeadUrl: toStringPointer("https://media.giphy.com/media/I2v9aehFlQBQ4/giphy.gif"),
 	})
 }
 
 func handleMove(res http.ResponseWriter, req *http.Request) {
 	ctx := appengine.NewContext(req)
-	data, err := NewMoveRequest(req)
+	str := getMoveRequestString(req)
+
+	log.Infof(ctx, str)
+
+	data, err := NewMoveRequest(str)
 	if err != nil {
 		respond(res, MoveResponse{
 			Move:  "up",
@@ -72,8 +77,16 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
-	log.Infof(ctx, "Incoming data: %#v", data)
 
+	//str, err := getJson(data)
+	//if err != nil {
+	//log.Errorf(ctx, "Unable to Unmarshal JSON")
+	//}
+
+	//	if str != "" {
+	//		log.Infof(ctx, "Incoming data: %v", str)
+	//	}
+	//
 	_, err := GenerateMetaData(data)
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
