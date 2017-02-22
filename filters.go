@@ -8,12 +8,18 @@ import (
 	"runtime"
 )
 
-func keepFMTFilters() {
+// used to keep the fmt function around for filters
+func keepFMTForFilters() {
 	fmt.Printf("")
 }
 
 func GetFunctionName(i interface{}) string {
-	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()[29:]
+	funcName := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+	if len(funcName) < 29 {
+		return funcName
+	}
+
+	return funcName[29:]
 }
 
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
