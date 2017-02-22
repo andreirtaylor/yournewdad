@@ -73,9 +73,9 @@ func FilterPossibleMoves(data *MoveRequest) ([]string, error) {
 	directions := []string{UP, DOWN, LEFT, RIGHT}
 	ret := []string{}
 	for _, direc := range directions {
-		if len(data.Direcs[direc].MovesAway) == 0 {
+		if len(data.Direcs[direc].MovesAway) != 0 {
 			ret = append(ret, direc)
 		}
 	}
-	return directions, nil
+	return ret, nil
 }

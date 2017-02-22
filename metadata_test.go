@@ -264,12 +264,12 @@ func TestClosestFood(t *testing.T) {
 		t.Errorf("Unexpected error in filtering possible directions %v", err)
 	}
 
-	all := []string{LEFT, DOWN, UP, RIGHT}
+	all := []string{LEFT, UP, RIGHT}
 	sort.Strings(all)
 	sort.Strings(directions)
 
 	if !reflect.DeepEqual(directions, all) {
-		t.Errorf("expected all directions got %v", directions)
+		t.Errorf("expected all directions except down, got %v", directions)
 	}
 
 	foodDirections := ClosestFoodDirections(req, directions)
@@ -360,11 +360,16 @@ func TestStrangeDeath(t *testing.T) {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	data.init()
 
-	//moves, err := bestMoves(data)
+	moves, err := bestMoves(data)
 	if err != nil {
 		t.Errorf("Unexpected Errror whlie getting best move %v", err)
 	}
-	//fmt.Printf("%v", moves)
+
+	for _, move := range moves {
+		if move == UP {
+			t.Errorf("You cant move onto yourself")
+		}
+	}
+
 }
