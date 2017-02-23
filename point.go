@@ -103,6 +103,23 @@ func (point *Point) Right(data *MoveRequest) *Point {
 	return ret
 }
 
+// returns a map that has strings correspondings to the valid neighbours
+func (p *Point) GetValidNeighboursMap(data *MoveRequest) map[string]bool {
+	pts := []*Point{
+		p.Up(data),
+		p.Down(data),
+		p.Left(data),
+		p.Right(data)}
+
+	m := make(map[string]bool)
+	for _, pt := range pts {
+		if pt != nil {
+			m[pt.String()] = true
+		}
+	}
+	return m
+}
+
 // Hazard functions return the points of Hazards as well as
 // valid moves
 // returns nil if the point is a wall

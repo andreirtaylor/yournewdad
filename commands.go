@@ -60,6 +60,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	//SaveMove(data, req)
 
 	move, err := getMove(data, req)
+	log.Infof(ctx, "%v", data.tightSpace)
 
 	if err != nil {
 		respond(res, MoveResponse{

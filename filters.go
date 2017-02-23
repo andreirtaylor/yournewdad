@@ -23,19 +23,30 @@ func GetFunctionName(i interface{}) string {
 }
 
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
+	FilterPossibleMoves,
 	FilterMovesVsSpace,
 	ClosestFoodDirections,
+}
+
+var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
+	FilterPossibleMoves,
+	FilterMovesVsSpace,
+	FilterMinimizeSpace,
 }
 
 // A file for all of the filtering of moves
 
 // not necessairily the best move but the move that we are going with
 func bestMoves(data *MoveRequest) ([]string, error) {
-	moves, err := FilterPossibleMoves(data)
-	if err != nil {
-		return nil, err
+	moves := []string{UP, DOWN, LEFT, RIGHT}
+
+	funcArray := GROW_FUNCS
+
+	if data.MetaData.tightSpace {
+		funcArray = SPACE_SAVING_FUNCS
 	}
-	for _, filt := range GROW_FUNCS {
+
+	for _, filt := range funcArray {
 		moves = filt(data, moves)
 		if len(moves) == 0 {
 			return []string{}, errors.New(
@@ -46,29 +57,29 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	return moves, nil
 }
 
-func FilterMinimizeSpace(data *MoveRequest, moves []string) (string, error) {
+func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
 	min := math.MaxInt64
 	ret := ""
 	head, err := getMyHead(data)
 	if err != nil {
-		return "", err
+		return []string{}
 	}
 	for _, direc := range moves {
 		p, err := GetPointInDirection(&head, direc, data)
 		if err != nil {
-			return "", err
+			return []string{}
 		}
 
 		neighbours, err := GetNumNeighbours(data, p)
 		if err != nil {
-			return "", err
+			return []string{}
 		}
 		if neighbours < min {
 			ret = direc
 			min = neighbours
 		}
 	}
-	return ret, nil
+	return []string{ret}
 }
 
 // Filters out moves that will put you into tight places.
@@ -83,23 +94,21 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 	if len(ret) == 0 {
 		max := math.MinInt64
 		for _, direc := range moves {
-			if data.Direcs[direc].MovesVsSpace < max {
+			if data.Direcs[direc].MovesVsSpace > max {
 				ret = []string{direc}
-			} else if data.Direcs[direc].MovesVsSpace < max {
-				ret = append(ret, direc)
+				max = data.Direcs[direc].MovesVsSpace
 			}
 		}
 	}
 	return ret
 }
 
-func FilterPossibleMoves(data *MoveRequest) ([]string, error) {
-	directions := []string{UP, DOWN, LEFT, RIGHT}
+func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 	ret := []string{}
 	for _, direc := range directions {
 		if len(data.Direcs[direc].MovesAway) != 0 {
 			ret = append(ret, direc)
 		}
 	}
-	return ret, nil
+	return ret
 }

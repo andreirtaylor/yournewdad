@@ -19,7 +19,25 @@ func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
 	if err != nil {
 		return nil, err
 	}
-	return graphSearch(p, data, direc), nil
+	if p != nil {
+		data.Hazards[p.String()] = true
+		if !data.FoodMap[p.String()] {
+			t, _ := getMyTail(data)
+			data.Hazards[t.String()] = false
+		}
+
+	}
+
+	ret := graphSearch(p, data, direc)
+
+	if p != nil {
+		data.Hazards[p.String()] = false
+		if !data.FoodMap[p.String()] {
+			t, _ := getMyTail(data)
+			data.Hazards[t.String()] = true
+		}
+	}
+	return ret, nil
 }
 
 func pushOntoPQ(
@@ -130,11 +148,7 @@ func bestMove(data *MoveRequest) (string, error) {
 		return "", errors.New("Unable to give you a good Move")
 	}
 
-	move, err := FilterMinimizeSpace(data, moves)
-	if err != nil {
-		return "", err
-	}
-	return move, nil
+	return moves[0], nil
 }
 
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
@@ -169,6 +183,7 @@ func GenerateMetaData(data *MoveRequest) error {
 	data.Direcs[LEFT] = &MetaDataDirec{}
 	data.Direcs[RIGHT] = &MetaDataDirec{}
 
+	tightSpace := true
 	for direc, direcMD := range data.Direcs {
 		sd, err := getStaticData(data, direc)
 		if err != nil {
@@ -178,7 +193,10 @@ func GenerateMetaData(data *MoveRequest) error {
 		direcMD.MovesAway = sd
 		direcMD.ClosestFood = ClosestFood(sd)
 		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
-
+		if direcMD.MovesVsSpace > 5 {
+			tightSpace = false
+		}
 	}
+	data.tightSpace = tightSpace
 	return nil
 }

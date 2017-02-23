@@ -62,4 +62,10 @@ func TestSetMinSnakePointInArea(t *testing.T) {
 	if !reflect.DeepEqual(p, &expected) {
 		t.Errorf("Expected %v to be %v", p, expected)
 	}
+
+	expected = Point{X: 6, Y: 1}
+	tail, _ := getMyTail(data)
+	if !reflect.DeepEqual(&tail, &expected) {
+		t.Errorf("Expected %v to be %v", tail, expected)
+	}
 }

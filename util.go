@@ -86,3 +86,12 @@ func getMyHead(data *MoveRequest) (Point, error) {
 	}
 	return Point{}, errors.New("Could not get head")
 }
+
+func getMyTail(data *MoveRequest) (Point, error) {
+	for _, snake := range data.Snakes {
+		if snake.Id == data.You && len(data.You) > 0 {
+			return snake.Coords[len(snake.Coords)-1], nil
+		}
+	}
+	return Point{}, errors.New("Could not get head")
+}

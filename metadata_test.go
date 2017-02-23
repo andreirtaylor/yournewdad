@@ -52,67 +52,36 @@ func TestPoint(t *testing.T) {
 }
 
 func TestMetaDataOnlyOneSnake(t *testing.T) {
-	req := &MoveRequest{
-		Height: 20,
-		Width:  20,
-		Food: []Point{
-			Point{X: 5, Y: 13},
-			Point{X: 5, Y: 8},
-		},
-		Snakes: []Snake{
-			Snake{
-				Coords: []Point{
-					Point{X: 14, Y: 12},
-					Point{X: 13, Y: 12},
-					Point{X: 13, Y: 13},
-					// snake layout
-					//   | x | x |
-					//   | x |   |
-				},
-				HealthPoints: 80,
-				Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
-				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-				Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
-		},
-		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
-	}
+	data, err := NewMoveRequest(`{"you":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","width":10,"turn":233,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","health_points":100,"coords":[[1,3],[0,3],[0,4],[0,5],[0,6],[0,7],[1,7],[2,7],[3,7],[3,8],[3,9],[4,9],[4,8],[4,7],[4,6],[4,5],[5,5],[5,4],[6,4],[7,4],[7,3],[6,3],[5,3],[4,3],[4,4],[3,4],[3,3],[3,2],[4,2],[5,2],[5,1],[4,1],[3,1],[2,1],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[9,1],[9,2],[9,2]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[6,2],[7,5],[2,3]],"dead_snakes":[]}`)
 
-	// need to make the hazards manually
-
-	err := GenerateMetaData(req)
 	if err != nil {
-		t.Errorf("Unexpected Errror %v", err)
+		t.Logf("error: %v", err)
 	}
 
-	head, err := getMyHead(req)
+	head, err := getMyHead(data)
 	if err != nil {
 		t.Errorf("Getting Head %v", err)
 	}
 
 	if !reflect.DeepEqual(head, Point{X: 14, Y: 12}) {
-		t.Errorf("Expected %v to be %v", head, Point{X: 14, Y: 12})
+		t.Errorf("Expected %v to be %v", head, Point{X: 1, Y: 3})
 	}
 
 	// all moves are possible except moving onto yourself
 
-	moves := req.Width*req.Height - len(req.Snakes[0].Coords)
+	moves := data.Width*data.Height - len(data.Snakes[0].Coords)
 
-	for direc, dirData := range req.Direcs {
+	for direc, dirData := range data.Direcs {
 		// all moves are possible except for moving onto yourself
 		moveMax, err := dirData.moveMax()
+		if err != nil {
+			t.Errorf("getting moveMax %v", err)
+			continue
+		}
 		if direc != LEFT {
-
-			if moveMax.Moves != moves {
+			if moveMax.Moves != moves[direc] {
 				t.Errorf("expected %v to be %v", moveMax.Moves, moves)
 			}
-			if err != nil {
-				t.Errorf("getting moveMax %v", err)
-				continue
-			}
-			if moveMax.Snakes != 0 {
-				t.Errorf("Expected %v to be %v", moveMax.Snakes, 0)
-			}
-
 		} else {
 			if moveMax != nil {
 				t.Errorf("Moving left moves you onto your body, it is not a valid move")
@@ -259,10 +228,7 @@ func TestClosestFood(t *testing.T) {
 			direcs[DOWN].ClosestFood)
 	}
 
-	directions, err := FilterPossibleMoves(req)
-	if err != nil {
-		t.Errorf("Unexpected error in filtering possible directions %v", err)
-	}
+	directions := FilterPossibleMoves(req, []string{UP, DOWN, LEFT, RIGHT})
 
 	all := []string{LEFT, UP, RIGHT}
 	sort.Strings(all)

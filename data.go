@@ -14,9 +14,10 @@ import (
 // have name colisions with the MoveRequest struct
 type MetaData struct {
 	// denotes the number of moves until you reach the closest piece of food
-	MyLength int
-	Hazards  map[string]bool
-	FoodMap  map[string]bool
+	MyLength   int
+	Hazards    map[string]bool
+	FoodMap    map[string]bool
+	tightSpace bool
 	// making this a pointer makes it able to be tested against
 	// nil so we might as well keep it like this
 	SnakeHash map[string]*SnakeData
