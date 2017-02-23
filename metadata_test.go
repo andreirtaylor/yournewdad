@@ -354,29 +354,8 @@ func TestRandom(t *testing.T) {
 	}
 }
 
-func TestStrangeDeath(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"89d8690a-d3ee-49ea-a272-968c7bf467d2","width":20,"turn":642,"snakes":[{"taunt":"battlesnake-go!","name":"06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0 (20x20)","id":"89d8690a-d3ee-49ea-a272-968c7bf467d2","health_points":100,"coords":[[15,7],[15,6],[15,5],[15,4],[15,3],[16,3],[16,2],[15,2],[15,1],[14,1],[13,1],[13,0],[12,0],[11,0],[10,0],[9,0],[9,1],[10,1],[11,1],[12,1],[12,2],[13,2],[14,2],[14,3],[13,3],[12,3],[12,4],[12,5],[12,6],[12,7],[11,7],[11,8],[10,8],[9,8],[9,9],[9,10],[9,11],[9,12],[10,12],[11,12],[12,12],[13,12],[14,12],[15,12],[16,12],[17,12],[17,11],[17,10],[17,9],[18,9],[18,10],[18,11],[18,12],[18,13],[18,14],[18,15],[18,16],[18,17],[17,17],[16,17],[16,18],[15,18],[14,18],[13,18],[12,18],[11,18],[10,18],[9,18],[8,18],[7,18],[6,18],[5,18],[5,17],[5,16],[4,16],[4,17],[4,18],[3,18],[3,17],[3,16],[3,15],[3,14],[3,13],[2,13],[1,13],[1,12],[1,11],[1,10],[1,9],[1,8],[0,8],[0,7],[1,7],[2,7],[2,8],[2,9],[2,10],[2,11],[2,12],[3,12],[4,12],[5,12],[6,12],[6,11],[6,10],[6,9],[6,8],[5,8],[4,8],[4,7],[4,6],[4,5],[4,4],[4,3],[4,2],[3,2],[2,2],[2,1],[2,1]]}],"height":20,"game_id":"06e65a2e-dc3b-4d19-80c3-aa436a0f7ca0","food":[[2,5],[3,3],[8,3],[2,14],[19,18],[2,19],[13,19],[4,11],[1,0],[7,6]],"dead_snakes":[]}`)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-		return
-	}
-
-	moves, err := bestMoves(data)
-	if err != nil {
-		t.Errorf("Unexpected Errror whlie getting best move %v", err)
-	}
-
-	for _, move := range moves {
-		if move == UP {
-			t.Errorf("You cant move onto yourself")
-		}
-	}
-
-}
-
 func TestEfficientSpace(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"dfda0e37-be0c-4ea6-a1b3-09bb6799c06a","width":10,"turn":80,"snakes":[{"taunt":"battlesnake-go!","name":"641321b4-48e4-420b-9358-72947fc21dfb (10x10)","id":"dfda0e37-be0c-4ea6-a1b3-09bb6799c06a","health_points":100,"coords":[[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7],[8,7],[7,7],[6,7],[5,7],[4,7],[4,6],[3,6],[2,6],[1,6],[1,7],[1,8],[0,8],[0,7],[0,6],[0,5],[0,4],[0,3],[1,3],[1,2],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[5,1],[5,2],[5,3],[5,3]]}],"height":10,"game_id":"641321b4-48e4-420b-9358-72947fc21dfb","food":[[2,9],[5,8],[6,0],[1,1],[1,4],[3,4],[7,3],[8,3],[4,9],[9,0]],"dead_snakes":[]}
-`)
+	data, err := NewMoveRequest(`{"you":"0623b12a-411b-4674-a115-591063ef92d3","width":10,"turn":124,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"0623b12a-411b-4674-a115-591063ef92d3","health_points":96,"coords":[[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,3],[7,4],[7,5],[7,6],[6,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[5,5],[5,4],[5,3],[5,2],[6,2],[6,1]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[0,0],[1,3],[4,0]],"dead_snakes":[]}`)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
@@ -384,10 +363,15 @@ func TestEfficientSpace(t *testing.T) {
 
 	move, err := bestMove(data)
 	if err != nil {
-		t.Errorf("Unexpected Errror whlie getting best move %v", err)
+		t.Errorf("%v", err)
 	}
 
-	if move != LEFT {
+	totalMoves := data.Direcs[DOWN].TotalMoves
+	if totalMoves != 30 {
+		t.Errorf("Expected 30 total moves got, %v", totalMoves)
+	}
+
+	if move != DOWN {
 		t.Errorf("Expected Move to be left got, %v", move)
 	}
 

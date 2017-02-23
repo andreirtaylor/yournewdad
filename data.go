@@ -14,10 +14,12 @@ import (
 // have name colisions with the MoveRequest struct
 type MetaData struct {
 	// denotes the number of moves until you reach the closest piece of food
-	MyLength  int
-	Hazards   map[string]bool
-	FoodMap   map[string]bool
-	SnakeHash map[string]SnakeData
+	MyLength int
+	Hazards  map[string]bool
+	FoodMap  map[string]bool
+	// making this a pointer makes it able to be tested against
+	// nil so we might as well keep it like this
+	SnakeHash map[string]*SnakeData
 	Direcs    MoveMetaData
 }
 
@@ -33,8 +35,25 @@ type MetaDataDirec struct {
 	MovesVsSpace int
 	// the total number of moves possible in this direction
 	TotalMoves int
+	// contains a map to the last accessable piece of a snake
+	// from your current location if you moved in this direction
+	KeySnakeData map[int]*SnakeData
 	// definied by the itoa above
 	MovesAway []*StaticData
+}
+
+// minKeySnakePart
+// returns the snake data for the point you are waiting to open up
+// it is the least number of moves that anyone around you can make before
+// you are able to exit the area you are in
+func (m *MetaDataDirec) minKeySnakePart() *SnakeData {
+	var min *SnakeData
+	for _, val := range m.KeySnakeData {
+		if min == nil || min.lengthLeft > val.lengthLeft {
+			min = val
+		}
+	}
+	return min
 }
 
 // String
@@ -78,19 +97,23 @@ func (m *MetaData) SetMyLength(data *MoveRequest) {
 type SnakeData struct {
 	id         int
 	lengthLeft int
+	pnt        *Point
 }
+
+func (s *SnakeData) String() string { return fmt.Sprintf("%#v", s) }
 
 // GenenSnakeHash
 //	generates a map of all the points in all the snakes
 //	is used to determine how much of the snake must move
 //      in order for the area they are blocking to be open
 func (m *MetaData) GenSnakeHash(data *MoveRequest) {
-	m.SnakeHash = make(map[string]SnakeData)
-	for _, snake := range data.Snakes {
-		for i, coord := range snake.Coords {
-			m.SnakeHash[coord.String()] = *&SnakeData{
+	m.SnakeHash = make(map[string]*SnakeData)
+	for i, snake := range data.Snakes {
+		for j, coord := range snake.Coords {
+			m.SnakeHash[coord.String()] = &SnakeData{
 				id:         i,
-				lengthLeft: len(snake.Coords) - i - 1,
+				lengthLeft: len(snake.Coords) - j - 1,
+				pnt:        &Point{coord.X, coord.Y},
 			}
 		}
 	}

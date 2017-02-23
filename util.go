@@ -5,6 +5,34 @@ import (
 	"fmt"
 )
 
+// get the position of all neighbouring snake tiles and
+// return the snake data corresponding to the last piece
+// of snake that you see
+// if there are no snakes around you return nil
+func FindMinSnakePointInArea(p *Point, data *MoveRequest, direc string) {
+	pts := []*Point{
+		p.UpHazard(data),
+		p.DownHazard(data),
+		p.LeftHazard(data),
+		p.RightHazard(data)}
+
+	if data.Direcs[direc].KeySnakeData == nil {
+		data.Direcs[direc].KeySnakeData = make(map[int]*SnakeData)
+	}
+
+	for _, pt := range pts {
+		if pt != nil {
+			sd := data.SnakeHash[pt.String()]
+			if sd != nil {
+				if data.Direcs[direc].KeySnakeData[sd.id] == nil ||
+					sd.lengthLeft < data.Direcs[direc].KeySnakeData[sd.id].lengthLeft {
+					data.Direcs[direc].KeySnakeData[sd.id] = sd
+				}
+			}
+		}
+	}
+}
+
 // returns the number of valid neighbours to a point p
 func GetNumNeighbours(data *MoveRequest, p *Point) (int, error) {
 	if p == nil {
