@@ -11,7 +11,6 @@ goapp serve -host=192.168.0.33
 ## TODO
 
 guess where the snakes are going
-efficiently use space when you are getting larger
 make moves to trap other snakes
 account for tail movement
-predict moves ahead
+predict 1 move ahead
