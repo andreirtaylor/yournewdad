@@ -2,9 +2,7 @@ package kaa
 
 import (
 	"fmt"
-	"math"
 	"reflect"
-	"sort"
 	"testing"
 )
 
@@ -90,80 +88,76 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 	//	}
 }
 
-func TestClosestFood(t *testing.T) {
-	req := &MoveRequest{
-		Height: 20,
-		Width:  20,
-		Food: []Point{
-			Point{X: 11, Y: 9},
-			Point{X: 11, Y: 10},
-			Point{X: 14, Y: 8},
-			Point{X: 12, Y: 11},
-		},
-		Snakes: []Snake{
-			Snake{
-				Coords: []Point{
-					Point{X: 14, Y: 12},
-					Point{X: 14, Y: 13},
-					// snake layout
-					//   | x |
-				},
-				HealthPoints: 80,
-				Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
-				Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-				Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
-		},
-		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
-	}
+func TestClosestFoodNoFood(t *testing.T) {
+	data, err := NewMoveRequest(`{"you":"0623b12a-411b-4674-a115-591063ef92d3","width":10,"turn":124,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"0623b12a-411b-4674-a115-591063ef92d3","health_points":96,"coords":[[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,3],[7,4],[7,5],[7,6],[6,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[5,5],[5,4],[5,3],[5,2],[6,2],[6,1]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[0,0],[1,3],[4,0]],"dead_snakes":[]}`)
 
-	// need to make the hazards manually
-	err := GenerateMetaData(req)
 	if err != nil {
-		t.Errorf("Unexpected Errror %v", err)
+		t.Logf("error: %v", err)
 	}
-	direcs := req.Direcs
+	direcs := data.Direcs
 
-	if direcs[LEFT].ClosestFood != 3 {
+	expected := 0
+	if direcs[LEFT].ClosestFood != expected {
 		t.Errorf(
-			"closest food to the left is 3 moves away, got %v",
-			direcs[LEFT].ClosestFood)
+			"closest food LEFT is %v moves away, got %v",
+			expected, direcs[LEFT].ClosestFood)
 	}
 
-	if direcs[RIGHT].ClosestFood != 5 {
+	if direcs[RIGHT].ClosestFood != expected {
 		t.Errorf(
-			"closest food to the right should be 5 moves away got %v",
-			direcs[RIGHT].ClosestFood)
+			"closest food RIGHT is %v moves away, got %v",
+			expected, direcs[RIGHT].ClosestFood)
 	}
 
-	if direcs[UP].ClosestFood != 3 {
+	if direcs[UP].ClosestFood != expected {
 		t.Errorf(
-			"expected the closest food up to be 3 moves away, got %v",
-			direcs[UP].ClosestFood)
+			"closest food UP is %v moves away, got %v",
+			expected, direcs[UP].ClosestFood)
 	}
 
-	if direcs[DOWN].ClosestFood != math.MaxInt64 {
+	if direcs[DOWN].ClosestFood != expected {
 		t.Errorf(
-			"Going down is invalid should be max int, got %v",
-			direcs[DOWN].ClosestFood)
+			"closest food DOWN is %v moves away, got %v",
+			expected, direcs[DOWN].ClosestFood)
 	}
 
-	directions := FilterPossibleMoves(req, []string{UP, DOWN, LEFT, RIGHT})
+}
 
-	all := []string{LEFT, UP, RIGHT}
-	sort.Strings(all)
-	sort.Strings(directions)
+func TestClosestFoodWithFood(t *testing.T) {
+	data, err := NewMoveRequest(` {"you":"3de4f206-1538-4bfc-ad49-4cb17fc61bb5","width":10,"turn":8,"snakes":[{"taunt":"Dad 2.0 Ready","name":"Your New Dad","id":"3de4f206-1538-4bfc-ad49-4cb17fc61bb5","health_points":92,"coords":[[5,8],[6,8],[7,8]]}],"height":10,"game_id":"8d58c168-aa8c-4395-90dc-79e36b32bf1e","food":[[2,5],[5,7],[1,8],[8,7],[6,2],[2,8],[7,4],[6,3],[4,2],[6,4]],"dead_snakes":[]}`)
 
-	if !reflect.DeepEqual(directions, all) {
-		t.Errorf("expected all directions except down, got %v", directions)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
 	}
 
-	foodDirections := ClosestFoodDirections(req, directions)
-	expectedFoodDirections := []string{LEFT, UP}
-	sort.Strings(foodDirections)
-	sort.Strings(expectedFoodDirections)
+	direcs := data.Direcs
+	expected := 3
+	if direcs[LEFT].ClosestFood != expected {
+		t.Errorf(
+			"closest food LEFT is %v moves away, got %v",
+			expected, direcs[LEFT].ClosestFood)
+	}
 
-	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
-		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
+	expected = 0
+	if direcs[RIGHT].ClosestFood != expected {
+		t.Errorf(
+			"closest food RIGHT is %v moves away, got %v",
+			expected, direcs[RIGHT].ClosestFood)
+	}
+
+	expected = 1
+	if direcs[UP].ClosestFood != expected {
+		t.Errorf(
+			"closest food UP is %v moves away, got %v",
+			expected, direcs[UP].ClosestFood)
+	}
+
+	expected = 5
+	if direcs[DOWN].ClosestFood != expected {
+		t.Errorf(
+			"closest food DOWN is %v moves away, got %v",
+			expected, direcs[DOWN].ClosestFood)
 	}
 
 }

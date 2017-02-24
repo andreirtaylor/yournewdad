@@ -19,13 +19,13 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if p != nil {
 		data.Hazards[p.String()] = true
 		if !data.FoodMap[p.String()] {
 			t, _ := getMyTail(data)
 			data.Hazards[t.String()] = false
 		}
-
 	}
 
 	ret := graphSearch(p, data, direc)
@@ -104,6 +104,9 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 
 		if data.FoodMap[p.String()] {
 			//fmt.Printf("food\n")
+			if data.Direcs[currentDirec].ClosestFood == 0 {
+				data.Direcs[currentDirec].ClosestFood = priority - 1
+			}
 			accumulator.Food += 1
 		}
 		// add 1 to the moves in this direction in this generation
@@ -125,6 +128,7 @@ func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	min := math.MaxInt64
 	metaD := data.Direcs
 	for _, direc := range moves {
+		fmt.Printf("%v\n", metaD[direc].ClosestFood)
 		if metaD[direc].ClosestFood < min {
 			directions = []string{}
 			directions = append(directions, direc)
@@ -179,8 +183,8 @@ func GenerateMetaData(data *MoveRequest) error {
 
 		//fmt.Printf("%#v\n%#v\n", sd, direc)
 		if sd != nil {
-			direcMD.ClosestFood = sd.Food
 			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
+			direcMD.TotalMoves = sd.Moves
 			if direcMD.MovesVsSpace > 5 {
 				tightSpace = false
 			}

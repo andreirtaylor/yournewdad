@@ -1,12 +1,53 @@
 package kaa
 
 import (
+	"reflect"
+	"sort"
 	"testing"
 )
 
 func TestFilterDFSMoveMax(t *testing.T) {
-	_, err := NewMoveRequest(`{"you":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","width":10,"turn":223,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","health_points":100,"coords":[[3,9],[4,9],[4,8],[4,7],[4,6],[4,5],[5,5],[5,4],[6,4],[7,4],[7,3],[6,3],[5,3],[4,3],[4,4],[3,4],[3,3],[3,2],[4,2],[5,2],[5,1],[4,1],[3,1],[2,1],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7],[9,8],[8,8],[8,8]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[3,5],[0,7],[0,6]],"dead_snakes":[]}`)
+	_, err := NewMoveRequest(gameString3)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+}
+
+func Test_FilterPossibleMoves(t *testing.T) {
+	data, err := NewMoveRequest(gameString3)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions := FilterPossibleMoves(data, []string{UP, DOWN, LEFT, RIGHT})
+
+	notRightOrDown := []string{LEFT, UP}
+
+	// sort both of the strings so that deep equal will be able to see them
+	sort.Strings(notRightOrDown)
+	sort.Strings(directions)
+
+	if !reflect.DeepEqual(directions, notRightOrDown) {
+		t.Errorf("expected all directions except down, got %v", directions)
+	}
+
+}
+
+func Test_ClosestFood(t *testing.T) {
+	data, err := NewMoveRequest(gameString3)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions := []string{LEFT, UP}
+	foodDirections := ClosestFoodDirections(data, directions)
+	expectedFoodDirections := []string{LEFT, UP}
+	sort.Strings(foodDirections)
+	sort.Strings(expectedFoodDirections)
+
+	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
+		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
+	}
+
 }
