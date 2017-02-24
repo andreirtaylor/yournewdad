@@ -106,7 +106,7 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 	ret := []string{}
 	for _, direc := range directions {
-		if len(data.Direcs[direc].MovesAway) != 0 {
+		if data.Direcs[direc].TotalMoves == 0 {
 			ret = append(ret, direc)
 		}
 	}

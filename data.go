@@ -3,7 +3,6 @@ package kaa
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -21,7 +20,6 @@ type MetaData struct {
 	// making this a pointer makes it able to be tested against
 	// nil so we might as well keep it like this
 	SnakeHash map[string]*SnakeData
-	Direcs    MoveMetaData
 }
 
 // MetaDataDirec
@@ -36,11 +34,10 @@ type MetaDataDirec struct {
 	MovesVsSpace int
 	// the total number of moves possible in this direction
 	TotalMoves int
+	TotalFood  int
 	// contains a map to the last accessable piece of a snake
 	// from your current location if you moved in this direction
 	KeySnakeData map[int]*SnakeData
-	// definied by the itoa above
-	MovesAway []*StaticData
 }
 
 // minKeySnakePart
@@ -67,20 +64,11 @@ func (m *MetaDataDirec) String() string {
 	buffer.WriteString("\n{")
 	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
 	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v\n", m.MovesVsSpace))
-	for _, x := range m.MovesAway {
-		buffer.WriteString(fmt.Sprintf("%#v\n", x))
-	}
+	buffer.WriteString(fmt.Sprintf("TotalMoves:%v\n", m.TotalMoves))
+	buffer.WriteString(fmt.Sprintf("KeySnakeData:%v\n", m.KeySnakeData))
 	buffer.WriteString("}\n")
 
 	return buffer.String()
-}
-
-// returns the staticdata for the maximum distance you can travel i.e. the whole board
-func (m *MetaDataDirec) moveMax() (*StaticData, error) {
-	if len(m.MovesAway) == 0 {
-		return nil, errors.New("Array is empty")
-	}
-	return m.MovesAway[len(m.MovesAway)-1], nil
 }
 
 // used to find and set the length of your snake globally in the
@@ -208,6 +196,7 @@ type MoveRequest struct {
 
 	// added here for convenience
 	MetaData
+	Direcs MoveMetaData
 }
 
 // initializes global meta data attributes

@@ -10,7 +10,7 @@ import (
 // This file contains all of the functions which build
 // the metadata in each direction
 
-func getStaticData(data *MoveRequest, direc string) ([]*StaticData, error) {
+func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 	head, err := getMyHead(data)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
@@ -65,8 +65,7 @@ func pushOntoPQ(
 // Will search from the point pos to the maximum depth provided
 // a depth of any positive integer will max out at that integer and a depth of
 // any negative integer will allow any negative number
-func graphSearch(pos *Point, data *MoveRequest, currentDirec string) []*StaticData {
-	ret := []*StaticData{}
+func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData {
 	// Create a priority queue, put the items in it, and
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
@@ -89,10 +88,6 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) []*StaticDa
 			//		fmt.Printf("%v", x)
 			//	}
 			priority = item.priority
-			ret = append(ret, accumulator)
-			// copy accumulator
-			tmp := *accumulator
-			accumulator = &tmp
 		}
 		p := item.value
 		//fmt.Printf("%v", p)
@@ -118,9 +113,7 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) []*StaticDa
 	}
 	data.Direcs[currentDirec].TotalMoves = totalMoves
 
-	ret = append(ret, accumulator)
-	// cut off extra accumulated value
-	return ret[1:]
+	return accumulator
 }
 
 func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
@@ -140,11 +133,10 @@ func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 }
 
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
-	last, err := data.Direcs[direc].moveMax()
-	if err != nil {
-		return 0
-	}
-	excessMoves := last.Moves - last.Food - data.Direcs[direc].minKeySnakePart().lengthLeft
+	totalMoves := data.Direcs[direc].TotalMoves
+	totalFood := data.Direcs[direc].TotalFood
+	excessMoves := totalMoves - totalFood - data.Direcs[direc].minKeySnakePart().lengthLeft
+
 	if excessMoves > 0 {
 		// do something clever here to account for food
 	}
@@ -178,8 +170,7 @@ func GenerateMetaData(data *MoveRequest) error {
 			return err
 		}
 
-		direcMD.MovesAway = sd
-		direcMD.ClosestFood = ClosestFood(sd)
+		direcMD.ClosestFood = sd.Food
 		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 		if direcMD.MovesVsSpace > 5 {
 			tightSpace = false
