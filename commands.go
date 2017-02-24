@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -64,12 +66,18 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
 	ctx := appengine.NewContext(req)
 
-	move, err := bestMove(data)
+	moves, err := bestMoves(data)
 
 	if err != nil {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
 	}
-	log.Infof(ctx, "%v\n", move)
-	return move, nil
+	log.Infof(ctx, "%v\n", moves)
+	if len(moves) < 1 {
+		return "", err
+	}
+
+	rand.Seed(time.Now().Unix())
+
+	return moves[rand.Intn(len(moves))], nil
 }

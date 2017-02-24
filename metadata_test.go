@@ -270,12 +270,8 @@ func TestSmallSpaceWithFood(t *testing.T) {
 		t.Errorf("There is only one good move")
 	}
 
-	move, err := bestMove(req)
-	if err != nil {
-		t.Errorf("Unexpected Errror whlie getting best move %v", err)
-	}
-	if move == DOWN {
-		t.Errorf("There is only one good move, and its UP, you gave me: %v", move)
+	if moves[0] == DOWN {
+		t.Errorf("There is only one good move, and its UP, you gave me: %v", moves[0])
 	}
 }
 
@@ -327,18 +323,19 @@ func TestEfficientSpace(t *testing.T) {
 		return
 	}
 
-	move, err := bestMove(data)
+	moves, err := bestMoves(data)
+
 	if err != nil {
 		t.Errorf("%v", err)
+	}
+
+	if moves[0] != DOWN {
+		t.Errorf("Expected Move to be left got, %v", moves[0])
 	}
 
 	totalMoves := data.Direcs[DOWN].TotalMoves
 	if totalMoves != 30 {
 		t.Errorf("Expected 30 total moves got, %v", totalMoves)
-	}
-
-	if move != DOWN {
-		t.Errorf("Expected Move to be left got, %v", move)
 	}
 
 }

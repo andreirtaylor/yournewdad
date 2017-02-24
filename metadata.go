@@ -139,18 +139,6 @@ func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	return directions
 }
 
-func bestMove(data *MoveRequest) (string, error) {
-	moves, err := bestMoves(data)
-	if err != nil {
-		return "", err
-	}
-	if len(moves) == 0 {
-		return "", errors.New("Unable to give you a good Move")
-	}
-
-	return moves[0], nil
-}
-
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
 	last, err := data.Direcs[direc].moveMax()
 	if err != nil {

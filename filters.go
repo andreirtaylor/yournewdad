@@ -13,15 +13,6 @@ func keepFMTForFilters() {
 	fmt.Printf("")
 }
 
-func GetFunctionName(i interface{}) string {
-	funcName := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
-	if len(funcName) < 29 {
-		return funcName
-	}
-
-	return funcName[29:]
-}
-
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
@@ -32,6 +23,15 @@ var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
 	FilterMinimizeSpace,
+}
+
+func GetFunctionName(i interface{}) string {
+	funcName := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+	if len(funcName) < 29 {
+		return funcName
+	}
+
+	return funcName[29:]
 }
 
 // A file for all of the filtering of moves
