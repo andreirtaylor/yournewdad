@@ -2,7 +2,6 @@ package kaa
 
 import (
 	"encoding/json"
-	"fmt"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 	"net/http"
@@ -14,29 +13,15 @@ func respond(res http.ResponseWriter, obj interface{}) {
 }
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
-	data, err := NewGameStartRequest(req)
-
-	//saveGame(data, req)
-
-	if err != nil {
-		respond(res, GameStartResponse{
-			Taunt:   toStringPointer("battlesnake-go!"),
-			Color:   "#00FF00",
-			Name:    fmt.Sprintf("%v (%vx%v)", data.GameId, data.Width, data.Height),
-			HeadUrl: toStringPointer(fmt.Sprintf("%v://%v/static/head.png")),
-		})
-	}
-
 	color := "gold"
 	if appengine.IsDevAppServer() {
 		color = "gold"
 	}
-
 	respond(res, GameStartResponse{
-		Taunt:   toStringPointer("battlesnake-go!"),
+		Taunt:   toStringPointer("Dad 2.0 Ready"),
 		Color:   color,
-		Name:    fmt.Sprintf("%v (%vx%v)", data.GameId, data.Width, data.Height),
-		HeadUrl: toStringPointer("https://media.giphy.com/media/I2v9aehFlQBQ4/giphy.gif"),
+		Name:    "Your New Dad",
+		HeadUrl: toStringPointer("http://i.imgur.com/MLo4AQI.png"),
 	})
 }
 
@@ -51,7 +36,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		respond(res, MoveResponse{
 			Move:  "up",
-			Taunt: toStringPointer("can't parse this!"),
+			Taunt: "can't parse this!",
 		})
 		return
 	}
@@ -60,20 +45,19 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	//SaveMove(data, req)
 
 	move, err := getMove(data, req)
-	log.Infof(ctx, "%v", data.tightSpace)
 
 	if err != nil {
 		respond(res, MoveResponse{
 			Move:  "up",
-			Taunt: toStringPointer("can't parse this!"),
+			Taunt: "Couldn't parse",
 		})
 		log.Errorf(ctx, "Could not find a move for this data")
 		return
 	}
-
+	taunt := getTaunt(data.Turn)
 	respond(res, MoveResponse{
 		Move:  move,
-		Taunt: &data.You,
+		Taunt: taunt,
 	})
 }
 

@@ -5,6 +5,17 @@ import (
 	"fmt"
 )
 
+func getTaunt(turn int) string {
+	if turn < 30 {
+		return "This dad likes what he sees"
+	} else if turn < 60 {
+		return "My god you've grown"
+	} else if turn < 90 {
+		return "Let me get my glasses"
+	}
+	return "I need to go to bed"
+}
+
 // get the position of all neighbouring snake tiles and
 // return the snake data corresponding to the last piece
 // of snake that you see

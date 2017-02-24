@@ -68,6 +68,15 @@ func TestSetMinSnakePointInArea(t *testing.T) {
 	if !reflect.DeepEqual(&tail, &expected) {
 		t.Errorf("Expected %v to be %v", tail, expected)
 	}
+
+	head, err := getMyHead(data)
+	if err != nil {
+		t.Errorf("getting NumNeighbours up,  %v", err)
+	}
+	if !reflect.DeepEqual(head, Point{X: 9, Y: 1}) {
+		t.Errorf("head should be %v got %v", Point{X: 9, Y: 1})
+	}
+
 }
 
 func Test_Numberof(t *testing.T) {

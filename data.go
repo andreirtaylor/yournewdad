@@ -173,8 +173,8 @@ type StaticData struct {
 
 // RESPONSE AND REQUEST STRUCTS
 type MoveResponse struct {
-	Move  string  `json:"move"`
-	Taunt *string `json:"taunt,omitempty"`
+	Move  string `json:"move"`
+	Taunt string `json:"taunt,omitempty"`
 }
 
 type GameStartRequest struct {
