@@ -70,16 +70,20 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
 	heap.Init(&pq)
-	priority := 1
-	seen := make(map[string]bool)
 
+	seen := make(map[string]bool)
 	// make the first item priority 1 so that if statement
 	// at the end of the loop is executed
 	pushOntoPQ(pos, seen, &pq, 1)
+	if pq.Len() == 0 {
+		return nil
+	}
 
-	accumulator := &StaticData{}
+	priority := 1
+
 	totalMoves := 0
 
+	accumulator := &StaticData{}
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
 		if item.priority > priority {
@@ -133,6 +137,9 @@ func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 }
 
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
+	if data.Direcs[direc] == nil {
+		return 0
+	}
 	totalMoves := data.Direcs[direc].TotalMoves
 	totalFood := data.Direcs[direc].TotalFood
 	excessMoves := totalMoves - totalFood - data.Direcs[direc].minKeySnakePart().lengthLeft
@@ -170,10 +177,13 @@ func GenerateMetaData(data *MoveRequest) error {
 			return err
 		}
 
-		direcMD.ClosestFood = sd.Food
-		direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
-		if direcMD.MovesVsSpace > 5 {
-			tightSpace = false
+		//fmt.Printf("%#v\n%#v\n", sd, direc)
+		if sd != nil {
+			direcMD.ClosestFood = sd.Food
+			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
+			if direcMD.MovesVsSpace > 5 {
+				tightSpace = false
+			}
 		}
 	}
 	data.tightSpace = tightSpace
