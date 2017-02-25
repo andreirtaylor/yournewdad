@@ -16,6 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	//FilterAggression,
 	FilterClosestFoodDirections,
 	FilterMinimizeSpace,
 }
@@ -53,32 +54,46 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	}
 	return moves, nil
 }
+
+func FilterAggression(data *MoveRequest, moves []string) []string {
+	return nil
+}
+
 func FilterKeyArea(data *MoveRequest, moves []string) []string {
-	directions := []string{}
+	ret := []string{}
 	head, err := getMyHead(data)
 	if err != nil {
 		return []string{}
 	}
-
 	for _, direc := range moves {
-		p, err := GetPointInDirection(&head, direc, data)
+		// we know this is a valid move because all moves are filterd to be vaild
+		// this is the location you are moving to
+		p, err := GetPointInDirection(head, direc, data)
 		if err != nil {
 			return []string{}
 		}
+		p2 := data.Direcs[direc].minKeySnakePart().pnt
+		distFromHead := head.Dist(p2)
+		distFromPnt := p.Dist(p2)
 
-		// if there are multiple moves to consider
-		neighbours, err := GetNumNeighbours(data, p)
-		if err != nil {
-			return []string{}
-		}
-		if neighbours <= 2 {
+		// prefer to move in the opposite direction
+		if distFromPnt.X > distFromHead.X || distFromPnt.Y > distFromHead.Y {
 			ret = append(ret, direc)
 		}
 	}
-	if len(directions) == 0 {
+	///if stringInSlice(direc, p.WhichDirectionIs(p2)) {
+	///	if direc == UP || direc == down {
+	///		// the distance from you to the point in the Y
+	///		dist := p.Dist(p2).Y
+	///		if dist > bestDist {
+	///		}
+	///	}
+	///	fmt.Printf("%v\n", direc)
+	///}
+	if len(ret) == 0 {
 		return moves
 	}
-	return directions
+	return ret
 }
 
 func FilterClosestFoodDirections(data *MoveRequest, moves []string) []string {
@@ -111,7 +126,7 @@ func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
 	}
 
 	for _, direc := range moves {
-		p, err := GetPointInDirection(&head, direc, data)
+		p, err := GetPointInDirection(head, direc, data)
 		if err != nil {
 			return []string{}
 		}

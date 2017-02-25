@@ -15,7 +15,7 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
 	}
-	p, err := GetPointInDirection(&head, direc, data)
+	p, err := GetPointInDirection(head, direc, data)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
 
-		FindMinSnakePointInArea(&p, data, currentDirec)
+		FindMinSnakePointInSurroundingArea(&p, data, currentDirec)
 
 		// add 1 to the total moves
 		totalMoves += 1
@@ -165,7 +165,7 @@ func GenerateMetaData(data *MoveRequest) error {
 			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 			direcMD.TotalMoves = sd.Moves
 			direcMD.TotalFood = sd.Food
-			if direcMD.MovesVsSpace > 5 {
+			if direcMD.MovesVsSpace > 20 {
 				tightSpace = false
 			}
 		}

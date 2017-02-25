@@ -17,7 +17,7 @@ func Test_getMyHead(t *testing.T) {
 		t.Errorf("Getting Head %v", err)
 	}
 
-	if !reflect.DeepEqual(head, Point{X: 3, Y: 9}) {
+	if !reflect.DeepEqual(head, &Point{X: 3, Y: 9}) {
 		t.Errorf("Expected %v to be %v", head, Point{X: 1, Y: 3})
 	}
 
@@ -91,14 +91,14 @@ func TestSetMinSnakePointInArea(t *testing.T) {
 	if err != nil {
 		t.Errorf("getting NumNeighbours up,  %v", err)
 	}
-	if !reflect.DeepEqual(head, Point{X: 9, Y: 1}) {
-		t.Errorf("head should be %v got %v", Point{X: 9, Y: 1})
+	if !reflect.DeepEqual(head, &Point{X: 9, Y: 1}) {
+		t.Errorf("head should be %v got %v", &Point{X: 9, Y: 1}, head)
 	}
 
 }
 
-func Test_Numberof(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"0623b12a-411b-4674-a115-591063ef92d3","width":10,"turn":124,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"0623b12a-411b-4674-a115-591063ef92d3","health_points":96,"coords":[[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,3],[7,4],[7,5],[7,6],[6,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[5,5],[5,4],[5,3],[5,2],[6,2],[6,1]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[0,0],[1,3],[4,0]],"dead_snakes":[]}`)
+func Test_NumberofNeighbours(t *testing.T) {
+	data, err := NewMoveRequest(gameString1)
 
 	n, err := GetNumNeighbours(data, &Point{X: 0, Y: 0})
 	if err != nil {

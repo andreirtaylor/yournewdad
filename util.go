@@ -14,6 +14,13 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+func IsSnakeHead(p *Point, data *MoveRequest) bool {
+	if p != nil && data.SnakeHeads[p.String()] {
+		return true
+	}
+	return false
+}
+
 func getTaunt(turn int) string {
 	if turn < 30 {
 		return "This dad likes what he sees"
@@ -29,7 +36,7 @@ func getTaunt(turn int) string {
 // return the snake data corresponding to the last piece
 // of snake that you see
 // if there are no snakes around you return nil
-func FindMinSnakePointInArea(p *Point, data *MoveRequest, direc string) {
+func FindMinSnakePointInSurroundingArea(p *Point, data *MoveRequest, direc string) {
 	pts := []*Point{
 		p.UpHazard(data),
 		p.DownHazard(data),
@@ -98,13 +105,13 @@ func toStringPointer(str string) *string {
 	return &str
 }
 
-func getMyHead(data *MoveRequest) (Point, error) {
+func getMyHead(data *MoveRequest) (*Point, error) {
 	for _, snake := range data.Snakes {
 		if snake.Id == data.You && len(data.You) > 0 {
 			return snake.Head(), nil
 		}
 	}
-	return Point{}, errors.New("Could not get head")
+	return &Point{}, errors.New("Could not get head")
 }
 
 func getMyTail(data *MoveRequest) (Point, error) {

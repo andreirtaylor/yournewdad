@@ -19,7 +19,8 @@ type MetaData struct {
 	tightSpace bool
 	// making this a pointer makes it able to be tested against
 	// nil so we might as well keep it like this
-	SnakeHash map[string]*SnakeData
+	SnakeHash  map[string]*SnakeData
+	SnakeHeads map[string]bool
 }
 
 // MetaDataDirec
@@ -164,9 +165,22 @@ type MoveMetaData map[string]*MetaDataDirec
 // first search to determine the ammount of food you can reach in
 // a desired number of moves from the source
 type StaticData struct {
-	Food   int
-	Snakes int
-	Moves  int
+	ClosestFood *Point
+	Food        int
+	Snakes      int
+	Moves       int
+}
+
+func (m *StaticData) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("\n{")
+	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
+	buffer.WriteString(fmt.Sprintf("Food:%v\n", m.Food))
+	buffer.WriteString(fmt.Sprintf("Snakes:%v\n", m.Snakes))
+	buffer.WriteString(fmt.Sprintf("Moves:%v\n", m.Moves))
+	buffer.WriteString("}\n")
+
+	return buffer.String()
 }
 
 // RESPONSE AND REQUEST STRUCTS
@@ -251,5 +265,5 @@ type Snake struct {
 	Taunt        string  `json:"taunt"`
 }
 
-func (snake Snake) Head() Point     { return snake.Coords[0] }
+func (snake Snake) Head() *Point    { return &snake.Coords[0] }
 func (snake *Snake) String() string { return fmt.Sprintf("%#v", snake) }

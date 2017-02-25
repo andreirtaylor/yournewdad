@@ -87,7 +87,7 @@ func TestDontMoveOntoTheKeyArea(t *testing.T) {
 	}
 
 	directions := []string{RIGHT, UP}
-	filteredMoves := FilterMinimizeSpace(data, directions)
+	filteredMoves := FilterKeyArea(data, directions)
 
 	expectedDirection := []string{RIGHT}
 	sort.Strings(filteredMoves)
