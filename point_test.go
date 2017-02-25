@@ -6,7 +6,91 @@ import (
 )
 
 func Test_Dist(t *testing.T) {
+	p := &Point{X: 5, Y: 13}
 
+	output := p.Dist(nil)
+	if output != nil {
+		t.Errorf("Should not return anything when there is not another point")
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 := &Point{X: 0, Y: 13}
+
+	output = p.Dist(p2)
+	expected := &Point{X: 5, Y: 0}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 0, Y: 10}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 5, Y: 3}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 5, Y: 10}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 0, Y: 3}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 8, Y: 10}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 3, Y: 3}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 8, Y: 13}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 3, Y: 0}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 8, Y: 15}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 3, Y: 2}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 5, Y: 15}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 0, Y: 2}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
+
+	p = &Point{X: 5, Y: 13}
+	p2 = &Point{X: 2, Y: 15}
+
+	output = p.Dist(p2)
+	expected = &Point{X: 3, Y: 2}
+
+	if !reflect.DeepEqual(output, expected) {
+		t.Errorf("Expected %v to be %v", output, expected)
+	}
 }
 
 func Test_WhichDirectionIs(t *testing.T) {

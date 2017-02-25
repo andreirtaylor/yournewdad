@@ -162,5 +162,20 @@ func (p1 *Point) WhichDirectionIs(p2 *Point) []string {
 }
 
 func (p1 *Point) Dist(p2 *Point) *Point {
-	return nil
+	if p2 == nil {
+		return nil
+	}
+	ret := &Point{}
+	if p1.X > p2.X {
+		ret.X = p1.X - p2.X
+	} else if p1.X < p2.X {
+		ret.X = p2.X - p1.X
+	}
+
+	if p1.Y > p2.Y {
+		ret.Y = p1.Y - p2.Y
+	} else if p1.Y < p2.Y {
+		ret.Y = p2.Y - p1.Y
+	}
+	return ret
 }
