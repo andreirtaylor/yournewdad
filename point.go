@@ -161,6 +161,8 @@ func (p1 *Point) WhichDirectionIs(p2 *Point) []string {
 	return ret
 }
 
+// returns the absolute distance from point p1 to point p2
+// This distance is returned as a point in both the X and Y directions
 func (p1 *Point) Dist(p2 *Point) *Point {
 	if p2 == nil {
 		return nil

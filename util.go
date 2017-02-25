@@ -5,6 +5,15 @@ import (
 	"fmt"
 )
 
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func getTaunt(turn int) string {
 	if turn < 30 {
 		return "This dad likes what he sees"

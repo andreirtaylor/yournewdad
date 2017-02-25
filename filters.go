@@ -64,10 +64,21 @@ func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
 	if err != nil {
 		return []string{}
 	}
+
 	for _, direc := range moves {
+
 		p, err := GetPointInDirection(&head, direc, data)
 		if err != nil {
 			return []string{}
+		}
+
+		// if there are multiple moves to consider
+		if len(moves) > 1 {
+			sd := data.Direcs[direc].minKeySnakePart()
+			direcToPoint := p.WhichDirectionIs(sd.pnt)
+			if stringInSlice(direc, direcToPoint) {
+				continue
+			}
 		}
 
 		neighbours, err := GetNumNeighbours(data, p)
