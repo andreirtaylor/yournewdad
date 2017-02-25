@@ -14,6 +14,62 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+// only handles valid moves right now
+func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
+	if (ind < 0) || (ind >= len(data.Snakes)) {
+		return errors.New("Index out of bounds")
+	}
+	head := data.Snakes[0].Head()
+
+	p, err := GetPointInDirection(head, direc, data)
+	if err != nil {
+		return err
+	}
+	if p != nil {
+		data.Hazards[p.String()] = true
+		if !data.FoodMap[p.String()] {
+			t, err := getTail(ind, data)
+			if err != nil {
+				return err
+			}
+			data.Hazards[t.String()] = false
+		}
+		// append the coords to the front of the snake
+		data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
+	}
+	return nil
+}
+
+func MoveSnakeBackward(ind int, data *MoveRequest) error {
+	if (ind < 0) || (ind >= len(data.Snakes)) {
+		return errors.New("Index out of bounds")
+	}
+	// assumes the snakes are all more than length 1
+	p := data.Snakes[0].Head()
+
+	data.Hazards[p.String()] = false
+	///fmt.Printf("head :%v", p)
+	data.Snakes[ind].Coords = data.Snakes[ind].Coords[1:]
+	if !data.FoodMap[p.String()] {
+		t, err := getTail(ind, data)
+		if err != nil {
+			return err
+		}
+		//fmt.Printf("tail :%v\n", t)
+		data.Hazards[t.String()] = false
+	}
+	return nil
+}
+
+func getTail(ind int, data *MoveRequest) (*Point, error) {
+	if (ind < 0) || (ind >= len(data.Snakes)) {
+		return nil, errors.New("Index out of bounds")
+	}
+	snake := data.Snakes[ind]
+	return &(snake.Coords[len(snake.Coords)-1]), nil
+
+}
+
 func IsSnakeHead(p *Point, data *MoveRequest) bool {
 	if p != nil && data.SnakeHeads[p.String()] {
 		return true
@@ -114,11 +170,6 @@ func getMyHead(data *MoveRequest) (*Point, error) {
 	return &Point{}, errors.New("Could not get head")
 }
 
-func getMyTail(data *MoveRequest) (Point, error) {
-	for _, snake := range data.Snakes {
-		if snake.Id == data.You && len(data.You) > 0 {
-			return snake.Coords[len(snake.Coords)-1], nil
-		}
-	}
-	return Point{}, errors.New("Could not get head")
+func getMyTail(data *MoveRequest) (*Point, error) {
+	return getTail(data.MyIndex, data)
 }

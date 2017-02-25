@@ -1,6 +1,7 @@
 package kaa
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -14,8 +15,27 @@ func Test_FullStats(t *testing.T) {
 	for _, snake := range data.Snakes {
 		head := snake.Head()
 		stats := fullStats(head, data)
-		t.Logf("%v", stats)
-		stats = quickStats(head, data, 5)
-		t.Logf("%v", stats)
+		if stats.Food != 6 {
+			t.Errorf("All 6 pieces of food are accessable by all snakes got %v", stats.Food)
+		}
+		if stats.Moves != 336 {
+			t.Errorf("All 6 pieces of food are accessable by all snakes got %v", stats.Food)
+		}
+	}
+
+	stats := quickStats(&Point{X: 13, Y: 2}, data, 5)
+	if stats.Food != 0 {
+		t.Errorf("There is no food within 5 moves got %v", stats.Food)
+	}
+	if stats.ClosestFood != nil {
+		t.Errorf("closest food should be nil within 5 moves got %v", stats.ClosestFood)
+	}
+
+	stats = quickStats(&Point{X: 13, Y: 2}, data, 10)
+	if stats.Food != 1 {
+		t.Errorf("There is 1 food within 10 moves got %v", stats.Food)
+	}
+	if reflect.DeepEqual(stats.ClosestFood, &Point{X: 0, Y: 8}) {
+		t.Errorf("closest food should be nil within 5 moves got %v", stats.ClosestFood)
 	}
 }

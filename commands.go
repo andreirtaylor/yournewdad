@@ -17,7 +17,7 @@ func respond(res http.ResponseWriter, obj interface{}) {
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	color := "gold"
 	if appengine.IsDevAppServer() {
-		color = "gold"
+		color = "brown"
 	}
 	respond(res, GameStartResponse{
 		Taunt:   toStringPointer("Dad 2.0 Ready"),
@@ -43,7 +43,8 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Infof(ctx, "%v", data)
+	// log move request
+	//log.Infof(ctx, "%v", data)
 
 	// its tooooooooo sloooooooooooooooww :(
 	//SaveMove(data, req)

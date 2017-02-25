@@ -5,11 +5,45 @@ import (
 	"testing"
 )
 
+func Test_MoveSnake(t *testing.T) {
+	data, err := NewMoveRequest(gameString4)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	tail, err := getTail(0, data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	err = MoveSnakeForward(0, data, LEFT)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	p := &Point{X: 0, Y: 15}
+	// the head moves onto food meaning the tail stays where it is
+	if !data.Hazards[p.String()] || !data.Hazards[tail.String()] {
+		t.Errorf("If the head moves onto a food the tail should not move")
+	}
+
+	err = MoveSnakeBackward(0, data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	// the head moves back and the tail remains in the same spot
+	if data.Hazards[p.String()] || !data.Hazards[tail.String()] {
+		t.Errorf("If the head moves back from a food the tail should stay in the same spot")
+	}
+
+}
 func Test_getMyHead(t *testing.T) {
 	data, err := NewMoveRequest(gameString3)
 
 	if err != nil {
-		t.Logf("error: %v", err)
+		t.Errorf("error: %v", err)
 	}
 
 	head, err := getMyHead(data)
@@ -83,7 +117,7 @@ func TestSetMinSnakePointInArea(t *testing.T) {
 
 	expected = Point{X: 6, Y: 1}
 	tail, _ := getMyTail(data)
-	if !reflect.DeepEqual(&tail, &expected) {
+	if !reflect.DeepEqual(tail, &expected) {
 		t.Errorf("Expected %v to be %v", tail, expected)
 	}
 

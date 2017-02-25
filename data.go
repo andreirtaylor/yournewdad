@@ -14,6 +14,7 @@ import (
 type MetaData struct {
 	// denotes the number of moves until you reach the closest piece of food
 	MyLength   int
+	MyIndex    int
 	Hazards    map[string]bool
 	FoodMap    map[string]bool
 	tightSpace bool
@@ -87,9 +88,10 @@ func (m *MetaDataDirec) String() string {
 // used to find and set the length of your snake globally in the
 // metatdata object
 func (m *MetaData) SetMyLength(data *MoveRequest) {
-	for _, snake := range data.Snakes {
+	for i, snake := range data.Snakes {
 		if snake.Id == data.You && len(data.You) > 0 {
 			m.MyLength = len(snake.Coords)
+			m.MyIndex = i
 		}
 	}
 }
@@ -244,6 +246,7 @@ func (m *MoveRequest) String() string {
 		buffer.WriteString(fmt.Sprintf("\t%v:%v", direc, val))
 	}
 	buffer.WriteString(fmt.Sprintf("tightSpace: %v ", m.tightSpace))
+	buffer.WriteString(fmt.Sprintf("MyIndex: %v ", m.MyIndex))
 	buffer.WriteString("}\n")
 	buffer.WriteString("}\n")
 

@@ -20,24 +20,10 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 		return nil, err
 	}
 
-	if p != nil {
-		data.Hazards[p.String()] = true
-		if !data.FoodMap[p.String()] {
-			t, _ := getMyTail(data)
-			data.Hazards[t.String()] = false
-		}
-	}
-
+	//MoveSnakeForward(data.MyIndex, data, direc)
 	ret := graphSearch(p, data, direc)
-	//ret.TightMoves = DFSMoves(p, data, direc)
+	//MoveSnakeBackward(data.MyIndex, data)
 
-	if p != nil {
-		data.Hazards[p.String()] = false
-		if !data.FoodMap[p.String()] {
-			t, _ := getMyTail(data)
-			data.Hazards[t.String()] = true
-		}
-	}
 	return ret, nil
 }
 

@@ -52,3 +52,9 @@ The snake in the lower left should always prefer to go up instead of down or to 
 ![](assets/Tests-ba58c.png)
 
 You are the snake with head at [13, 2]
+
+## gameString10
+
+![](assets/Tests-0312c.png)
+
+You are the snake with head at [7, 18]
