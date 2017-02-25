@@ -26,12 +26,7 @@ var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 }
 
 func GetFunctionName(i interface{}) string {
-	funcName := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
-	if len(funcName) < 29 {
-		return funcName
-	}
-
-	return funcName[29:]
+	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
 // A file for all of the filtering of moves
@@ -99,6 +94,10 @@ func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
 		if neighbours <= 2 {
 			ret = append(ret, direc)
 		}
+	}
+	// dont return a empty array
+	if len(ret) == 0 {
+		return moves
 	}
 	return ret
 }
