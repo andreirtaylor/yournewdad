@@ -71,11 +71,14 @@ func (m *MoveRequest) NoFood() bool {
 // maybe I could make
 func (m *MetaDataDirec) String() string {
 	var buffer bytes.Buffer
-	buffer.WriteString("\n{")
-	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
-	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v\n", m.MovesVsSpace))
-	buffer.WriteString(fmt.Sprintf("TotalMoves:%v\n", m.TotalMoves))
-	buffer.WriteString(fmt.Sprintf("KeySnakeData:%v\n", m.KeySnakeData))
+	buffer.WriteString("MetaDataDirec{")
+	buffer.WriteString(fmt.Sprintf("ClosestFood:%v, ", m.ClosestFood))
+	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v, ", m.MovesVsSpace))
+	buffer.WriteString(fmt.Sprintf("TotalMoves:%v, ", m.TotalMoves))
+	buffer.WriteString(fmt.Sprintf("KeySnakeData:\n"))
+	for direc, val := range m.KeySnakeData {
+		buffer.WriteString(fmt.Sprintf("\t%v:%v", direc, val))
+	}
 	buffer.WriteString("}\n")
 
 	return buffer.String()
@@ -97,10 +100,18 @@ type SnakeData struct {
 	id         int
 	lengthLeft int
 	pnt        *Point
-	MoveMetaData
 }
 
-func (s *SnakeData) String() string { return fmt.Sprintf("%#v", s) }
+func (s *SnakeData) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("{")
+	buffer.WriteString(fmt.Sprintf("id:%v, ", s.id))
+	buffer.WriteString(fmt.Sprintf("lengthLeft:%v, ", s.lengthLeft))
+	buffer.WriteString(fmt.Sprintf("pnt:%v, ", s.pnt))
+	buffer.WriteString("}\n")
+
+	return buffer.String()
+}
 
 // GenenSnakeHash
 //	generates a map of all the points in all the snakes
@@ -173,11 +184,11 @@ type StaticData struct {
 
 func (m *StaticData) String() string {
 	var buffer bytes.Buffer
-	buffer.WriteString("\n{")
-	buffer.WriteString(fmt.Sprintf("ClosestFood:%v\n", m.ClosestFood))
-	buffer.WriteString(fmt.Sprintf("Food:%v\n", m.Food))
-	buffer.WriteString(fmt.Sprintf("Snakes:%v\n", m.Snakes))
-	buffer.WriteString(fmt.Sprintf("Moves:%v\n", m.Moves))
+	buffer.WriteString("\nStaticData{")
+	buffer.WriteString(fmt.Sprintf("ClosestFood:%v, ", m.ClosestFood))
+	buffer.WriteString(fmt.Sprintf("Food:%v, ", m.Food))
+	buffer.WriteString(fmt.Sprintf("Snakes:%v, ", m.Snakes))
+	buffer.WriteString(fmt.Sprintf("Moves:%v, ", m.Moves))
 	buffer.WriteString("}\n")
 
 	return buffer.String()
@@ -221,6 +232,22 @@ type MoveRequest struct {
 	// added here for convenience
 	MetaData
 	Direcs MoveMetaData
+}
+
+func (m *MoveRequest) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("\nMoveRequest{\n")
+	head, _ := getMyHead(m)
+	buffer.WriteString(fmt.Sprintf("head: %v ", head))
+	buffer.WriteString("Direcs{\n")
+	for direc, val := range m.Direcs {
+		buffer.WriteString(fmt.Sprintf("\t%v:%v", direc, val))
+	}
+	buffer.WriteString(fmt.Sprintf("tightSpace: %v ", m.tightSpace))
+	buffer.WriteString("}\n")
+	buffer.WriteString("}\n")
+
+	return buffer.String()
 }
 
 // initializes global meta data attributes
