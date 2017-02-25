@@ -1,56 +1,12 @@
 package kaa
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
 
-func keepFMT() {
-	fmt.Printf("")
-}
-
-func TestPoint(t *testing.T) {
-	var point Point
-
-	// test string
-	point = Point{X: 5, Y: 13}
-	if point.String() != "{5,13}" {
-		t.Errorf("expected point to print %v got %v", "{5,13}", point)
-	}
-	data := &MoveRequest{
-		Height: 20,
-		Width:  20,
-	}
-
-	// test x limit
-	point = Point{X: 0, Y: 13}
-	if point.Left(data) != nil {
-		t.Errorf("point %v should not be able to go left", point)
-	}
-
-	// test x limit
-	point = Point{X: 19, Y: 13}
-	if point.Right(data) != nil {
-		t.Errorf("point %v should not be able to go right", point)
-	}
-
-	// test x limit
-	point = Point{X: 19, Y: 19}
-	if point.Down(data) != nil {
-		t.Errorf("point %v should not be able to go down", point)
-	}
-
-	// test x limit
-	point = Point{X: 19, Y: 0}
-	if point.Up(data) != nil {
-		t.Errorf("point %v should not be able to go up", point)
-	}
-
-}
-
 func TestMetaDataOnlyOneSnake(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","width":10,"turn":233,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"82557bbc-5ff2-4e51-8133-f6875d4f8d71","health_points":100,"coords":[[1,3],[0,3],[0,4],[0,5],[0,6],[0,7],[1,7],[2,7],[3,7],[3,8],[3,9],[4,9],[4,8],[4,7],[4,6],[4,5],[5,5],[5,4],[6,4],[7,4],[7,3],[6,3],[5,3],[4,3],[4,4],[3,4],[3,3],[3,2],[4,2],[5,2],[5,1],[4,1],[3,1],[2,1],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[9,1],[9,2],[9,2]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[6,2],[7,5],[2,3]],"dead_snakes":[]}`)
+	data, err := NewMoveRequest(gameString3)
 
 	if err != nil {
 		t.Logf("error: %v", err)
@@ -61,35 +17,14 @@ func TestMetaDataOnlyOneSnake(t *testing.T) {
 		t.Errorf("Getting Head %v", err)
 	}
 
-	if !reflect.DeepEqual(head, Point{X: 1, Y: 3}) {
+	if !reflect.DeepEqual(head, Point{X: 3, Y: 9}) {
 		t.Errorf("Expected %v to be %v", head, Point{X: 1, Y: 3})
 	}
 
-	// all moves are possible except moving onto yourself
-
-	//	moves := data.Width*data.Height - len(data.Snakes[0].Coords)
-
-	//	for direc, dirData := range data.Direcs {
-	//		// all moves are possible except for moving onto yourself
-	//		moveMax, err := dirData.moveMax()
-	//		if err != nil {
-	//			t.Errorf("getting moveMax %v", err)
-	//			continue
-	//		}
-	//		if direc != LEFT {
-	//			if moveMax.Moves != moves[direc] {
-	//				t.Errorf("expected %v to be %v", moveMax.Moves, moves)
-	//			}
-	//		} else {
-	//			if moveMax != nil {
-	//				t.Errorf("Moving left moves you onto your body, it is not a valid move")
-	//			}
-	//		}
-	//	}
 }
 
 func TestClosestFoodNoFood(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"0623b12a-411b-4674-a115-591063ef92d3","width":10,"turn":124,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"0623b12a-411b-4674-a115-591063ef92d3","health_points":96,"coords":[[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,3],[7,4],[7,5],[7,6],[6,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[5,5],[5,4],[5,3],[5,2],[6,2],[6,1]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[0,0],[1,3],[4,0]],"dead_snakes":[]}`)
+	data, err := NewMoveRequest(gameString1)
 
 	if err != nil {
 		t.Logf("error: %v", err)
@@ -124,10 +59,10 @@ func TestClosestFoodNoFood(t *testing.T) {
 }
 
 func TestClosestFoodWithFood(t *testing.T) {
-	data, err := NewMoveRequest(` {"you":"3de4f206-1538-4bfc-ad49-4cb17fc61bb5","width":10,"turn":8,"snakes":[{"taunt":"Dad 2.0 Ready","name":"Your New Dad","id":"3de4f206-1538-4bfc-ad49-4cb17fc61bb5","health_points":92,"coords":[[5,8],[6,8],[7,8]]}],"height":10,"game_id":"8d58c168-aa8c-4395-90dc-79e36b32bf1e","food":[[2,5],[5,7],[1,8],[8,7],[6,2],[2,8],[7,4],[6,3],[4,2],[6,4]],"dead_snakes":[]}`)
+	data, err := NewMoveRequest(gameString5)
 
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		t.Logf("error: %v", err)
 		return
 	}
 
@@ -188,51 +123,10 @@ func TestSmallSpaceWithFood(t *testing.T) {
 	}
 }
 
-// not really a test, this is for checking out if the snake works as expected
-func TestRandom(t *testing.T) {
-	req := &MoveRequest{
-		GameId: "d0bd244e-91da-4e63-86e6-ea575376c3be",
-		Height: 5,
-		Width:  5,
-		Turn:   20,
-		Food: []Point{
-			Point{X: 0, Y: 0},
-			Point{X: 4, Y: 4},
-			Point{X: 3, Y: 2},
-		},
-		Snakes: []Snake{Snake{
-			Coords: []Point{
-				Point{X: 1, Y: 0},
-				Point{X: 1, Y: 1},
-				Point{X: 1, Y: 2},
-				Point{X: 1, Y: 3},
-				Point{X: 1, Y: 4},
-			},
-			HealthPoints: 80,
-			Id:           "6db6f851-635b-4534-b882-6f219e0a1f6a",
-			Name:         "d0bd244e-91da-4e63-86e6-ea575376c3be (20x20)",
-			Taunt:        "6db6f851-635b-4534-b882-6f219e0a1f6a"},
-		},
-		You: "6db6f851-635b-4534-b882-6f219e0a1f6a",
-	}
-
-	err := GenerateMetaData(req)
-	if err != nil {
-		t.Errorf("Unexpected Errror %v", err)
-	}
-	moves, err := bestMoves(req)
-	if err != nil {
-		t.Errorf("Unexpected Errror whlie getting best move %v", err)
-	}
-	if len(moves) > 1 {
-		t.Errorf("The best move is left")
-	}
-}
-
 func TestEfficientSpace(t *testing.T) {
-	data, err := NewMoveRequest(`{"you":"0623b12a-411b-4674-a115-591063ef92d3","width":10,"turn":124,"snakes":[{"taunt":"battlesnake-go!","name":"7eef72e9-72fc-4c27-a387-898384639f46 (10x10)","id":"0623b12a-411b-4674-a115-591063ef92d3","health_points":96,"coords":[[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,3],[7,4],[7,5],[7,6],[6,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[5,5],[5,4],[5,3],[5,2],[6,2],[6,1]]}],"height":10,"game_id":"7eef72e9-72fc-4c27-a387-898384639f46","food":[[0,0],[1,3],[4,0]],"dead_snakes":[]}`)
+	data, err := NewMoveRequest(gameString1)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		t.Logf("error: %v", err)
 		return
 	}
 

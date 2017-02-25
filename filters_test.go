@@ -51,3 +51,22 @@ func Test_ClosestFood(t *testing.T) {
 	}
 
 }
+
+func TestDontMoveOntoTheKeyArea(t *testing.T) {
+	data, err := NewMoveRequest(gameString6)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions := []string{RIGHT, UP}
+	filteredMoves := FilterMinimizeSpace(data, directions)
+
+	expectedDirection := []string{RIGHT}
+	sort.Strings(filteredMoves)
+	sort.Strings(expectedDirection)
+
+	if !reflect.DeepEqual(expectedDirection, filteredMoves) {
+		t.Errorf("expected %v directions got %v", expectedDirection, filteredMoves)
+	}
+
+}

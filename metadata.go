@@ -29,6 +29,7 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 	}
 
 	ret := graphSearch(p, data, direc)
+	//ret.TightMoves = DFSMoves(p, data, direc)
 
 	if p != nil {
 		data.Hazards[p.String()] = false
@@ -128,7 +129,6 @@ func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	min := math.MaxInt64
 	metaD := data.Direcs
 	for _, direc := range moves {
-		fmt.Printf("%v\n", metaD[direc].ClosestFood)
 		if metaD[direc].ClosestFood < min {
 			directions = []string{}
 			directions = append(directions, direc)

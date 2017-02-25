@@ -103,23 +103,6 @@ func (point *Point) Right(data *MoveRequest) *Point {
 	return ret
 }
 
-// returns a map that has strings correspondings to the valid neighbours
-func (p *Point) GetValidNeighboursMap(data *MoveRequest) map[string]bool {
-	pts := []*Point{
-		p.Up(data),
-		p.Down(data),
-		p.Left(data),
-		p.Right(data)}
-
-	m := make(map[string]bool)
-	for _, pt := range pts {
-		if pt != nil {
-			m[pt.String()] = true
-		}
-	}
-	return m
-}
-
 // Hazard functions return the points of Hazards as well as
 // valid moves
 // returns nil if the point is a wall
@@ -137,4 +120,47 @@ func (point *Point) LeftHazard(data *MoveRequest) *Point {
 
 func (point *Point) RightHazard(data *MoveRequest) *Point {
 	return point.getRight(data, true)
+}
+
+// returns a map that has strings correspondings to the valid neighbours
+func (p *Point) GetValidNeighboursMap(data *MoveRequest) map[string]bool {
+	pts := []*Point{
+		p.Up(data),
+		p.Down(data),
+		p.Left(data),
+		p.Right(data)}
+
+	m := make(map[string]bool)
+	for _, pt := range pts {
+		if pt != nil {
+			m[pt.String()] = true
+		}
+	}
+	return m
+}
+
+// returns which direction (as a string)
+// the point is in
+func (p1 *Point) WhichDirectionIs(p2 *Point) []string {
+	if p2 == nil {
+		return nil
+	}
+	var ret = []string{}
+
+	if p1.X > p2.X {
+		ret = append(ret, LEFT)
+	} else if p1.X < p2.X {
+		ret = append(ret, RIGHT)
+	}
+
+	if p1.Y < p2.Y {
+		ret = append(ret, DOWN)
+	} else if p1.Y > p2.Y {
+		ret = append(ret, UP)
+	}
+	return ret
+}
+
+func (p1 *Point) Dist(p2 *Point) *Point {
+	return nil
 }
