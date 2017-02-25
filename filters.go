@@ -17,11 +17,13 @@ var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
 	FilterClosestFoodDirections,
+	FilterMinimizeSpace,
 }
 
 var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	FilterKeyArea,
 	FilterMinimizeSpace,
 }
 
@@ -51,6 +53,34 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	}
 	return moves, nil
 }
+func FilterKeyArea(data *MoveRequest, moves []string) []string {
+	directions := []string{}
+	head, err := getMyHead(data)
+	if err != nil {
+		return []string{}
+	}
+
+	for _, direc := range moves {
+		p, err := GetPointInDirection(&head, direc, data)
+		if err != nil {
+			return []string{}
+		}
+
+		// if there are multiple moves to consider
+		neighbours, err := GetNumNeighbours(data, p)
+		if err != nil {
+			return []string{}
+		}
+		if neighbours <= 2 {
+			ret = append(ret, direc)
+		}
+	}
+	if len(directions) == 0 {
+		return moves
+	}
+	return directions
+}
+
 func FilterClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	directions := []string{}
 	min := math.MaxInt64

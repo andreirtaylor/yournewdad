@@ -96,6 +96,7 @@ type SnakeData struct {
 	id         int
 	lengthLeft int
 	pnt        *Point
+	MoveMetaData
 }
 
 func (s *SnakeData) String() string { return fmt.Sprintf("%#v", s) }

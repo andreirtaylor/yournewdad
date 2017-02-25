@@ -1,6 +1,8 @@
 package kaa
 
 import (
+	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -79,17 +81,24 @@ func TestClosestFoodWithFood(t *testing.T) {
 }
 
 func TestWeirdDeath(t *testing.T) {
-	data, err := NewMoveRequest(` {"you":"fe292f8e-d74f-46f8-a85e-b5688d0e8ca0","width":20,"turn":497,"snakes":[{"taunt":"Dad 2.0 Ready","name":"Your New Dad","id":"fe292f8e-d74f-46f8-a85e-b5688d0e8ca0","health_points":70,"coords":[[13,15],[14,15],[14,16],[13,16],[12,16],[11,16],[10,16],[9,16],[9,15],[9,14],[9,13],[10,13],[11,13],[12,13],[12,12],[12,11],[12,10],[12,9],[12,8],[12,7],[13,7],[14,7],[15,7],[15,8],[16,8],[16,7],[17,7],[17,8],[18,8],[18,7],[18,6],[17,6],[16,6],[15,6],[14,6],[13,6],[12,6],[11,6],[11,7],[11,8],[11,9],[10,9],[9,9],[9,10],[9,11],[10,11],[11,11],[11,12],[10,12],[9,12],[8,12],[8,13],[8,14],[8,15],[8,16],[8,17],[9,17],[10,17],[11,17],[12,17],[13,17],[14,17],[15,17],[16,17],[17,17],[18,17],[18,16],[18,15],[17,15],[16,15],[15,15],[15,14],[16,14],[16,13],[16,12],[16,11],[16,10],[16,9]]}],"height":20,"game_id":"e5fe7eb6-6420-4499-a387-d8537b40c6d1","food":[[6,18],[7,4],[6,2],[6,10],[4,14],[16,3]],"dead_snakes":[]}
-`)
+	data, err := NewMoveRequest(gameString2)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 
 	moves, err := bestMoves(data)
 	if err != nil {
-		t.Errorf("Unexpected Errror whlie getting best moves %v", err)
+		t.Errorf("%v", err)
 	}
-	t.Logf("%v\n", moves)
+
+	expected := []string{DOWN}
+
+	sort.Strings(moves)
+	sort.Strings(expected)
+
+	if !reflect.DeepEqual(expected, moves) {
+		t.Errorf("expected %v directions got %v", expected, moves)
+	}
 }
 
 func TestSmallSpaceWithFood(t *testing.T) {

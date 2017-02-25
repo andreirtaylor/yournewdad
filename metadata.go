@@ -88,14 +88,9 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
 		if item.priority > priority {
-			//	fmt.Printf("%v\n", item)
-			//	for _, x := range ret {
-			//		fmt.Printf("%v", x)
-			//	}
 			priority = item.priority
 		}
 		p := item.value
-		//fmt.Printf("%v", p)
 
 		// push all directions on priority queue
 		pushOntoPQ(p.Up(data), seen, &pq, item.priority)
