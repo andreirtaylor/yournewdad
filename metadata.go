@@ -124,22 +124,6 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	return accumulator
 }
 
-func ClosestFoodDirections(data *MoveRequest, moves []string) []string {
-	directions := []string{}
-	min := math.MaxInt64
-	metaD := data.Direcs
-	for _, direc := range moves {
-		if metaD[direc].ClosestFood < min {
-			directions = []string{}
-			directions = append(directions, direc)
-			min = metaD[direc].ClosestFood
-		} else if metaD[direc].ClosestFood == min {
-			directions = append(directions, direc)
-		}
-	}
-	return directions
-}
-
 func GetMovesVsSpace(data *MoveRequest, direc string) int {
 	if data.Direcs[direc] == nil {
 		return 0
@@ -185,6 +169,7 @@ func GenerateMetaData(data *MoveRequest) error {
 		if sd != nil {
 			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 			direcMD.TotalMoves = sd.Moves
+			direcMD.TotalFood = sd.Food
 			if direcMD.MovesVsSpace > 5 {
 				tightSpace = false
 			}

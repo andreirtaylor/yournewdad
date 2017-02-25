@@ -38,3 +38,7 @@ The snake in the lower left should always prefer to go up instead of down or to 
 ## gameString6
 
 ![](assets/Tests-f3578.png)
+
+## gameString7
+
+![](assets/Tests-ab782.png)

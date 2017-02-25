@@ -54,6 +54,15 @@ func (m *MetaDataDirec) minKeySnakePart() *SnakeData {
 	return min
 }
 
+func (m *MoveRequest) NoFood() bool {
+	for _, val := range m.Direcs {
+		if val.TotalFood > 0 {
+			return false
+		}
+	}
+	return true
+}
+
 // String
 // used to print the metadata for a particular direction
 // it is necessary because the Static data is a pointer

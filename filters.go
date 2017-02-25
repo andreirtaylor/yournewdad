@@ -16,7 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	ClosestFoodDirections,
+	FilterClosestFoodDirections,
 }
 
 var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
@@ -42,7 +42,7 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 
 	funcArray := GROW_FUNCS
 
-	if data.MetaData.tightSpace {
+	if data.MetaData.tightSpace || data.NoFood() {
 		funcArray = SPACE_SAVING_FUNCS
 	}
 
@@ -56,41 +56,51 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	}
 	return moves, nil
 }
+func FilterClosestFoodDirections(data *MoveRequest, moves []string) []string {
+	directions := []string{}
+	min := math.MaxInt64
+	metaD := data.Direcs
+	for _, direc := range moves {
+		if data.Direcs[direc].ClosestFood == 0 {
+			continue
+		}
+		if metaD[direc].ClosestFood < min {
+			directions = []string{}
+			directions = append(directions, direc)
+			min = metaD[direc].ClosestFood
+		} else if metaD[direc].ClosestFood == min {
+			directions = append(directions, direc)
+		}
+	}
+	if len(directions) == 0 {
+		return moves
+	}
+	return directions
+}
 
 func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
-	min := math.MaxInt64
-	ret := ""
+	ret := []string{}
 	head, err := getMyHead(data)
 	if err != nil {
 		return []string{}
 	}
 
 	for _, direc := range moves {
-
 		p, err := GetPointInDirection(&head, direc, data)
 		if err != nil {
 			return []string{}
 		}
 
 		// if there are multiple moves to consider
-		if len(moves) > 1 {
-			sd := data.Direcs[direc].minKeySnakePart()
-			direcToPoint := p.WhichDirectionIs(sd.pnt)
-			if stringInSlice(direc, direcToPoint) {
-				continue
-			}
-		}
-
 		neighbours, err := GetNumNeighbours(data, p)
 		if err != nil {
 			return []string{}
 		}
-		if neighbours < min {
-			ret = direc
-			min = neighbours
+		if neighbours <= 2 {
+			ret = append(ret, direc)
 		}
 	}
-	return []string{ret}
+	return ret
 }
 
 // Filters out moves that will put you into tight places.

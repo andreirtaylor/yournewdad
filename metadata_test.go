@@ -1,27 +1,8 @@
 package kaa
 
 import (
-	"reflect"
 	"testing"
 )
-
-func TestMetaDataOnlyOneSnake(t *testing.T) {
-	data, err := NewMoveRequest(gameString3)
-
-	if err != nil {
-		t.Logf("error: %v", err)
-	}
-
-	head, err := getMyHead(data)
-	if err != nil {
-		t.Errorf("Getting Head %v", err)
-	}
-
-	if !reflect.DeepEqual(head, Point{X: 3, Y: 9}) {
-		t.Errorf("Expected %v to be %v", head, Point{X: 1, Y: 3})
-	}
-
-}
 
 func TestClosestFoodNoFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString1)
@@ -134,6 +115,7 @@ func TestEfficientSpace(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("%v", err)
+		return
 	}
 
 	if moves[0] != DOWN {
