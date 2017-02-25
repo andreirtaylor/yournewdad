@@ -21,6 +21,7 @@ type MetaData struct {
 	// making this a pointer makes it able to be tested against
 	// nil so we might as well keep it like this
 	SnakeHash  map[string]*SnakeData
+	KillZones  map[string]bool
 	SnakeHeads map[string]bool
 }
 
@@ -135,6 +136,7 @@ func (m *MetaData) GenSnakeHash(data *MoveRequest) {
 // Generates a map of hazards
 func (m *MetaData) GenHazards(data *MoveRequest) {
 	m.Hazards = make(map[string]bool)
+	m.KillZones = make(map[string]bool)
 	for _, snake := range data.Snakes {
 		if len(snake.Coords) >= m.MyLength && data.You != snake.Id {
 			head := snake.Head()
@@ -153,6 +155,25 @@ func (m *MetaData) GenHazards(data *MoveRequest) {
 			d = head.Left(data)
 			if d != nil {
 				m.Hazards[d.String()] = true
+			}
+
+		} else if len(snake.Coords) < m.MyLength && data.You != snake.Id {
+			head := snake.Head()
+			d := head.Down(data)
+			if d != nil {
+				m.KillZones[d.String()] = true
+			}
+			d = head.Up(data)
+			if d != nil {
+				m.KillZones[d.String()] = true
+			}
+			d = head.Right(data)
+			if d != nil {
+				m.KillZones[d.String()] = true
+			}
+			d = head.Left(data)
+			if d != nil {
+				m.KillZones[d.String()] = true
 			}
 
 		}
@@ -247,6 +268,7 @@ func (m *MoveRequest) String() string {
 	}
 	buffer.WriteString(fmt.Sprintf("tightSpace: %v ", m.tightSpace))
 	buffer.WriteString(fmt.Sprintf("MyIndex: %v ", m.MyIndex))
+	buffer.WriteString(fmt.Sprintf("MyIndex: %v ", m.KillZones))
 	buffer.WriteString("}\n")
 	buffer.WriteString("}\n")
 

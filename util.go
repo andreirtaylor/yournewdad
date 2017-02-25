@@ -36,6 +36,7 @@ func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 		}
 		// append the coords to the front of the snake
 		data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
+		//fmt.Printf("%v\n", data.Snakes[ind].Coords)
 	}
 	return nil
 }
@@ -48,14 +49,13 @@ func MoveSnakeBackward(ind int, data *MoveRequest) error {
 	p := data.Snakes[0].Head()
 
 	data.Hazards[p.String()] = false
-	///fmt.Printf("head :%v", p)
 	data.Snakes[ind].Coords = data.Snakes[ind].Coords[1:]
+	//fmt.Printf("%v\n", data.Snakes[ind].Coords)
 	if !data.FoodMap[p.String()] {
 		t, err := getTail(ind, data)
 		if err != nil {
 			return err
 		}
-		//fmt.Printf("tail :%v\n", t)
 		data.Hazards[t.String()] = false
 	}
 	return nil

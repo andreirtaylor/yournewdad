@@ -44,7 +44,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// log move request
-	//log.Infof(ctx, "%v", data)
+	log.Infof(ctx, "%v", data)
 
 	// its tooooooooo sloooooooooooooooww :(
 	//SaveMove(data, req)
