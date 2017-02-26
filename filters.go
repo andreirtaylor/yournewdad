@@ -16,6 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	FilterTail,
 	FilterClosestFoodDirections,
 	FilterKillArea,
 	FilterMinimizeSpace,
@@ -23,6 +24,7 @@ var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 
 var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
+	FilterTail,
 	FilterKillArea,
 	FilterMovesVsSpace,
 	FilterMinimizeSpace,
@@ -111,6 +113,19 @@ func GetPossibleDeath(data *MoveRequest, direc string, turns int) int {
 		return 0
 	}
 	return 0
+}
+
+func FilterTail(data *MoveRequest, moves []string) []string {
+	ret := []string{}
+	for _, direc := range moves {
+		if data.Direcs[direc].myTail {
+			ret = append(ret, direc)
+		}
+	}
+	if len(ret) == 0 {
+		return moves
+	}
+	return ret
 }
 
 func FilterAggression(data *MoveRequest, moves []string) []string {

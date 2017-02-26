@@ -34,6 +34,20 @@ func (point *Point) String() string {
 	return fmt.Sprintf("{%d,%d}", point.X, point.Y)
 }
 
+func (p1 *Point) isNeighbour(p2 *Point) bool {
+	if p1 == nil || p2 == nil {
+		return false
+	}
+	d := p1.Dist(p2)
+	if d.X == 0 && d.Y == 1 {
+		return true
+	}
+	if d.X == 1 && d.Y == 0 {
+		return true
+	}
+	return false
+}
+
 func (point *Point) getUp(data *MoveRequest, hazards bool) *Point {
 	if point.Y == 0 {
 		return nil

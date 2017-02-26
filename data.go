@@ -41,6 +41,7 @@ type MetaDataDirec struct {
 	// the total number of moves possible in this direction
 	TotalMoves int
 	TotalFood  int
+	myTail     bool
 	// contains a map to the last accessable piece of a snake
 	// from your current location if you moved in this direction
 	KeySnakeData map[int]*SnakeData

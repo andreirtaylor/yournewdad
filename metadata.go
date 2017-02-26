@@ -70,6 +70,11 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 		return nil
 	}
 
+	t, err := getTail(data.MyIndex, data)
+	if err != nil {
+		return nil
+	}
+
 	priority := 1
 
 	totalMoves := 0
@@ -103,6 +108,11 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 		accumulator.Moves += 1
 
 		FindMinSnakePointInSurroundingArea(&p, data, data.Direcs[currentDirec].KeySnakeData)
+
+		if p.isNeighbour(t) && priority > 2 {
+			data.Direcs[currentDirec].myTail = true
+
+		}
 
 		// add 1 to the total moves
 		totalMoves += 1

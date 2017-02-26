@@ -27,6 +27,30 @@ func Test_FilterPossibleMoves(t *testing.T) {
 
 }
 
+func Test_FilterTail(t *testing.T) {
+	data, err := NewMoveRequest(gameString15)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	right := []string{RIGHT}
+
+	// sort both of the strings so that deep equal will be able to see them
+	sort.Strings(right)
+	sort.Strings(directions)
+
+	if !reflect.DeepEqual(directions, right) {
+		t.Errorf("expected right, got %v", directions)
+	}
+
+}
+
 func Test_MovingIntoTightSpaces(t *testing.T) {
 	data, err := NewMoveRequest(gameString7)
 	if err != nil {
