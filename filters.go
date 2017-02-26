@@ -24,8 +24,8 @@ var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	FilterKeyArea,
 	FilterMinimizeSpace,
+	FilterKeyArea,
 }
 
 func GetFunctionName(i interface{}) string {
@@ -81,15 +81,6 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 			ret = append(ret, direc)
 		}
 	}
-	///if stringInSlice(direc, p.WhichDirectionIs(p2)) {
-	///	if direc == UP || direc == down {
-	///		// the distance from you to the point in the Y
-	///		dist := p.Dist(p2).Y
-	///		if dist > bestDist {
-	///		}
-	///	}
-	///	fmt.Printf("%v\n", direc)
-	///}
 	if len(ret) == 0 {
 		return moves
 	}

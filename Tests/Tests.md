@@ -58,3 +58,7 @@ You are the snake with head at [13, 2]
 ![](assets/Tests-0312c.png)
 
 You are the snake with head at [7, 18]
+
+## gameString11
+
+![](assets/Tests-68ff2.png)
