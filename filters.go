@@ -16,13 +16,14 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	FilterAggression,
 	FilterClosestFoodDirections,
+	FilterKillArea,
 	FilterMinimizeSpace,
 }
 
 var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
+	FilterKillArea,
 	FilterMovesVsSpace,
 	FilterMinimizeSpace,
 	FilterKeyArea,
@@ -56,38 +57,58 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 }
 
 func GetPossibleDeath(data *MoveRequest, direc string, turns int) int {
-	for j := 0; j < turns; j++ {
-		baseData := []*StaticData{}
-		for _, snake := range data.Snakes {
-			sd := fullStats(snake.HeadPoint, data)
-			baseData = append(baseData, sd)
-		}
+	baseData := []*StaticData{}
+	for _, snake := range data.Snakes {
+		sd := fullStats(snake.HeadPoint, data)
+		baseData = append(baseData, sd)
+	}
 
-		err := MoveSnakeForward(data.MyIndex, data, direc)
-		if err != nil {
-			return 0
-		}
-		newData := []*StaticData{}
-		for _, snake := range data.Snakes {
-			sd := fullStats(snake.HeadPoint, data)
-			newData = append(newData, sd)
-		}
+	err := MoveSnakeForward(data.MyIndex, data, direc)
+	if err != nil {
+		return 0
+	}
+	newData := []*StaticData{}
+	for _, snake := range data.Snakes {
+		sd := fullStats(snake.HeadPoint, data)
+		newData = append(newData, sd)
+	}
 
-		for i := range newData {
-			if newData[i].Moves < baseData[i].Moves {
-				err = MoveSnakeBackward(data.MyIndex, data)
-				if err != nil {
-					return 0
-				}
-				return 1
-
+	for i := range newData {
+		if newData[i].Moves < baseData[i].Moves {
+			err = MoveSnakeBackward(data.MyIndex, data)
+			if err != nil {
+				return 0
 			}
-		}
+			return 1
 
-		err = MoveSnakeBackward(data.MyIndex, data)
-		if err != nil {
-			return 0
 		}
+	}
+
+	err = MoveSnakeForward(data.MyIndex, data, direc)
+	if err != nil {
+		return 0
+	}
+	newData = []*StaticData{}
+	for _, snake := range data.Snakes {
+		sd := fullStats(snake.HeadPoint, data)
+		newData = append(newData, sd)
+	}
+	for i := range newData {
+		if newData[i].Moves < baseData[i].Moves {
+			err = MoveSnakeBackward(data.MyIndex, data)
+			err = MoveSnakeBackward(data.MyIndex, data)
+			if err != nil {
+				return 0
+			}
+			return 1
+
+		}
+	}
+
+	err = MoveSnakeBackward(data.MyIndex, data)
+	err = MoveSnakeBackward(data.MyIndex, data)
+	if err != nil {
+		return 0
 	}
 	return 0
 }
@@ -102,6 +123,30 @@ func FilterAggression(data *MoveRequest, moves []string) []string {
 	//}
 	data.GenHazards(data, true)
 	return moves
+}
+
+func FilterKillArea(data *MoveRequest, moves []string) []string {
+	ret := []string{}
+	head, err := getMyHead(data)
+	if err != nil {
+		return []string{}
+	}
+	for _, direc := range moves {
+		// we know this is a valid move because all moves are filterd to be vaild
+		// this is the location you are moving to
+		p, err := GetPointInDirection(head, direc, data)
+		if err != nil {
+			return []string{}
+		}
+		if data.KillZones[p.String()] {
+			ret = append(ret, direc)
+		}
+	}
+	if len(ret) == 0 {
+		return moves
+	}
+	return ret
+
 }
 
 func FilterKeyArea(data *MoveRequest, moves []string) []string {
@@ -124,7 +169,16 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 		// prefer to move in the opposite direction
 		if distFromPnt.X > distFromHead.X || distFromPnt.Y > distFromHead.Y {
 			ret = append(ret, direc)
+		} else if distFromHead.X > distFromHead.Y {
+			if direc == UP || direc == DOWN {
+				ret = append(ret, direc)
+			}
+		} else if distFromHead.X < distFromHead.Y {
+			if direc == RIGHT || direc == LEFT {
+				ret = append(ret, direc)
+			}
 		}
+
 	}
 	if len(ret) == 0 {
 		return moves

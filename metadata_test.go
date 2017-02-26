@@ -80,27 +80,6 @@ func TestClosestFoodWithFood(t *testing.T) {
 
 }
 
-func TestWeirdDeath(t *testing.T) {
-	data, err := NewMoveRequest(gameString2)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	moves, err := bestMoves(data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	expected := []string{DOWN}
-
-	sort.Strings(moves)
-	sort.Strings(expected)
-
-	if !reflect.DeepEqual(expected, moves) {
-		t.Errorf("expected %v directions got %v", expected, moves)
-	}
-}
-
 func TestEfficientSpace(t *testing.T) {
 	data, err := NewMoveRequest(gameString1)
 	if err != nil {
