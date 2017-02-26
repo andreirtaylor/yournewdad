@@ -58,7 +58,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 				accumulator.ClosestFood = &p
 			}
 			accumulator.Food += 1
-			foodptr := &FoodData{moves: currDepth - 1, pnt: &p}
+			foodptr := &FoodData{moves: currDepth - 2, pnt: &p}
 			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
 		}
 		// add 1 to the moves in this direction in this generation

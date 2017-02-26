@@ -30,7 +30,7 @@ func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
 			if foodh == nil {
 				continue
 			}
-			if food.moves > foodh.moves {
+			if food.moves > foodh.moves || ((food.moves == foodh.moves) && data.MyLength > len(snake.Coords)) {
 				allFarther = false
 			}
 		}
