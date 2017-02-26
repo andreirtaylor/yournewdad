@@ -150,10 +150,13 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 	if len(ret) == 0 {
 		max := math.MinInt64
 		for _, direc := range moves {
-			if data.Direcs[direc].MovesVsSpace > max {
+			if data.Direcs[direc].MovesVsSpace == max {
+				ret = append(ret, direc)
+			} else if data.Direcs[direc].MovesVsSpace > max {
 				ret = []string{direc}
 				max = data.Direcs[direc].MovesVsSpace
 			}
+
 		}
 	}
 	return ret
