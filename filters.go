@@ -16,7 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	//FilterAggression,
+	FilterAggression,
 	FilterClosestFoodDirections,
 	FilterMinimizeSpace,
 }
@@ -56,37 +56,46 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 }
 
 func GetPossibleDeath(data *MoveRequest, direc string, turns int) int {
-	baseData := []*StaticData{}
-	for i, snake := range data.Snakes {
-		fmt.Printf("snake %v head %v \n", i, snake.HeadPoint)
-		sd := fullStats(snake.HeadPoint, data)
-		baseData = append(baseData, sd)
-	}
-	fmt.Printf("%v\n", baseData)
+	for j := 0; j < turns; j++ {
+		baseData := []*StaticData{}
+		for _, snake := range data.Snakes {
+			sd := fullStats(snake.HeadPoint, data)
+			baseData = append(baseData, sd)
+		}
 
-	err := MoveSnakeForward(data.MyIndex, data, direc)
-	if err != nil {
-		return 0
-	}
-	newData := []*StaticData{}
-	for i, snake := range data.Snakes {
-		fmt.Printf("snake %v head %v \n", i, snake.HeadPoint)
-		sd := fullStats(snake.HeadPoint, data)
-		newData = append(newData, sd)
-	}
+		err := MoveSnakeForward(data.MyIndex, data, direc)
+		if err != nil {
+			return 0
+		}
+		newData := []*StaticData{}
+		for _, snake := range data.Snakes {
+			sd := fullStats(snake.HeadPoint, data)
+			newData = append(newData, sd)
+		}
 
-	err = MoveSnakeBackward(data.MyIndex, data)
-	if err != nil {
-		return 0
+		for i := range newData {
+			if newData[i].Moves < baseData[i].Moves {
+				err = MoveSnakeBackward(data.MyIndex, data)
+				if err != nil {
+					return 0
+				}
+				return 1
+
+			}
+		}
+
+		err = MoveSnakeBackward(data.MyIndex, data)
+		if err != nil {
+			return 0
+		}
 	}
-	fmt.Printf("%v\n", newData)
 	return 0
 }
 
 func FilterAggression(data *MoveRequest, moves []string) []string {
 	data.GenHazards(data, false)
 	//for _, move := range moves {
-	deaths := GetPossibleDeath(data, DOWN, 5)
+	deaths := GetPossibleDeath(data, DOWN, 2)
 	if deaths > 0 {
 		return []string{DOWN}
 	}

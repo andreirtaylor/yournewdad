@@ -49,7 +49,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		pushOntoPQ(p.Left(data), seen, &pq, item.priority)
 		pushOntoPQ(p.Right(data), seen, &pq, item.priority)
 
-		fmt.Printf("%v", p)
+		//fmt.Printf("%v", p)
 		if data.FoodMap[p.String()] {
 			//fmt.Printf("food\n")
 			if accumulator.ClosestFood == nil {
@@ -62,7 +62,6 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		FindMinSnakePointInSurroundingArea(&p, data, ksd)
 	}
 
-	fmt.Printf("\n")
 	accumulator.KeySnakeData = ksd
 	return accumulator
 }

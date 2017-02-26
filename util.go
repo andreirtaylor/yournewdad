@@ -20,7 +20,6 @@ func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 		return errors.New("Index out of bounds")
 	}
 	head := data.Snakes[ind].Head()
-	fmt.Printf(" head is %v\n", head)
 
 	p, err := GetPointInDirection(head, direc, data)
 	if err != nil {
