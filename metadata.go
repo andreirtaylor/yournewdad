@@ -58,6 +58,9 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
 	heap.Init(&pq)
+	if data.Direcs[currentDirec].KeySnakeData == nil {
+		data.Direcs[currentDirec].KeySnakeData = make(map[int]*SnakeData)
+	}
 
 	seen := make(map[string]bool)
 	// make the first item priority 1 so that if statement
@@ -95,7 +98,7 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
 
-		FindMinSnakePointInSurroundingArea(&p, data, currentDirec)
+		FindMinSnakePointInSurroundingArea(&p, data, data.Direcs[currentDirec].KeySnakeData)
 
 		// add 1 to the total moves
 		totalMoves += 1

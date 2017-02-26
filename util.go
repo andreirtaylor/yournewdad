@@ -20,25 +20,29 @@ func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 		return errors.New("Index out of bounds")
 	}
 	head := data.Snakes[ind].Head()
+	fmt.Printf(" head is %v\n", head)
 
 	p, err := GetPointInDirection(head, direc, data)
 	if err != nil {
 		return err
 	}
-	if p != nil {
-		data.Hazards[p.String()] = true
-		if !data.FoodMap[p.String()] {
-			t, err := getTail(ind, data)
-			if err != nil {
-				return err
-			}
-			data.Hazards[t.String()] = false
-			data.Snakes[ind].TailStack.Push(t)
-			fmt.Printf("%v", data.Snakes[ind].TailStack.Len())
-		}
-		// append the coords to the front of the snake
-		data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
+	if p == nil {
+		return errors.New("Invalid move")
 	}
+	data.Hazards[p.String()] = true
+
+	data.Snakes[ind].HeadPoint = p
+
+	if !data.FoodMap[p.String()] {
+		t, err := getTail(ind, data)
+		if err != nil {
+			return err
+		}
+		data.Hazards[t.String()] = false
+		data.Snakes[ind].TailStack.Push(t)
+	}
+	// append the coords to the front of the snake
+	data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
 	return nil
 }
 
@@ -54,7 +58,6 @@ func MoveSnakeBackward(ind int, data *MoveRequest) error {
 	//fmt.Printf("%v\n", data.Snakes[ind].Coords)
 	if !data.FoodMap[p.String()] {
 		t := data.Snakes[ind].TailStack.Pop()
-		fmt.Printf("%v\n", t)
 		data.Hazards[t.String()] = false
 		data.Snakes[ind].Coords = append(data.Snakes[ind].Coords, *t)
 	}
@@ -92,24 +95,20 @@ func getTaunt(turn int) string {
 // return the snake data corresponding to the last piece
 // of snake that you see
 // if there are no snakes around you return nil
-func FindMinSnakePointInSurroundingArea(p *Point, data *MoveRequest, direc string) {
+func FindMinSnakePointInSurroundingArea(p *Point, data *MoveRequest, KeySnakeData map[int]*SnakeData) {
 	pts := []*Point{
 		p.UpHazard(data),
 		p.DownHazard(data),
 		p.LeftHazard(data),
 		p.RightHazard(data)}
 
-	if data.Direcs[direc].KeySnakeData == nil {
-		data.Direcs[direc].KeySnakeData = make(map[int]*SnakeData)
-	}
-
 	for _, pt := range pts {
 		if pt != nil {
 			sd := data.SnakeHash[pt.String()]
 			if sd != nil {
-				if data.Direcs[direc].KeySnakeData[sd.id] == nil ||
-					sd.lengthLeft < data.Direcs[direc].KeySnakeData[sd.id].lengthLeft {
-					data.Direcs[direc].KeySnakeData[sd.id] = sd
+				if KeySnakeData[sd.id] == nil ||
+					sd.lengthLeft < KeySnakeData[sd.id].lengthLeft {
+					KeySnakeData[sd.id] = sd
 				}
 			}
 		}

@@ -100,11 +100,10 @@ func TestDontMoveOntoTheKeyArea(t *testing.T) {
 }
 
 func TestAggression(t *testing.T) {
-	data, err := NewMoveRequest(gameString6)
+	data, err := NewMoveRequest(gameString10)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-
 	directions := []string{LEFT, RIGHT, DOWN}
 	filteredMoves := FilterAggression(data, directions)
 

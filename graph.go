@@ -2,8 +2,13 @@ package kaa
 
 import (
 	"container/heap"
+	"fmt"
 	"math"
 )
+
+func keepFMTforGraph() {
+	fmt.Printf("%v")
+}
 
 func fullStats(pos *Point, data *MoveRequest) *StaticData {
 	return quickStats(pos, data, math.MaxInt64)
@@ -17,6 +22,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 	heap.Init(&pq)
 
 	seen := make(map[string]bool)
+	ksd := make(map[int]*SnakeData)
 	// make the first item priority 1 so that if statement
 	// at the end of the loop is executed
 	pushOntoPQ(pos, seen, &pq, 1)
@@ -43,6 +49,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		pushOntoPQ(p.Left(data), seen, &pq, item.priority)
 		pushOntoPQ(p.Right(data), seen, &pq, item.priority)
 
+		fmt.Printf("%v", p)
 		if data.FoodMap[p.String()] {
 			//fmt.Printf("food\n")
 			if accumulator.ClosestFood == nil {
@@ -52,7 +59,10 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
+		FindMinSnakePointInSurroundingArea(&p, data, ksd)
 	}
 
+	fmt.Printf("\n")
+	accumulator.KeySnakeData = ksd
 	return accumulator
 }

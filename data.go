@@ -134,13 +134,15 @@ func (m *MetaData) GenSnakeHash(data *MoveRequest) {
 }
 
 // Generates a map of hazards
-func (m *MetaData) GenHazards(data *MoveRequest) {
+// this is pretty janky and will need to get refactored
+func (m *MetaData) GenHazards(data *MoveRequest, snakeMovesAsHazards bool) {
 	m.Hazards = make(map[string]bool)
 	m.KillZones = make(map[string]bool)
 	for _, snake := range data.Snakes {
+		snake.HeadPoint = &(snake.Coords[0])
 		snake.HeadStack = new(Stack)
 		snake.TailStack = new(Stack)
-		if len(snake.Coords) >= m.MyLength && data.You != snake.Id {
+		if len(snake.Coords) >= m.MyLength && data.You != snake.Id && snakeMovesAsHazards {
 			head := snake.Head()
 			d := head.Down(data)
 			if d != nil {
@@ -159,7 +161,7 @@ func (m *MetaData) GenHazards(data *MoveRequest) {
 				m.Hazards[d.String()] = true
 			}
 
-		} else if len(snake.Coords) < m.MyLength && data.You != snake.Id {
+		} else if len(snake.Coords) < m.MyLength && data.You != snake.Id && snakeMovesAsHazards {
 			head := snake.Head()
 			d := head.Down(data)
 			if d != nil {
@@ -201,10 +203,11 @@ type MoveMetaData map[string]*MetaDataDirec
 // first search to determine the ammount of food you can reach in
 // a desired number of moves from the source
 type StaticData struct {
-	ClosestFood *Point
-	Food        int
-	Snakes      int
-	Moves       int
+	ClosestFood  *Point
+	Food         int
+	Snakes       int
+	Moves        int
+	KeySnakeData map[int]*SnakeData
 }
 
 func (m *StaticData) String() string {
@@ -214,6 +217,10 @@ func (m *StaticData) String() string {
 	buffer.WriteString(fmt.Sprintf("Food:%v, ", m.Food))
 	buffer.WriteString(fmt.Sprintf("Snakes:%v, ", m.Snakes))
 	buffer.WriteString(fmt.Sprintf("Moves:%v, ", m.Moves))
+	buffer.WriteString("KeySnakeData{\n")
+	for ind, val := range m.KeySnakeData {
+		buffer.WriteString(fmt.Sprintf("\t%cv:%v ", ind, val))
+	}
 	buffer.WriteString("}\n")
 
 	return buffer.String()
@@ -280,7 +287,7 @@ func (m *MoveRequest) String() string {
 // initializes global meta data attributes
 func (m *MoveRequest) init() {
 	m.SetMyLength(m)
-	m.GenHazards(m)
+	m.GenHazards(m, true)
 	m.GenFoodMap(m)
 	m.GenSnakeHash(m)
 }
@@ -319,7 +326,8 @@ type Snake struct {
 	Taunt        string  `json:"taunt"`
 	HeadStack    *Stack
 	TailStack    *Stack
+	HeadPoint    *Point
 }
 
-func (snake Snake) Head() *Point    { return &snake.Coords[0] }
+func (snake Snake) Head() *Point    { return snake.HeadPoint }
 func (snake *Snake) String() string { return fmt.Sprintf("%#v", snake) }

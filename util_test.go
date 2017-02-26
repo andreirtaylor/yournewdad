@@ -52,30 +52,39 @@ func Test_MoveSnakeOntoBlankSpace(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 
+	if data.Hazards[tail.String()] == false {
+		t.Errorf("The tail should be a hazard")
+	}
+
+	p := &Point{X: 1, Y: 16}
+	if data.Hazards[p.String()] == true {
+		t.Errorf("The position of the new head should not be a hazard")
+	}
+
 	err = MoveSnakeForward(0, data, DOWN)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 
-	p := &Point{X: 1, Y: 16}
-	if !data.Hazards[p.String()] || data.Hazards[tail.String()] {
-		t.Errorf("If the head moves onto a blank space the tail should no longer be there")
+	if data.Hazards[p.String()] == false {
+		t.Errorf("The new position of the head should be a hazzard")
 	}
 
+	if data.Hazards[tail.String()] == true {
+		t.Errorf("The tail should no longet be a hazard")
+	}
 	err = MoveSnakeBackward(0, data)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 
-	oldHead := &Point{X: 1, Y: 15}
-	if data.Hazards[oldHead.String()] {
+	oldHead := &Point{X: 1, Y: 16}
+	if data.Hazards[oldHead.String()] == true {
 		t.Errorf("The old head should not be a hazard")
 	}
 
-	head := data.Snakes[0].Head()
-	// the head moves back and the tail remains in the same spot
-	if data.Hazards[head.String()] || !data.Hazards[tail.String()] {
-		t.Errorf("If the head moves back from a blank space the tail should be back where it was")
+	if data.Hazards[tail.String()] == true {
+		t.Errorf("The old tail should come back")
 	}
 
 }
