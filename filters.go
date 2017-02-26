@@ -151,7 +151,7 @@ func FilterMinimizeSpace(data *MoveRequest, moves []string) []string {
 func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 	ret := []string{}
 	for _, direc := range moves {
-		if data.Direcs[direc].MovesVsSpace > -2 {
+		if data.Direcs[direc].MovesVsSpace > len(data.Food) {
 			//fmt.Printf("%v\n", ret)
 			ret = append(ret, direc)
 		}

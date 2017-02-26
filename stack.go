@@ -28,7 +28,7 @@ func (s *Stack) Push(value *Point) {
 
 // Remove the top element from the stack and return it's value
 // If the stack is empty, return nil
-func (s *Stack) Pop() (value interface{}) {
+func (s *Stack) Pop() (value *Point) {
 	if s.size > 0 {
 		value, s.top = s.top.value, s.top.next
 		s.size--

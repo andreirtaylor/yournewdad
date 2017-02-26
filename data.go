@@ -138,6 +138,8 @@ func (m *MetaData) GenHazards(data *MoveRequest) {
 	m.Hazards = make(map[string]bool)
 	m.KillZones = make(map[string]bool)
 	for _, snake := range data.Snakes {
+		snake.HeadStack = new(Stack)
+		snake.TailStack = new(Stack)
 		if len(snake.Coords) >= m.MyLength && data.You != snake.Id {
 			head := snake.Head()
 			d := head.Down(data)
@@ -244,13 +246,13 @@ type GameStartResponse struct {
 
 type MoveRequest struct {
 	// static
-	GameId string  `json:"game_id"`
-	Height int     `json:"height"`
-	Width  int     `json:"width"`
-	Turn   int     `json:"turn"`
-	Food   []Point `json:"food"`
-	Snakes []Snake `json:"snakes"`
-	You    string  `json:"you"`
+	GameId string   `json:"game_id"`
+	Height int      `json:"height"`
+	Width  int      `json:"width"`
+	Turn   int      `json:"turn"`
+	Food   []Point  `json:"food"`
+	Snakes []*Snake `json:"snakes"`
+	You    string   `json:"you"`
 
 	// added here for convenience
 	MetaData
@@ -315,6 +317,8 @@ type Snake struct {
 	Id           string  `json:"id"`
 	Name         string  `json:"name"`
 	Taunt        string  `json:"taunt"`
+	HeadStack    *Stack
+	TailStack    *Stack
 }
 
 func (snake Snake) Head() *Point    { return &snake.Coords[0] }

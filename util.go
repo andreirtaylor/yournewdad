@@ -19,7 +19,7 @@ func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 	if (ind < 0) || (ind >= len(data.Snakes)) {
 		return errors.New("Index out of bounds")
 	}
-	head := data.Snakes[0].Head()
+	head := data.Snakes[ind].Head()
 
 	p, err := GetPointInDirection(head, direc, data)
 	if err != nil {
@@ -33,10 +33,11 @@ func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 				return err
 			}
 			data.Hazards[t.String()] = false
+			data.Snakes[ind].TailStack.Push(t)
+			fmt.Printf("%v", data.Snakes[ind].TailStack.Len())
 		}
 		// append the coords to the front of the snake
 		data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
-		//fmt.Printf("%v\n", data.Snakes[ind].Coords)
 	}
 	return nil
 }
@@ -46,17 +47,16 @@ func MoveSnakeBackward(ind int, data *MoveRequest) error {
 		return errors.New("Index out of bounds")
 	}
 	// assumes the snakes are all more than length 1
-	p := data.Snakes[0].Head()
+	p := data.Snakes[ind].Head()
 
 	data.Hazards[p.String()] = false
 	data.Snakes[ind].Coords = data.Snakes[ind].Coords[1:]
 	//fmt.Printf("%v\n", data.Snakes[ind].Coords)
 	if !data.FoodMap[p.String()] {
-		t, err := getTail(ind, data)
-		if err != nil {
-			return err
-		}
+		t := data.Snakes[ind].TailStack.Pop()
+		fmt.Printf("%v\n", t)
 		data.Hazards[t.String()] = false
+		data.Snakes[ind].Coords = append(data.Snakes[ind].Coords, *t)
 	}
 	return nil
 }

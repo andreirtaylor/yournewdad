@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_MoveSnake(t *testing.T) {
+func Test_MoveSnakeOntoFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString4)
 
 	if err != nil {
@@ -36,6 +36,46 @@ func Test_MoveSnake(t *testing.T) {
 	// the head moves back and the tail remains in the same spot
 	if data.Hazards[p.String()] || !data.Hazards[tail.String()] {
 		t.Errorf("If the head moves back from a food the tail should stay in the same spot")
+	}
+
+}
+
+func Test_MoveSnakeOntoBlankSpace(t *testing.T) {
+	data, err := NewMoveRequest(gameString4)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	tail, err := getTail(0, data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	err = MoveSnakeForward(0, data, DOWN)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	p := &Point{X: 1, Y: 16}
+	if !data.Hazards[p.String()] || data.Hazards[tail.String()] {
+		t.Errorf("If the head moves onto a blank space the tail should no longer be there")
+	}
+
+	err = MoveSnakeBackward(0, data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	oldHead := &Point{X: 1, Y: 15}
+	if data.Hazards[oldHead.String()] {
+		t.Errorf("The old head should not be a hazard")
+	}
+
+	head := data.Snakes[0].Head()
+	// the head moves back and the tail remains in the same spot
+	if data.Hazards[head.String()] || !data.Hazards[tail.String()] {
+		t.Errorf("If the head moves back from a blank space the tail should be back where it was")
 	}
 
 }

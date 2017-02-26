@@ -20,6 +20,7 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 		return nil, err
 	}
 
+	// dont do this ye it doesnt work
 	//MoveSnakeForward(data.MyIndex, data, direc)
 	ret := graphSearch(p, data, direc)
 	//MoveSnakeBackward(data.MyIndex, data)
