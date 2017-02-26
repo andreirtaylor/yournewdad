@@ -14,6 +14,27 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+func findGuaranteedClosestFood(data *MoveRequest, direc string) *Point {
+	head, _ := getMyHead(data)
+	for _, food := range data.Direcs[direc].sortedFood {
+		dh := head.Dist(food)
+		distFromHead := dh.X + dh.Y
+		allFarther := true
+		for _, snake := range data.Snakes {
+			snakeHead := snake.Head()
+			ds := snakeHead.Dist(food)
+			distanceFromSnake := ds.X + ds.Y
+			if distFromHead > distanceFromSnake {
+				allFarther = false
+			}
+		}
+		if allFarther {
+			return food
+		}
+	}
+	return nil
+}
+
 // only handles valid moves right now
 func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
 	if (ind < 0) || (ind >= len(data.Snakes)) {

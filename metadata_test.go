@@ -1,8 +1,6 @@
 package kaa
 
 import (
-	"reflect"
-	"sort"
 	"testing"
 )
 

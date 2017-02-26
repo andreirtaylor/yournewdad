@@ -5,6 +5,36 @@ import (
 	"testing"
 )
 
+func Test_FindNoGuaranteedClosestFood(t *testing.T) {
+	data, err := NewMoveRequest(gameString9)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	p := findGuaranteedClosestFood(data, UP)
+	if p != nil {
+		t.Errorf("you are not closest to any food")
+	}
+}
+
+func Test_FindGuaranteedClosestFood(t *testing.T) {
+	data, err := NewMoveRequest(gameString10)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	p := findGuaranteedClosestFood(data, LEFT)
+	if p == nil {
+		t.Errorf("you are closest to some food")
+	}
+
+	if !reflect.DeepEqual(p, &Point{X: 12, Y: 18}) {
+		t.Errorf("expected something else, %v", p)
+	}
+}
+
 func Test_MoveSnakeOntoFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString4)
 

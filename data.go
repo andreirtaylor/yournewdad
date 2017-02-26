@@ -32,6 +32,7 @@ type MetaData struct {
 type MetaDataDirec struct {
 	// denotes the number of moves until you reach the closest piece of food
 	ClosestFood int
+	sortedFood  []*Point
 	// totals up your length and the ammount of food in a direction
 	// if you would fill up the space make it unlikely to go that direction
 	MovesVsSpace int
@@ -208,6 +209,7 @@ type StaticData struct {
 	Snakes       int
 	Moves        int
 	KeySnakeData map[int]*SnakeData
+	sortedFood   []*Point
 }
 
 func (m *StaticData) String() string {

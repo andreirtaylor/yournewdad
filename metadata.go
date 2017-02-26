@@ -94,6 +94,7 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 				data.Direcs[currentDirec].ClosestFood = priority - 1
 			}
 			accumulator.Food += 1
+			accumulator.sortedFood = append(accumulator.sortedFood, &p)
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
@@ -128,7 +129,6 @@ func ClosestFood(data []*StaticData) int {
 	for i, staticData := range data {
 		//fmt.Printf("direction : %v\ndata for move %v: %#v\n", direc, i, staticData)
 		if staticData.Food > 0 {
-			// the first entry is always empty
 			return i + 1
 		}
 	}
@@ -155,6 +155,7 @@ func GenerateMetaData(data *MoveRequest) error {
 			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 			direcMD.TotalMoves = sd.Moves
 			direcMD.TotalFood = sd.Food
+			direcMD.sortedFood = sd.sortedFood
 			if direcMD.MovesVsSpace > 20 {
 				tightSpace = false
 			}
