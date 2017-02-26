@@ -75,6 +75,7 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	totalMoves := 0
 
 	accumulator := &StaticData{}
+	accumulator.FoodHash = make(map[string]*FoodData)
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
 		if item.priority > priority {
@@ -94,7 +95,9 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 				data.Direcs[currentDirec].ClosestFood = priority - 1
 			}
 			accumulator.Food += 1
-			accumulator.sortedFood = append(accumulator.sortedFood, &p)
+			foodptr := &FoodData{moves: priority - 1, pnt: &p}
+			accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
+			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
@@ -156,6 +159,7 @@ func GenerateMetaData(data *MoveRequest) error {
 			direcMD.TotalMoves = sd.Moves
 			direcMD.TotalFood = sd.Food
 			direcMD.sortedFood = sd.sortedFood
+			direcMD.FoodHash = sd.FoodHash
 			if direcMD.MovesVsSpace > 20 {
 				tightSpace = false
 			}

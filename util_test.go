@@ -25,12 +25,13 @@ func Test_FindGuaranteedClosestFood(t *testing.T) {
 		t.Errorf("error: %v", err)
 	}
 
-	p := findGuaranteedClosestFood(data, LEFT)
+	p := findGuaranteedClosestFood(data, DOWN)
 	if p == nil {
 		t.Errorf("you are closest to some food")
 	}
 
-	if !reflect.DeepEqual(p, &Point{X: 12, Y: 18}) {
+	//t.Logf("%#v", p)
+	if !reflect.DeepEqual(p.pnt, &Point{X: 12, Y: 18}) {
 		t.Errorf("expected something else, %v", p)
 	}
 }

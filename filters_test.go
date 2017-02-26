@@ -62,6 +62,26 @@ func Test_ClosestFood(t *testing.T) {
 
 }
 
+func Test_ClosestFood2(t *testing.T) {
+	data, err := NewMoveRequest(gameString12)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	foodDirections, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	expectedFoodDirections := []string{DOWN}
+	sort.Strings(foodDirections)
+	sort.Strings(expectedFoodDirections)
+
+	if !reflect.DeepEqual(foodDirections, expectedFoodDirections) {
+		t.Errorf("expected %v directions got %v", expectedFoodDirections, foodDirections)
+	}
+
+}
+
 func Test_MinimizationOfSpace(t *testing.T) {
 	data, err := NewMoveRequest(gameString8)
 	if err != nil {

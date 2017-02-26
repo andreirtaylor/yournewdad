@@ -62,3 +62,9 @@ You are the snake with head at [7, 18]
 ## gameString11
 
 ![](assets/Tests-68ff2.png)
+
+## gameString12
+
+![](assets/Tests-4b72f.png)
+
+You are the red snake

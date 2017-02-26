@@ -14,17 +14,23 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func findGuaranteedClosestFood(data *MoveRequest, direc string) *Point {
-	head, _ := getMyHead(data)
+func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
+	data.GenHazards(data, false)
+	defer data.GenHazards(data, true)
 	for _, food := range data.Direcs[direc].sortedFood {
-		dh := head.Dist(food)
-		distFromHead := dh.X + dh.Y
 		allFarther := true
-		for _, snake := range data.Snakes {
+		for i, snake := range data.Snakes {
+			if i == data.MyIndex {
+				continue
+			}
 			snakeHead := snake.Head()
-			ds := snakeHead.Dist(food)
-			distanceFromSnake := ds.X + ds.Y
-			if distFromHead > distanceFromSnake {
+			d := fullStats(snakeHead, data)
+			foodh := d.FoodHash[food.pnt.String()]
+			//fmt.Printf("point %v mine %#v theirs %#v\n", food.pnt, food, foodh)
+			if foodh == nil {
+				continue
+			}
+			if food.moves > foodh.moves {
 				allFarther = false
 			}
 		}

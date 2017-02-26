@@ -33,6 +33,8 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 	currDepth := 1
 
 	accumulator := &StaticData{}
+	accumulator.FoodHash = make(map[string]*FoodData)
+
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
 		if item.priority > currDepth {
@@ -56,6 +58,8 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 				accumulator.ClosestFood = &p
 			}
 			accumulator.Food += 1
+			foodptr := &FoodData{moves: currDepth - 1, pnt: &p}
+			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1

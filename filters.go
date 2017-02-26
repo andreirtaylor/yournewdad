@@ -189,16 +189,16 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 func FilterClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	directions := []string{}
 	min := math.MaxInt64
-	metaD := data.Direcs
 	for _, direc := range moves {
-		if data.Direcs[direc].ClosestFood == 0 {
+		food := findGuaranteedClosestFood(data, direc)
+		if food == nil {
 			continue
 		}
-		if metaD[direc].ClosestFood < min {
+		if food.moves < min {
 			directions = []string{}
 			directions = append(directions, direc)
-			min = metaD[direc].ClosestFood
-		} else if metaD[direc].ClosestFood == min {
+			min = food.moves
+		} else if food.moves == min {
 			directions = append(directions, direc)
 		}
 	}
