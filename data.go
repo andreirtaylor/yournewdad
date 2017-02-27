@@ -7,6 +7,35 @@ import (
 	"net/http"
 )
 
+type MMArray [][]MinMaxData
+
+func (ret MMArray) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("\n")
+	for i := range ret {
+		for j := range ret[i] {
+			if ret[i][j].snakeId == -2 {
+				buffer.WriteString(fmt.Sprintf("  + "))
+			} else if ret[i][j].articulationPoint {
+				// there are no artuculation points yet
+				//buffer.WriteString("  X ")
+			} else if ret[i][j].snakeId == -1 {
+				//p := &Point{X: j, Y: i}
+				//hd := data.SnakeHash[p.String()]
+				//if hd != nil {
+				//	buffer.WriteString(fmt.Sprintf("  S%d ", hd.id))
+				//} else {
+				buffer.WriteString(" XX ")
+				//}
+			} else {
+				buffer.WriteString(fmt.Sprintf(" %2d ", ret[i][j].snakeId))
+			}
+		}
+		buffer.WriteString("\n")
+	}
+	return buffer.String()
+}
+
 // MetaData
 // contains any computed data about the move request.
 // is used in composition with the move request so you cannot
@@ -23,6 +52,7 @@ type MetaData struct {
 	SnakeHash  map[string]*SnakeData
 	KillZones  map[string]bool
 	SnakeHeads map[string]bool
+	minMaxArr  MMArray
 }
 
 // MetaDataDirec
@@ -45,6 +75,7 @@ type MetaDataDirec struct {
 	// contains a map to the last accessable piece of a snake
 	// from your current location if you moved in this direction
 	KeySnakeData map[int]*SnakeData
+	minMaxArr    MMArray
 }
 
 // minKeySnakePart
@@ -99,6 +130,14 @@ func (m *MetaData) SetMyLength(data *MoveRequest) {
 			m.MyIndex = i
 		}
 	}
+}
+
+// a little struct used to see the length left after this portion of a
+// snakes body the tail of the snake has a value of 1
+type MinMaxData struct {
+	moves             int
+	snakeId           int
+	articulationPoint bool
 }
 
 // a little struct used to see the length left after this portion of a
@@ -215,6 +254,7 @@ type StaticData struct {
 	// indexed by their point
 	FoodHash   map[string]*FoodData
 	sortedFood []*FoodData
+	MoveHash   map[string]*MinMaxData
 }
 
 type FoodData struct {

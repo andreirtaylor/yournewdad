@@ -34,6 +34,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 
 	accumulator := &StaticData{}
 	accumulator.FoodHash = make(map[string]*FoodData)
+	accumulator.MoveHash = make(map[string]*MinMaxData)
 
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
@@ -64,6 +65,10 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
 		FindMinSnakePointInSurroundingArea(&p, data, ksd)
+		// the snake head shouldnt be in the hash
+		if currDepth > 2 {
+			accumulator.MoveHash[p.String()] = &MinMaxData{moves: currDepth}
+		}
 	}
 
 	accumulator.KeySnakeData = ksd

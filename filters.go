@@ -16,9 +16,9 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	FilterKillArea,
 	FilterTail,
 	FilterClosestFoodDirections,
-	FilterKillArea,
 	FilterMinimizeSpace,
 }
 

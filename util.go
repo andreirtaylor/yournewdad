@@ -1,8 +1,10 @@
 package kaa
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"math"
 )
 
 func stringInSlice(a string, list []string) bool {
@@ -12,6 +14,84 @@ func stringInSlice(a string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func GenMinMax(data *MoveRequest) {
+	data.minMaxArr = MinMax(data, "")
+	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
+		MinMax(data, direc)
+	}
+
+}
+
+func MinMax(data *MoveRequest, direc string) MMArray {
+	data.GenHazards(data, false)
+	defer data.GenHazards(data, true)
+	myHead := data.Snakes[data.MyIndex].Head()
+	if direc != "" {
+		myHeadtmp, err := GetPointInDirection(myHead, direc, data)
+		if err != nil {
+			return nil
+		}
+		myHead = myHeadtmp
+		if myHead == nil {
+			return nil
+		}
+		if myHead != nil {
+			data.Hazards[myHead.String()] = true
+		}
+	}
+	ret := make(MMArray, data.Height)
+	for i := range ret {
+		ret[i] = make([]MinMaxData, data.Width)
+		for j := range ret[i] {
+			ret[i][j].moves = math.MaxInt64
+			ret[i][j].snakeId = -1
+		}
+	}
+	for snakeId, snake := range data.Snakes {
+		head := snake.Head()
+		if snakeId == data.MyIndex {
+			head = myHead
+		}
+		stats := fullStats(head, data)
+		if head != nil {
+			for i := 0; i < data.Width; i++ {
+				for j := 0; j < data.Height; j++ {
+					p := &Point{X: i, Y: j}
+					if stats.MoveHash[p.String()] != nil {
+						if stats.MoveHash[p.String()].moves < ret[j][i].moves {
+							ret[j][i].moves = stats.MoveHash[p.String()].moves
+							ret[j][i].snakeId = snakeId
+						} else if stats.MoveHash[p.String()].moves == ret[j][i].moves {
+							ret[j][i].snakeId = -2
+
+						}
+						ret[j][i].articulationPoint = stats.MoveHash[p.String()].articulationPoint
+					}
+				}
+			}
+		}
+	}
+
+	if direc != "" {
+		data.Direcs[direc].minMaxArr = ret
+	}
+	return ret
+
+}
+
+func stringAllMinMAX(data *MoveRequest) string {
+	var buffer bytes.Buffer
+	buffer.WriteString("\n board\n ")
+	buffer.WriteString(data.minMaxArr.String())
+	for _, direc := range []string{UP, RIGHT, DOWN, LEFT} {
+		if data.Direcs[direc].minMaxArr != nil {
+			buffer.WriteString(fmt.Sprintf("%v\n", direc))
+			buffer.WriteString(data.Direcs[direc].minMaxArr.String())
+		}
+	}
+	return buffer.String()
 }
 
 func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {

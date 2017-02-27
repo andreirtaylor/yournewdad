@@ -36,6 +36,17 @@ func Test_FindGuaranteedClosestFood(t *testing.T) {
 	}
 }
 
+func Test_CutOff(t *testing.T) {
+	data, err := NewMoveRequest(gameString10)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	GenMinMax(data)
+	t.Logf("%v", stringAllMinMAX(data))
+}
+
 func Test_MoveSnakeOntoFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString4)
 
@@ -229,4 +240,14 @@ func Test_NumberofNeighbours(t *testing.T) {
 	if n != 1 {
 		t.Errorf("Expected 2 neighbours got %v", n)
 	}
+}
+
+func Test_PrintMinMax(t *testing.T) {
+	////data, err := NewMoveRequest(gameString13)
+
+	////if err != nil {
+	////	t.Errorf("error: %v", err)
+	////}
+
+	////printMinMax(data)
 }
