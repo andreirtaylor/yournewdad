@@ -18,21 +18,35 @@ func fullStatsMe(pos *Point, data *MoveRequest) *MetaDataDirec {
 	return quickStats(pos, data, math.MaxInt64, true)
 }
 
-func AppendIfMissing(slice []int, i int) bool {
+func AppendIfMissing(slice []int, i int) ([]int, bool) {
 	for _, ele := range slice {
 		if ele == i {
-			return false
+			return slice, false
 		}
 	}
 	slice = append(slice, i)
-	return true
+	return slice, true
 }
 
 // me is a boolean that basicly
 // a function that is to be used on other points
-func quickStats2(data *MoveRequest) *MetaDataDirec {
-	// generated the hazards without the hazards around the other snakes
+func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 	data.GenHazards(data, false)
+	myHead := data.Snakes[data.MyIndex].Head()
+	if direc != "" {
+		myHeadtmp, err := GetPointInDirection(myHead, direc, data)
+		if err != nil {
+			return nil
+		}
+		myHead = myHeadtmp
+		if myHead == nil {
+			return nil
+		}
+		if myHead != nil {
+			data.Hazards[myHead.String()] = true
+		}
+	}
+	// generated the hazards without the hazards around the other snakes
 
 	q := Queue{}
 
@@ -41,6 +55,9 @@ func quickStats2(data *MoveRequest) *MetaDataDirec {
 	// at the end of the loop is executed
 	for i, snake := range data.Snakes {
 		head := &snake.Coords[0]
+		if i == data.MyIndex {
+			head = myHead
+		}
 		mmd := &MinMaxData{
 			moves:    0,
 			snakeIds: []int{i},
@@ -80,7 +97,8 @@ func quickStats2(data *MoveRequest) *MetaDataDirec {
 		//fmt.Printf("%v %v %v\n ", p, boardState.moves, item.moves)
 		if boardState.moves == item.moves {
 			for _, id := range item.snakeIds {
-				if AppendIfMissing(accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds, id) {
+				if snakeIds, ok := AppendIfMissing(accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds, id); ok {
+					accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds = snakeIds
 					accumulator.minMaxArr[item.pnt.Y][item.pnt.X].tie = true
 				}
 

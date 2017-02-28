@@ -230,6 +230,8 @@ func Test_CutOff(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 
+	t.Logf("%v\n", stringAllMinMAX(data))
+
 	expectedDirection := []string{DOWN}
 	sort.Strings(filteredMoves)
 	sort.Strings(expectedDirection)
