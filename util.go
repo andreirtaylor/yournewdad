@@ -18,7 +18,6 @@ func stringInSlice(a string, list []string) bool {
 
 func MinMax(data *MoveRequest, direc string) MMArray {
 	data.GenHazards(data, false)
-	defer data.GenHazards(data, true)
 	myHead := data.Snakes[data.MyIndex].Head()
 	if direc != "" {
 		myHeadtmp, err := GetPointInDirection(myHead, direc, data)
@@ -42,25 +41,41 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 			ret[i][j].snakeIds = []int{}
 		}
 	}
+	seeTail := false
 	for snakeId, snake := range data.Snakes {
 		head := snake.Head()
 		if snakeId == data.MyIndex {
 			head = myHead
 		}
 		stats := fullStats(head, data)
-		if head != nil {
-			for i := range ret {
-				for j := range ret[i] {
-					p := &Point{X: i, Y: j}
-					if stats.MoveHash[p.String()] != nil {
-						if stats.MoveHash[p.String()].moves < ret[j][i].moves {
-							ret[j][i].moves = stats.MoveHash[p.String()].moves
-							ret[j][i].snakeIds = []int{snakeId}
-						} else if stats.MoveHash[p.String()].moves == ret[j][i].moves {
-							ret[j][i].snakeIds = append(ret[j][i].snakeIds, snakeId)
-							ret[j][i].tie = true
+		if stats.SeeTail {
+			seeTail = true
+		}
+		if direc != "" {
+			//data.Direcs[direc].MovesVsSpace = stats.MovesVsSpace
+			//data.Direcs[direc].minMaxArr = stats.MovesVsSpace
+			data.Direcs[direc].ClosestFood = stats.ClosestFood
+			data.Direcs[direc].Food = stats.Food
+			data.Direcs[direc].Snakes = stats.Snakes
+			data.Direcs[direc].Moves = stats.Moves
+			//fmt.Printf("%v %v\n", direc, stats.SeeTail)
+			data.Direcs[direc].SeeTail = seeTail
+			data.Direcs[direc].KeySnakeData = stats.KeySnakeData
+			data.Direcs[direc].FoodHash = stats.FoodHash
+			data.Direcs[direc].sortedFood = stats.sortedFood
+			data.Direcs[direc].MoveHash = stats.MoveHash
+		}
+		for i := range ret {
+			for j := range ret[i] {
+				p := &Point{X: i, Y: j}
+				if stats.MoveHash[p.String()] != nil {
+					if stats.MoveHash[p.String()].moves < ret[j][i].moves {
+						ret[j][i].moves = stats.MoveHash[p.String()].moves
+						ret[j][i].snakeIds = []int{snakeId}
+					} else if stats.MoveHash[p.String()].moves == ret[j][i].moves {
+						ret[j][i].snakeIds = append(ret[j][i].snakeIds, snakeId)
+						ret[j][i].tie = true
 
-						}
 					}
 				}
 			}
@@ -131,7 +146,6 @@ func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
 			snakeHead := snake.Head()
 			d := fullStats(snakeHead, data)
 			foodh := d.FoodHash[food.pnt.String()]
-			//fmt.Printf("point %v mine %#v theirs %#v\n", food.pnt, food, foodh)
 			if foodh == nil {
 				continue
 			}
@@ -283,6 +297,23 @@ func GetPointInDirection(p *Point, direc string, data *MoveRequest) (*Point, err
 		return p.Left(data), nil
 	case RIGHT:
 		return p.Right(data), nil
+	}
+	return nil, errors.New(fmt.Sprintf("could not find direction %v", direc))
+}
+
+func GetPointInDirectionHazards(p *Point, direc string, data *MoveRequest) (*Point, error) {
+	if p == nil {
+		return nil, nil
+	}
+	switch direc {
+	case UP:
+		return p.UpHazard(data), nil
+	case DOWN:
+		return p.DownHazard(data), nil
+	case LEFT:
+		return p.LeftHazard(data), nil
+	case RIGHT:
+		return p.RightHazard(data), nil
 	}
 	return nil, errors.New(fmt.Sprintf("could not find direction %v", direc))
 }

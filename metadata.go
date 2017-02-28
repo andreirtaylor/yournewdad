@@ -29,37 +29,3 @@ func pushOntoPQ(
 		}
 	}
 }
-
-func GenerateMetaData(data *MoveRequest) error {
-	data.init()
-	tightSpace := true
-	for direc, direcMD := range data.Direcs {
-		head, err := getMyHead(data)
-		if err != nil {
-			return err
-		}
-		newHead, err := GetPointInDirection(head, direc, data)
-		if err != nil {
-			return err
-		}
-		stats := fullStats(newHead, data)
-		//fmt.Printf("%#v\n%#v\n", sd, direc)
-		if stats != nil {
-			ksd := stats.KeySnakeData.minKeySnakePart()
-			if ksd != nil {
-				direcMD.MovesVsSpace = stats.Moves - stats.Food - ksd.lengthLeft
-			}
-			direcMD.KeySnakeData = stats.KeySnakeData
-			direcMD.TotalMoves = stats.Moves
-			direcMD.TotalFood = stats.Food
-			direcMD.sortedFood = stats.sortedFood
-			direcMD.FoodHash = stats.FoodHash
-			direcMD.myTail = stats.SeeTail
-			if direcMD.MovesVsSpace > 20 {
-				tightSpace = false
-			}
-		}
-	}
-	data.tightSpace = tightSpace
-	return nil
-}

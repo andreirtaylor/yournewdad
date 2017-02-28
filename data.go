@@ -64,29 +64,14 @@ type MetaData struct {
 // have name colisions with the MoveRequest struct
 type MetaDataDirec struct {
 	// denotes the number of moves until you reach the closest piece of food
-	sortedFood []*FoodData
 	// indexed by their point
-	FoodHash map[string]*FoodData
 	// totals up your length and the ammount of food in a direction
 	// if you would fill up the space make it unlikely to go that direction
 	MovesVsSpace int
 	// the total number of moves possible in this direction
-	TotalMoves int
-	TotalFood  int
-	myTail     bool
 	// contains a map to the last accessable piece of a snake
 	// from your current location if you moved in this direction
-	KeySnakeData KeySnakeData
 	minMaxArr    MMArray
-}
-
-type KeySnakeData map[int]*SnakeData
-
-// StaticData
-// a list of found information in a direction is used in a breadth
-// first search to determine the ammount of food you can reach in
-// a desired number of moves from the source
-type StaticData struct {
 	ClosestFood  *Point
 	Food         int
 	Snakes       int
@@ -98,6 +83,8 @@ type StaticData struct {
 	sortedFood []*FoodData
 	MoveHash   map[string]*MinMaxData
 }
+
+type KeySnakeData map[int]*SnakeData
 
 // minKeySnakePart
 // returns the snake data for the point you are waiting to open up
@@ -115,7 +102,7 @@ func (ksd KeySnakeData) minKeySnakePart() *SnakeData {
 
 func (m *MoveRequest) NoFood() bool {
 	for _, val := range m.Direcs {
-		if val.TotalFood > 0 {
+		if val.Food > 0 {
 			return false
 		}
 	}
@@ -131,7 +118,7 @@ func (m *MetaDataDirec) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("MetaDataDirec{")
 	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v, ", m.MovesVsSpace))
-	buffer.WriteString(fmt.Sprintf("TotalMoves:%v, ", m.TotalMoves))
+	buffer.WriteString(fmt.Sprintf("TotalMoves:%v, ", m.Moves))
 	buffer.WriteString(fmt.Sprintf("KeySnakeData:\n"))
 	for direc, val := range m.KeySnakeData {
 		buffer.WriteString(fmt.Sprintf("\t%v:%v", direc, val))
@@ -209,10 +196,22 @@ func (m *MetaData) GenSnakeHash(data *MoveRequest) {
 }
 
 func (m *MetaData) GenMinMax(data *MoveRequest) {
+	defer data.GenHazards(data, true)
+
+	tightSpace := true
 	data.minMaxArr = MinMax(data, "")
-	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
+	for direc, direcData := range data.Direcs {
 		MinMax(data, direc)
+		//fmt.Printf(direc)
+		ksd := direcData.KeySnakeData.minKeySnakePart()
+		if ksd != nil {
+			direcData.MovesVsSpace = direcData.Moves - direcData.Food - ksd.lengthLeft
+		}
+		if direcData.MovesVsSpace > 20 {
+			tightSpace = false
+		}
 	}
+	data.tightSpace = tightSpace
 }
 
 // Generates a map of hazards
@@ -285,22 +284,6 @@ type FoodData struct {
 	pnt   *Point
 }
 
-func (m *StaticData) String() string {
-	var buffer bytes.Buffer
-	buffer.WriteString("\nStaticData{")
-	buffer.WriteString(fmt.Sprintf("ClosestFood:%v, ", m.ClosestFood))
-	buffer.WriteString(fmt.Sprintf("Food:%v, ", m.Food))
-	buffer.WriteString(fmt.Sprintf("Snakes:%v, ", m.Snakes))
-	buffer.WriteString(fmt.Sprintf("Moves:%v, ", m.Moves))
-	buffer.WriteString("KeySnakeData{\n")
-	for ind, val := range m.KeySnakeData {
-		buffer.WriteString(fmt.Sprintf("\t%cv:%v ", ind, val))
-	}
-	buffer.WriteString("}\n")
-
-	return buffer.String()
-}
-
 // RESPONSE AND REQUEST STRUCTS
 type MoveResponse struct {
 	Move  string `json:"move"`
@@ -368,10 +351,10 @@ func (m *MoveRequest) init() {
 	m.Direcs[RIGHT] = &MetaDataDirec{}
 
 	m.SetMyLength(m)
-	m.GenHazards(m, true)
 	m.GenFoodMap(m)
 	m.GenSnakeHash(m)
 	m.GenMinMax(m)
+	m.GenHazards(m, true)
 }
 
 // de serializes the move request data into a string
@@ -388,7 +371,7 @@ func NewMoveRequest(str string) (*MoveRequest, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = GenerateMetaData(res)
+	res.init()
 	if err != nil {
 		return nil, err
 	}

@@ -63,7 +63,7 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 func FilterTail(data *MoveRequest, moves []string) []string {
 	ret := []string{}
 	for _, direc := range moves {
-		if data.Direcs[direc].myTail {
+		if data.Direcs[direc].SeeTail {
 			ret = append(ret, direc)
 		}
 	}
@@ -107,11 +107,11 @@ func FilterKillArea(data *MoveRequest, moves []string) []string {
 	for _, direc := range moves {
 		// we know this is a valid move because all moves are filterd to be vaild
 		// this is the location you are moving to
-		p, err := GetPointInDirection(head, direc, data)
+		p, err := GetPointInDirectionHazards(head, direc, data)
 		if err != nil {
 			return []string{}
 		}
-		if data.KillZones[p.String()] {
+		if p != nil && data.KillZones[p.String()] {
 			ret = append(ret, direc)
 		}
 	}
@@ -237,7 +237,7 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 	ret := []string{}
 	for _, direc := range directions {
-		if data.Direcs[direc].TotalMoves > 0 {
+		if data.Direcs[direc].Moves > 0 {
 			ret = append(ret, direc)
 		}
 	}

@@ -10,12 +10,12 @@ func keepFMTforGraph() {
 	fmt.Printf("%v")
 }
 
-func fullStats(pos *Point, data *MoveRequest) *StaticData {
+func fullStats(pos *Point, data *MoveRequest) *MetaDataDirec {
 	return quickStats(pos, data, math.MaxInt64)
 }
 
 // a function that is to be used on other points
-func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
+func quickStats(pos *Point, data *MoveRequest, depth int) *MetaDataDirec {
 	// Create a priority queue, put the items in it, and
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
@@ -37,7 +37,7 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 
 	currDepth := 1
 
-	accumulator := &StaticData{}
+	accumulator := &MetaDataDirec{}
 	accumulator.FoodHash = make(map[string]*FoodData)
 	accumulator.MoveHash = make(map[string]*MinMaxData)
 
@@ -74,7 +74,6 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 
 		if p.isNeighbour(t) && currDepth > 2 {
 			accumulator.SeeTail = true
-
 		}
 
 		// the snake head shouldnt be in the hash
