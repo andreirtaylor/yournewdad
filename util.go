@@ -16,7 +16,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func MinMax(data *MoveRequest, direc string) MMArray {
+func MinMax(data *MoveRequest, direc string) {
 	// generated the hazards without the hazards around the other snakes
 
 	data.GenHazards(data, false)
@@ -24,11 +24,11 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 	if direc != "" {
 		myHeadtmp, err := GetPointInDirection(myHead, direc, data)
 		if err != nil {
-			return nil
+			return
 		}
 		myHead = myHeadtmp
 		if myHead == nil {
-			return nil
+			return
 		}
 		if myHead != nil {
 			data.Hazards[myHead.String()] = true
@@ -52,12 +52,9 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 			stats = fullStatsPnt(head, data)
 		}
 		if direc != "" && snakeId == data.MyIndex {
-			//data.Direcs[direc].MovesVsSpace = stats.MovesVsSpace
-			//data.Direcs[direc].minMaxArr = stats.MovesVsSpace
 			data.Direcs[direc].ClosestFood = stats.ClosestFood
 			data.Direcs[direc].Food = stats.Food
 			data.Direcs[direc].Moves = stats.Moves
-			//fmt.Printf("%v %v\n", direc, stats.SeeTail)
 			data.Direcs[direc].SeeTail = stats.SeeTail
 			data.Direcs[direc].KeySnakeData = stats.KeySnakeData
 			data.Direcs[direc].FoodHash = stats.FoodHash
@@ -84,8 +81,9 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 
 	if direc != "" {
 		data.Direcs[direc].minMaxArr = ret
+	} else if direc == "" {
+		data.minMaxArr = ret
 	}
-	return ret
 
 }
 

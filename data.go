@@ -198,7 +198,7 @@ func (m *MetaData) GenMinMax(data *MoveRequest) {
 	defer data.GenHazards(data, true)
 
 	tightSpace := true
-	data.minMaxArr = MinMax(data, "")
+	MinMax(data, "")
 	for direc, direcData := range data.Direcs {
 		MinMax(data, direc)
 		//fmt.Printf(direc)

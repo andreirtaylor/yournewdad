@@ -65,20 +65,23 @@ func quickStats(pos *Point, data *MoveRequest, depth int, me bool) *MetaDataDire
 		//fmt.Printf("%v", p)
 		if data.FoodMap[p.String()] {
 			//fmt.Printf("food\n")
-			if accumulator.ClosestFood == nil {
+			if accumulator.ClosestFood == nil && me {
 				accumulator.ClosestFood = &p
 			}
 			accumulator.Food += 1
 			foodptr := &FoodData{moves: currDepth - 2, pnt: &p}
 			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
-			accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
+			if me {
+				accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
+			}
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
-		FindMinSnakePointInSurroundingArea(&p, data, ksd)
-
-		if p.isNeighbour(t) && currDepth > 2 {
-			accumulator.SeeTail = true
+		if me {
+			FindMinSnakePointInSurroundingArea(&p, data, ksd)
+			if p.isNeighbour(t) && currDepth > 2 {
+				accumulator.SeeTail = true
+			}
 		}
 
 		// the snake head shouldnt be in the hash
