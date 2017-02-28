@@ -18,6 +18,140 @@ func fullStatsMe(pos *Point, data *MoveRequest) *MetaDataDirec {
 	return quickStats(pos, data, math.MaxInt64, true)
 }
 
+func AppendIfMissing(slice []int, i int) bool {
+	for _, ele := range slice {
+		if ele == i {
+			return false
+		}
+	}
+	slice = append(slice, i)
+	return true
+}
+
+// me is a boolean that basicly
+// a function that is to be used on other points
+func quickStats2(data *MoveRequest) *MetaDataDirec {
+	// generated the hazards without the hazards around the other snakes
+	data.GenHazards(data, false)
+
+	q := Queue{}
+
+	ksd := make(map[int]*SnakeData)
+	// make the first item priority 1 so that if statement
+	// at the end of the loop is executed
+	for i, snake := range data.Snakes {
+		head := &snake.Coords[0]
+		mmd := &MinMaxData{
+			moves:    0,
+			snakeIds: []int{i},
+			tie:      false,
+			pnt:      head,
+		}
+		//ret[head.y][head.X] = mmd
+		q.Push(mmd)
+	}
+
+	t, err := getTail(data.MyIndex, data)
+	if err != nil {
+		return nil
+	}
+
+	accumulator := &MetaDataDirec{}
+	accumulator.FoodHash = make(map[string]*FoodData)
+	accumulator.MoveHash = make(map[string]*MinMaxData)
+	accumulator.minMaxArr = make(MMArray, data.Height)
+	for i := range accumulator.minMaxArr {
+		accumulator.minMaxArr[i] = make([]MinMaxData, data.Width)
+		for j := range accumulator.minMaxArr[i] {
+			accumulator.minMaxArr[i][j].moves = math.MaxInt64
+		}
+
+	}
+	for q.Len() > 0 {
+		item := q.Pop()
+
+		p := item.pnt
+
+		if p == nil {
+			continue
+		}
+
+		boardState := accumulator.minMaxArr[item.pnt.Y][item.pnt.X]
+		//fmt.Printf("%v %v %v\n ", p, boardState.moves, item.moves)
+		if boardState.moves == item.moves {
+			for _, id := range item.snakeIds {
+				if AppendIfMissing(accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds, id) {
+					accumulator.minMaxArr[item.pnt.Y][item.pnt.X].tie = true
+				}
+
+			}
+			continue
+		}
+		if len(boardState.snakeIds) != 0 {
+			continue
+		}
+		q.Push(
+			&MinMaxData{
+				moves:    item.moves + 1,
+				snakeIds: item.snakeIds,
+				pnt:      p.Up(data),
+			})
+
+		q.Push(
+			&MinMaxData{
+				moves:    item.moves + 1,
+				snakeIds: item.snakeIds,
+				pnt:      p.Right(data),
+			})
+		q.Push(
+			&MinMaxData{
+				moves:    item.moves + 1,
+				snakeIds: item.snakeIds,
+				pnt:      p.Left(data),
+			})
+		q.Push(
+			&MinMaxData{
+				moves:    item.moves + 1,
+				snakeIds: item.snakeIds,
+				pnt:      p.Down(data),
+			})
+		me := false
+		for _, sid := range item.snakeIds {
+			if sid == data.MyIndex {
+				me = true
+			}
+		}
+
+		if me {
+			//fmt.Printf("%v", p)
+			if data.FoodMap[p.String()] {
+				//fmt.Printf("food\n")
+				accumulator.ClosestFood = item.pnt
+				accumulator.Food += 1
+				foodptr := &FoodData{moves: item.moves, pnt: item.pnt}
+				accumulator.FoodHash[foodptr.pnt.String()] = foodptr
+				accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
+			}
+			// add 1 to the moves in this direction in this generation
+			accumulator.Moves += 1
+			FindMinSnakePointInSurroundingArea(item.pnt, data, ksd)
+			if item.pnt.isNeighbour(t) && item.moves > 1 {
+				accumulator.SeeTail = true
+			}
+		}
+
+		if item.moves > 0 {
+			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].moves = item.moves
+			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].pnt = item.pnt
+			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds = item.snakeIds
+		}
+
+	}
+
+	accumulator.KeySnakeData = ksd
+	return accumulator
+}
+
 // me is a boolean that basicly
 // a function that is to be used on other points
 func quickStats(pos *Point, data *MoveRequest, depth int, me bool) *MetaDataDirec {

@@ -25,6 +25,16 @@ func Test_GenerateMinMax(t *testing.T) {
 	}
 }
 
+func TestShit(t *testing.T) {
+	data, err := NewMoveRequest(gameString13)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	//t.Errorf("%v", quickStats2(data).minMaxArr.String())
+	t.Errorf("%v", data.MyIndex)
+}
+
 func Test_FindNoGuaranteedClosestFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString9)
 

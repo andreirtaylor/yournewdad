@@ -90,3 +90,7 @@ You are the red snake
 ## gameString17
 
 ![](assets/Tests-c03f3.png)
+
+## gameString18
+
+![](assets/Tests-0196a.png)

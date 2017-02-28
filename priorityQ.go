@@ -2,6 +2,22 @@ package kaa
 
 import ()
 
+type Queue []*MinMaxData
+
+func (q *Queue) Push(n *MinMaxData) {
+	*q = append(*q, n)
+}
+
+func (q *Queue) Pop() (n *MinMaxData) {
+	n = (*q)[0]
+	*q = (*q)[1:]
+	return
+}
+
+func (q *Queue) Len() int {
+	return len(*q)
+}
+
 // An Item is something we manage in a priority queue.
 type Item struct {
 	value    Point // The value of the item; arbitrary.

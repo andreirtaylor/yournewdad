@@ -21,16 +21,17 @@ func (ret MMArray) String() string {
 					buffer.WriteString(fmt.Sprintf("%d", sid))
 				}
 				buffer.WriteString(" ")
-			} else if ret[i][j].tie {
 			} else if len(ret[i][j].snakeIds) == 0 {
 				//p := &Point{X: j, Y: i}
 				//hd := data.SnakeHash[p.String()]
 				//if hd != nil {
 				//	buffer.WriteString(fmt.Sprintf("  S%d ", hd.id))
 				//} else {
-				buffer.WriteString(" XX ")
 				//}
+
+				buffer.WriteString(" XX ")
 			} else {
+				//buffer.WriteString(fmt.Sprintf("  %d ", ret[i][j].moves))
 				buffer.WriteString(fmt.Sprintf("  %d ", ret[i][j].snakeIds[0]))
 			}
 		}
@@ -143,7 +144,9 @@ func (m *MetaData) SetMyLength(data *MoveRequest) {
 type MinMaxData struct {
 	moves    int
 	snakeIds []int
+	snakes   map[int]bool
 	tie      bool
+	pnt      *Point
 }
 
 type MinMaxSnakeMD struct {
