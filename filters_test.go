@@ -191,8 +191,6 @@ func Test_CutOff(t *testing.T) {
 		t.Errorf("error: %v", err)
 	}
 
-	GenMinMax(data)
-
 	filteredMoves, err := bestMoves(data)
 	if err != nil {
 		t.Errorf("%v", err)

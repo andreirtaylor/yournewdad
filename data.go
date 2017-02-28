@@ -208,6 +208,13 @@ func (m *MetaData) GenSnakeHash(data *MoveRequest) {
 	}
 }
 
+func (m *MetaData) GenMinMax(data *MoveRequest) {
+	data.minMaxArr = MinMax(data, "")
+	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
+		MinMax(data, direc)
+	}
+}
+
 // Generates a map of hazards
 // this is pretty janky and will need to get refactored
 func (m *MetaData) GenHazards(data *MoveRequest, snakeMovesAsHazards bool) {
@@ -354,10 +361,17 @@ func (m *MoveRequest) String() string {
 
 // initializes global meta data attributes
 func (m *MoveRequest) init() {
+	m.Direcs = make(MoveMetaData)
+	m.Direcs[UP] = &MetaDataDirec{}
+	m.Direcs[DOWN] = &MetaDataDirec{}
+	m.Direcs[LEFT] = &MetaDataDirec{}
+	m.Direcs[RIGHT] = &MetaDataDirec{}
+
 	m.SetMyLength(m)
 	m.GenHazards(m, true)
 	m.GenFoodMap(m)
 	m.GenSnakeHash(m)
+	m.GenMinMax(m)
 }
 
 // de serializes the move request data into a string

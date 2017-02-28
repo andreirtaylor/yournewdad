@@ -47,7 +47,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 
 	// log move request
 	//log.Infof(ctx, "%v", data)
-	GenMinMax(data)
 	//log.Infof(ctx, stringAllMinMAX(data))
 
 	move, err := getMove(data, req)

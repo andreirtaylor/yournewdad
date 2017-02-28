@@ -16,14 +16,6 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func GenMinMax(data *MoveRequest) {
-	data.minMaxArr = MinMax(data, "")
-	for _, direc := range []string{UP, DOWN, LEFT, RIGHT} {
-		MinMax(data, direc)
-	}
-
-}
-
 func MinMax(data *MoveRequest, direc string) MMArray {
 	data.GenHazards(data, false)
 	defer data.GenHazards(data, true)

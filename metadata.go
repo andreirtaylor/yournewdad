@@ -32,12 +32,6 @@ func pushOntoPQ(
 
 func GenerateMetaData(data *MoveRequest) error {
 	data.init()
-	data.Direcs = make(MoveMetaData)
-	data.Direcs[UP] = &MetaDataDirec{}
-	data.Direcs[DOWN] = &MetaDataDirec{}
-	data.Direcs[LEFT] = &MetaDataDirec{}
-	data.Direcs[RIGHT] = &MetaDataDirec{}
-
 	tightSpace := true
 	for direc, direcMD := range data.Direcs {
 		head, err := getMyHead(data)
