@@ -54,7 +54,7 @@ func TestClosestFoodWithFood(t *testing.T) {
 
 }
 
-func TestEfficientSpace(t *testing.T) {
+func Test_EfficientSpace(t *testing.T) {
 	data, err := NewMoveRequest(gameString1)
 	if err != nil {
 		t.Logf("error: %v", err)
@@ -75,6 +75,41 @@ func TestEfficientSpace(t *testing.T) {
 	totalMoves := data.Direcs[DOWN].TotalMoves
 	if totalMoves != 30 {
 		t.Errorf("Expected 30 total moves got, %v", totalMoves)
+	}
+
+}
+
+func Test_MovesVsSpace(t *testing.T) {
+	data, err := NewMoveRequest(gameString7)
+	if err != nil {
+		t.Logf("error: %v", err)
+		return
+	}
+
+	mvs := data.Direcs[LEFT].MovesVsSpace
+	if mvs != 11 {
+		t.Errorf("Expected 30 total moves got, %v", mvs)
+	}
+
+}
+
+func Test_MovesVsSpace2(t *testing.T) {
+	data, err := NewMoveRequest(gameString11)
+	if err != nil {
+		t.Logf("error: %v", err)
+		return
+	}
+
+	mvs := data.Direcs[LEFT].MovesVsSpace
+	expected := 1
+	if mvs != expected {
+		t.Errorf("Expected %v total moves got, %v", expected, mvs)
+	}
+
+	mvs = data.Direcs[UP].MovesVsSpace
+	expected = 1
+	if mvs != expected {
+		t.Errorf("Expected %v total moves got, %v", expected, mvs)
 	}
 
 }

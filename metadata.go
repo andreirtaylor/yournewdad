@@ -116,21 +116,6 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 	return accumulator
 }
 
-func GetMovesVsSpace(data *MoveRequest, direc string) int {
-	if data.Direcs[direc] == nil {
-		return 0
-	}
-	totalMoves := data.Direcs[direc].TotalMoves
-	totalFood := data.Direcs[direc].TotalFood
-	excessMoves := totalMoves - totalFood - data.Direcs[direc].minKeySnakePart().lengthLeft
-
-	if excessMoves > 0 {
-		// do something clever here to account for food
-	}
-
-	return excessMoves
-}
-
 func GenerateMetaData(data *MoveRequest) error {
 	data.init()
 	data.Direcs = make(MoveMetaData)
@@ -150,14 +135,18 @@ func GenerateMetaData(data *MoveRequest) error {
 		if err != nil {
 			return err
 		}
-		stats := fullStats(head, data)
+		newHead, err := GetPointInDirection(head, direc, data)
+		if err != nil {
+			return err
+		}
+		stats := fullStats(newHead, data)
 		//fmt.Printf("%#v\n%#v\n", sd, direc)
 		if sd != nil {
-			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
-			direcMD.TotalMoves = sd.Moves
+			direcMD.MovesVsSpace = stats.Moves - stats.Food - data.Direcs[direc].minKeySnakePart().lengthLeft
+			direcMD.TotalMoves = stats.Moves
 			direcMD.TotalFood = stats.Food
-			direcMD.sortedFood = sd.sortedFood
-			direcMD.FoodHash = sd.FoodHash
+			direcMD.sortedFood = stats.sortedFood
+			direcMD.FoodHash = stats.FoodHash
 			if direcMD.MovesVsSpace > 20 {
 				tightSpace = false
 			}
