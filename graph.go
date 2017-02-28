@@ -30,6 +30,11 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 		return nil
 	}
 
+	t, err := getTail(data.MyIndex, data)
+	if err != nil {
+		return nil
+	}
+
 	currDepth := 1
 
 	accumulator := &StaticData{}
@@ -61,10 +66,17 @@ func quickStats(pos *Point, data *MoveRequest, depth int) *StaticData {
 			accumulator.Food += 1
 			foodptr := &FoodData{moves: currDepth - 2, pnt: &p}
 			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
+			accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
 		}
 		// add 1 to the moves in this direction in this generation
 		accumulator.Moves += 1
 		FindMinSnakePointInSurroundingArea(&p, data, ksd)
+
+		if p.isNeighbour(t) && currDepth > 2 {
+			accumulator.SeeTail = true
+
+		}
+
 		// the snake head shouldnt be in the hash
 		if currDepth > 2 {
 			accumulator.MoveHash[p.String()] = &MinMaxData{moves: currDepth}

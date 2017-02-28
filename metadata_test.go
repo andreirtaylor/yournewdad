@@ -1,6 +1,7 @@
 package kaa
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -10,31 +11,10 @@ func TestClosestFoodNoFood(t *testing.T) {
 	if err != nil {
 		t.Logf("error: %v", err)
 	}
-	direcs := data.Direcs
-
-	expected := 0
-	if direcs[LEFT].ClosestFood != expected {
-		t.Errorf(
-			"closest food LEFT is %v moves away, got %v",
-			expected, direcs[LEFT].ClosestFood)
-	}
-
-	if direcs[RIGHT].ClosestFood != expected {
-		t.Errorf(
-			"closest food RIGHT is %v moves away, got %v",
-			expected, direcs[RIGHT].ClosestFood)
-	}
-
-	if direcs[UP].ClosestFood != expected {
-		t.Errorf(
-			"closest food UP is %v moves away, got %v",
-			expected, direcs[UP].ClosestFood)
-	}
-
-	if direcs[DOWN].ClosestFood != expected {
-		t.Errorf(
-			"closest food DOWN is %v moves away, got %v",
-			expected, direcs[DOWN].ClosestFood)
+	for direc, direcData := range data.Direcs {
+		if len(direcData.sortedFood) != 0 {
+			t.Errorf("No food in direction %v", direc)
+		}
 	}
 
 }
@@ -48,32 +28,28 @@ func TestClosestFoodWithFood(t *testing.T) {
 	}
 
 	direcs := data.Direcs
-	expected := 3
-	if direcs[LEFT].ClosestFood != expected {
-		t.Errorf(
-			"closest food LEFT is %v moves away, got %v",
-			expected, direcs[LEFT].ClosestFood)
+	expected := &Point{X: 2, Y: 8}
+	if !reflect.DeepEqual(direcs[LEFT].sortedFood[0].pnt, expected) {
+		t.Errorf("closest food LEFT is %v, got %v",
+			expected, direcs[LEFT].sortedFood[0].pnt)
 	}
 
-	expected = 0
-	if direcs[RIGHT].ClosestFood != expected {
-		t.Errorf(
-			"closest food RIGHT is %v moves away, got %v",
-			expected, direcs[RIGHT].ClosestFood)
+	if len(direcs[RIGHT].sortedFood) != 0 {
+		t.Errorf("there is no food to the right thats your body")
 	}
 
-	expected = 1
-	if direcs[UP].ClosestFood != expected {
+	expected = &Point{X: 5, Y: 7}
+	if !reflect.DeepEqual(direcs[UP].sortedFood[0].pnt, expected) {
 		t.Errorf(
 			"closest food UP is %v moves away, got %v",
-			expected, direcs[UP].ClosestFood)
+			expected, direcs[UP].sortedFood[0].pnt)
 	}
 
-	expected = 5
-	if direcs[DOWN].ClosestFood != expected {
+	expected = &Point{X: 5, Y: 7}
+	if !reflect.DeepEqual(direcs[UP].sortedFood[0].pnt, expected) {
 		t.Errorf(
 			"closest food DOWN is %v moves away, got %v",
-			expected, direcs[DOWN].ClosestFood)
+			expected, direcs[UP].sortedFood[0].pnt)
 	}
 
 }

@@ -5,6 +5,28 @@ import (
 	"testing"
 )
 
+func Test_GenerateMinMax(t *testing.T) {
+	data, err := NewMoveRequest(gameString10)
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	testMap := make(map[string]map[int]MinMaxSnakeMD)
+	testMap[UP] = map[int]MinMaxSnakeMD{}
+	testMap[DOWN] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 215, ties: 0}, 2: MinMaxSnakeMD{moves: 64, ties: 3}, 1: MinMaxSnakeMD{moves: 2, ties: 3}}
+	testMap[LEFT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 220, ties: 0}, 1: MinMaxSnakeMD{moves: 0, ties: 63}, 2: MinMaxSnakeMD{moves: 1, ties: 63}}
+	testMap[RIGHT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 209, ties: 0}, 2: MinMaxSnakeMD{moves: 69, ties: 1}, 1: MinMaxSnakeMD{moves: 5, ties: 1}}
+
+	GenMinMax(data)
+
+	for direc, direcData := range data.Direcs {
+		stats := GenMinMaxStats(direcData.minMaxArr)
+		if !reflect.DeepEqual(testMap[direc], stats.snakes) {
+			t.Errorf("expected %v to be %v", stats.snakes, testMap[direc])
+		}
+	}
+}
+
 func Test_FindNoGuaranteedClosestFood(t *testing.T) {
 	data, err := NewMoveRequest(gameString9)
 

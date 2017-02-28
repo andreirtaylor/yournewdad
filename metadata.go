@@ -4,7 +4,6 @@ import (
 	"container/heap"
 	"errors"
 	"fmt"
-	"math"
 )
 
 // This file contains all of the functions which build
@@ -20,10 +19,7 @@ func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
 		return nil, err
 	}
 
-	// dont do this ye it doesnt work
-	//MoveSnakeForward(data.MyIndex, data, direc)
 	ret := graphSearch(p, data, direc)
-	//MoveSnakeBackward(data.MyIndex, data)
 
 	return ret, nil
 }
@@ -96,9 +92,6 @@ func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData
 
 		if data.FoodMap[p.String()] {
 			//fmt.Printf("food\n")
-			if data.Direcs[currentDirec].ClosestFood == 0 {
-				data.Direcs[currentDirec].ClosestFood = priority - 1
-			}
 			accumulator.Food += 1
 			foodptr := &FoodData{moves: priority - 1, pnt: &p}
 			accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
@@ -138,16 +131,6 @@ func GetMovesVsSpace(data *MoveRequest, direc string) int {
 	return excessMoves
 }
 
-func ClosestFood(data []*StaticData) int {
-	for i, staticData := range data {
-		//fmt.Printf("direction : %v\ndata for move %v: %#v\n", direc, i, staticData)
-		if staticData.Food > 0 {
-			return i + 1
-		}
-	}
-	return math.MaxInt64
-}
-
 func GenerateMetaData(data *MoveRequest) error {
 	data.init()
 	data.Direcs = make(MoveMetaData)
@@ -163,11 +146,16 @@ func GenerateMetaData(data *MoveRequest) error {
 			return err
 		}
 
+		head, err := getMyHead(data)
+		if err != nil {
+			return err
+		}
+		stats := fullStats(head, data)
 		//fmt.Printf("%#v\n%#v\n", sd, direc)
 		if sd != nil {
 			direcMD.MovesVsSpace = GetMovesVsSpace(data, direc)
 			direcMD.TotalMoves = sd.Moves
-			direcMD.TotalFood = sd.Food
+			direcMD.TotalFood = stats.Food
 			direcMD.sortedFood = sd.sortedFood
 			direcMD.FoodHash = sd.FoodHash
 			if direcMD.MovesVsSpace > 20 {

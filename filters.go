@@ -60,63 +60,6 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	return moves, nil
 }
 
-func GetPossibleDeath(data *MoveRequest, direc string, turns int) int {
-	baseData := []*StaticData{}
-	for _, snake := range data.Snakes {
-		sd := fullStats(snake.HeadPoint, data)
-		baseData = append(baseData, sd)
-	}
-
-	err := MoveSnakeForward(data.MyIndex, data, direc)
-	if err != nil {
-		return 0
-	}
-	newData := []*StaticData{}
-	for _, snake := range data.Snakes {
-		sd := fullStats(snake.HeadPoint, data)
-		newData = append(newData, sd)
-	}
-
-	for i := range newData {
-		if newData[i].Moves < baseData[i].Moves {
-			err = MoveSnakeBackward(data.MyIndex, data)
-			if err != nil {
-				return 0
-			}
-			return 1
-
-		}
-	}
-
-	err = MoveSnakeForward(data.MyIndex, data, direc)
-	if err != nil {
-		return 0
-	}
-	newData = []*StaticData{}
-	for _, snake := range data.Snakes {
-		sd := fullStats(snake.HeadPoint, data)
-		newData = append(newData, sd)
-	}
-	for i := range newData {
-		if newData[i].Moves < baseData[i].Moves {
-			err = MoveSnakeBackward(data.MyIndex, data)
-			err = MoveSnakeBackward(data.MyIndex, data)
-			if err != nil {
-				return 0
-			}
-			return 1
-
-		}
-	}
-
-	err = MoveSnakeBackward(data.MyIndex, data)
-	err = MoveSnakeBackward(data.MyIndex, data)
-	if err != nil {
-		return 0
-	}
-	return 0
-}
-
 func FilterTail(data *MoveRequest, moves []string) []string {
 	ret := []string{}
 	for _, direc := range moves {
@@ -153,18 +96,6 @@ func FilterMinMax(data *MoveRequest, moves []string) []string {
 		return moves
 	}
 	return ret
-}
-
-func FilterAggression(data *MoveRequest, moves []string) []string {
-	data.GenHazards(data, false)
-	//for _, move := range moves {
-	deaths := GetPossibleDeath(data, DOWN, 2)
-	if deaths > 0 {
-		return []string{DOWN}
-	}
-	//}
-	data.GenHazards(data, true)
-	return moves
 }
 
 func FilterKillArea(data *MoveRequest, moves []string) []string {

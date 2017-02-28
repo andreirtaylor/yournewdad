@@ -64,8 +64,7 @@ type MetaData struct {
 // have name colisions with the MoveRequest struct
 type MetaDataDirec struct {
 	// denotes the number of moves until you reach the closest piece of food
-	ClosestFood int
-	sortedFood  []*FoodData
+	sortedFood []*FoodData
 	// indexed by their point
 	FoodHash map[string]*FoodData
 	// totals up your length and the ammount of food in a direction
@@ -79,6 +78,23 @@ type MetaDataDirec struct {
 	// from your current location if you moved in this direction
 	KeySnakeData map[int]*SnakeData
 	minMaxArr    MMArray
+}
+
+// StaticData
+// a list of found information in a direction is used in a breadth
+// first search to determine the ammount of food you can reach in
+// a desired number of moves from the source
+type StaticData struct {
+	ClosestFood  *Point
+	Food         int
+	Snakes       int
+	Moves        int
+	SeeTail      bool
+	KeySnakeData map[int]*SnakeData
+	// indexed by their point
+	FoodHash   map[string]*FoodData
+	sortedFood []*FoodData
+	MoveHash   map[string]*MinMaxData
 }
 
 // minKeySnakePart
@@ -112,7 +128,6 @@ func (m *MoveRequest) NoFood() bool {
 func (m *MetaDataDirec) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("MetaDataDirec{")
-	buffer.WriteString(fmt.Sprintf("ClosestFood:%v, ", m.ClosestFood))
 	buffer.WriteString(fmt.Sprintf("movesVsSpace:%v, ", m.MovesVsSpace))
 	buffer.WriteString(fmt.Sprintf("TotalMoves:%v, ", m.TotalMoves))
 	buffer.WriteString(fmt.Sprintf("KeySnakeData:\n"))
@@ -255,22 +270,6 @@ func (m *MetaData) GenFoodMap(data *MoveRequest) {
 
 // alias for the metadata map
 type MoveMetaData map[string]*MetaDataDirec
-
-// StaticData
-// a list of found information in a direction is used in a breadth
-// first search to determine the ammount of food you can reach in
-// a desired number of moves from the source
-type StaticData struct {
-	ClosestFood  *Point
-	Food         int
-	Snakes       int
-	Moves        int
-	KeySnakeData map[int]*SnakeData
-	// indexed by their point
-	FoodHash   map[string]*FoodData
-	sortedFood []*FoodData
-	MoveHash   map[string]*MinMaxData
-}
 
 type FoodData struct {
 	moves int

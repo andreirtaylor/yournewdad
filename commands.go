@@ -32,7 +32,9 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	str := getMoveRequestString(req)
 
 	// log each and every json blob that comes in
-	log.Infof(ctx, str)
+	if appengine.IsDevAppServer() {
+		log.Infof(ctx, str)
+	}
 
 	data, err := NewMoveRequest(str)
 	if err != nil {
@@ -74,7 +76,10 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 		log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
 	}
-	log.Infof(ctx, "%v\n", moves)
+
+	if appengine.IsDevAppServer() {
+		log.Infof(ctx, "%v\n", moves)
+	}
 	if len(moves) < 1 {
 		return "", err
 	}
