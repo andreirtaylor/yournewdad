@@ -16,6 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	FilterMinMax,
 	FilterKillArea,
 	FilterTail,
 	FilterClosestFoodDirections,
@@ -27,6 +28,7 @@ var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterTail,
 	FilterKillArea,
 	FilterMovesVsSpace,
+	FilterMinMax,
 	FilterMinimizeSpace,
 	FilterKeyArea,
 }
@@ -120,6 +122,31 @@ func FilterTail(data *MoveRequest, moves []string) []string {
 	for _, direc := range moves {
 		if data.Direcs[direc].myTail {
 			ret = append(ret, direc)
+		}
+	}
+	if len(ret) == 0 {
+		return moves
+	}
+	return ret
+}
+
+func FilterMinMax(data *MoveRequest, moves []string) []string {
+	ret := []string{}
+	currStats := GenMinMaxStats(data.minMaxArr)
+	//for key, val := range currStats.snakes {
+	//	fmt.Printf("%v %v \n", key, val)
+	//}
+
+	for _, move := range moves {
+		nextStats := GenMinMaxStats(data.Direcs[move].minMaxArr)
+		for key, val := range nextStats.snakes {
+			if key != data.MyIndex {
+				nextMoves := float64(val.moves)
+				currMoves := float64(currStats.snakes[key].moves)
+				if 1-nextMoves/currMoves > 0.3 {
+					ret = append(ret, move)
+				}
+			}
 		}
 	}
 	if len(ret) == 0 {

@@ -41,12 +41,13 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 			data.Hazards[myHead.String()] = true
 		}
 	}
+
 	ret := make(MMArray, data.Height)
 	for i := range ret {
 		ret[i] = make([]MinMaxData, data.Width)
 		for j := range ret[i] {
 			ret[i][j].moves = math.MaxInt64
-			ret[i][j].snakeId = -1
+			ret[i][j].snakeIds = []int{}
 		}
 	}
 	for snakeId, snake := range data.Snakes {
@@ -56,18 +57,18 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 		}
 		stats := fullStats(head, data)
 		if head != nil {
-			for i := 0; i < data.Width; i++ {
-				for j := 0; j < data.Height; j++ {
+			for i := range ret {
+				for j := range ret[i] {
 					p := &Point{X: i, Y: j}
 					if stats.MoveHash[p.String()] != nil {
 						if stats.MoveHash[p.String()].moves < ret[j][i].moves {
 							ret[j][i].moves = stats.MoveHash[p.String()].moves
-							ret[j][i].snakeId = snakeId
+							ret[j][i].snakeIds = []int{snakeId}
 						} else if stats.MoveHash[p.String()].moves == ret[j][i].moves {
-							ret[j][i].snakeId = -2
+							ret[j][i].snakeIds = append(ret[j][i].snakeIds, snakeId)
+							ret[j][i].tie = true
 
 						}
-						ret[j][i].articulationPoint = stats.MoveHash[p.String()].articulationPoint
 					}
 				}
 			}
@@ -79,6 +80,38 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 	}
 	return ret
 
+}
+
+func GenMinMaxStats(arr MMArray) MinMaxMetaData {
+	ret := MinMaxMetaData{}
+	ret.movesHash = make(map[string]int)
+	ret.tiesHash = make(map[string][]int)
+	ret.snakes = make(map[int]MinMaxSnakeMD)
+	for i := range arr {
+		for j := range arr[i] {
+			p := &Point{X: i, Y: j}
+			ids := arr[i][j].snakeIds
+
+			if arr[i][j].tie {
+				ret.tiesHash[p.String()] = ids
+			}
+
+			for _, id := range ids {
+				s, ok := ret.snakes[id]
+				if !ok {
+					ret.snakes[id] = MinMaxSnakeMD{}
+				}
+				if arr[i][j].tie {
+					s.ties++
+				} else {
+					s.moves++
+					ret.movesHash[p.String()] = id
+				}
+				ret.snakes[id] = s
+			}
+		}
+	}
+	return ret
 }
 
 func stringAllMinMAX(data *MoveRequest) string {

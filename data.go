@@ -14,12 +14,15 @@ func (ret MMArray) String() string {
 	buffer.WriteString("\n")
 	for i := range ret {
 		for j := range ret[i] {
-			if ret[i][j].snakeId == -2 {
-				buffer.WriteString(fmt.Sprintf("  + "))
-			} else if ret[i][j].articulationPoint {
+			if ret[i][j].tie {
 				// there are no artuculation points yet
-				//buffer.WriteString("  X ")
-			} else if ret[i][j].snakeId == -1 {
+				buffer.WriteString(" ")
+				for _, sid := range ret[i][j].snakeIds {
+					buffer.WriteString(fmt.Sprintf("%d", sid))
+				}
+				buffer.WriteString(" ")
+			} else if ret[i][j].tie {
+			} else if len(ret[i][j].snakeIds) == 0 {
 				//p := &Point{X: j, Y: i}
 				//hd := data.SnakeHash[p.String()]
 				//if hd != nil {
@@ -28,7 +31,7 @@ func (ret MMArray) String() string {
 				buffer.WriteString(" XX ")
 				//}
 			} else {
-				buffer.WriteString(fmt.Sprintf(" %2d ", ret[i][j].snakeId))
+				buffer.WriteString(fmt.Sprintf("  %d ", ret[i][j].snakeIds[0]))
 			}
 		}
 		buffer.WriteString("\n")
@@ -135,9 +138,21 @@ func (m *MetaData) SetMyLength(data *MoveRequest) {
 // a little struct used to see the length left after this portion of a
 // snakes body the tail of the snake has a value of 1
 type MinMaxData struct {
-	moves             int
-	snakeId           int
+	moves    int
+	snakeIds []int
+	tie      bool
+
 	articulationPoint bool
+}
+
+type MinMaxSnakeMD struct {
+	moves int
+	ties  int
+}
+type MinMaxMetaData struct {
+	movesHash map[string]int
+	tiesHash  map[string][]int
+	snakes    map[int]MinMaxSnakeMD
 }
 
 // a little struct used to see the length left after this portion of a
