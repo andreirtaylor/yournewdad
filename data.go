@@ -74,7 +74,6 @@ type MetaDataDirec struct {
 	minMaxArr    MMArray
 	ClosestFood  *Point
 	Food         int
-	Snakes       int
 	Moves        int
 	SeeTail      bool
 	KeySnakeData KeySnakeData
@@ -392,6 +391,7 @@ type Snake struct {
 	HeadStack    *Stack
 	TailStack    *Stack
 	HeadPoint    *Point
+	FoodHash     map[string]*FoodData
 }
 
 func (snake Snake) Head() *Point    { return snake.HeadPoint }

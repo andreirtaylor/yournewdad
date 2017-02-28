@@ -117,7 +117,7 @@ func Test_ClosestFood3(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	expectedFoodDirections := []string{LEFT, DOWN, RIGHT}
+	expectedFoodDirections := []string{LEFT, DOWN}
 	sort.Strings(foodDirections)
 	sort.Strings(expectedFoodDirections)
 

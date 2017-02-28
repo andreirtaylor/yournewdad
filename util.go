@@ -17,6 +17,8 @@ func stringInSlice(a string, list []string) bool {
 }
 
 func MinMax(data *MoveRequest, direc string) MMArray {
+	// generated the hazards without the hazards around the other snakes
+
 	data.GenHazards(data, false)
 	myHead := data.Snakes[data.MyIndex].Head()
 	if direc != "" {
@@ -41,30 +43,28 @@ func MinMax(data *MoveRequest, direc string) MMArray {
 			ret[i][j].snakeIds = []int{}
 		}
 	}
-	seeTail := false
 	for snakeId, snake := range data.Snakes {
-		head := snake.Head()
+		var stats *MetaDataDirec
 		if snakeId == data.MyIndex {
-			head = myHead
+			stats = fullStatsMe(myHead, data)
+		} else {
+			head := snake.Head()
+			stats = fullStatsPnt(head, data)
 		}
-		stats := fullStats(head, data)
-		if stats.SeeTail {
-			seeTail = true
-		}
-		if direc != "" {
+		if direc != "" && snakeId == data.MyIndex {
 			//data.Direcs[direc].MovesVsSpace = stats.MovesVsSpace
 			//data.Direcs[direc].minMaxArr = stats.MovesVsSpace
 			data.Direcs[direc].ClosestFood = stats.ClosestFood
 			data.Direcs[direc].Food = stats.Food
-			data.Direcs[direc].Snakes = stats.Snakes
 			data.Direcs[direc].Moves = stats.Moves
 			//fmt.Printf("%v %v\n", direc, stats.SeeTail)
-			data.Direcs[direc].SeeTail = seeTail
+			data.Direcs[direc].SeeTail = stats.SeeTail
 			data.Direcs[direc].KeySnakeData = stats.KeySnakeData
 			data.Direcs[direc].FoodHash = stats.FoodHash
 			data.Direcs[direc].sortedFood = stats.sortedFood
 			data.Direcs[direc].MoveHash = stats.MoveHash
 		}
+		snake.FoodHash = stats.FoodHash
 		for i := range ret {
 			for j := range ret[i] {
 				p := &Point{X: i, Y: j}
@@ -143,9 +143,7 @@ func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
 			if i == data.MyIndex {
 				continue
 			}
-			snakeHead := snake.Head()
-			d := fullStats(snakeHead, data)
-			foodh := d.FoodHash[food.pnt.String()]
+			foodh := snake.FoodHash[food.pnt.String()]
 			if foodh == nil {
 				continue
 			}

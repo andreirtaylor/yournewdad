@@ -10,12 +10,17 @@ func keepFMTforGraph() {
 	fmt.Printf("%v")
 }
 
-func fullStats(pos *Point, data *MoveRequest) *MetaDataDirec {
-	return quickStats(pos, data, math.MaxInt64)
+func fullStatsPnt(pos *Point, data *MoveRequest) *MetaDataDirec {
+	return quickStats(pos, data, math.MaxInt64, false)
 }
 
+func fullStatsMe(pos *Point, data *MoveRequest) *MetaDataDirec {
+	return quickStats(pos, data, math.MaxInt64, true)
+}
+
+// me is a boolean that basicly
 // a function that is to be used on other points
-func quickStats(pos *Point, data *MoveRequest, depth int) *MetaDataDirec {
+func quickStats(pos *Point, data *MoveRequest, depth int, me bool) *MetaDataDirec {
 	// Create a priority queue, put the items in it, and
 	// establish the priority queue (heap) invariants.
 	pq := make(PriorityQueue, 0)
