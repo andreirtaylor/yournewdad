@@ -78,7 +78,7 @@ func MinMax(data *MoveRequest, direc string) {
 			}
 		}
 	}
-
+	ret = quickStats2(data).minMaxArr
 	if direc != "" {
 		data.Direcs[direc].minMaxArr = ret
 	} else if direc == "" {
