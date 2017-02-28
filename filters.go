@@ -135,7 +135,7 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 		if err != nil {
 			return []string{}
 		}
-		p2 := data.Direcs[direc].minKeySnakePart().pnt
+		p2 := data.Direcs[direc].KeySnakeData.minKeySnakePart().pnt
 		distFromHead := head.Dist(p2)
 		distFromPnt := p.Dist(p2)
 

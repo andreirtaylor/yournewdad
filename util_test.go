@@ -211,7 +211,7 @@ func TestSetMinSnakePointInArea(t *testing.T) {
 		return
 	}
 
-	p := data.Direcs[DOWN].minKeySnakePart().pnt
+	p := data.Direcs[DOWN].KeySnakeData.minKeySnakePart().pnt
 	expected := Point{X: 0, Y: 8}
 	if !reflect.DeepEqual(p, &expected) {
 		t.Errorf("Expected %v to be %v", p, expected)

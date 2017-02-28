@@ -2,27 +2,15 @@ package kaa
 
 import (
 	"container/heap"
-	"errors"
 	"fmt"
 )
 
+func keepMDFMT() {
+	fmt.Printf("")
+}
+
 // This file contains all of the functions which build
 // the metadata in each direction
-
-func getStaticData(data *MoveRequest, direc string) (*StaticData, error) {
-	head, err := getMyHead(data)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Unable to get head of your snake"))
-	}
-	p, err := GetPointInDirection(head, direc, data)
-	if err != nil {
-		return nil, err
-	}
-
-	ret := graphSearch(p, data, direc)
-
-	return ret, nil
-}
 
 func pushOntoPQ(
 	p *Point,
@@ -42,80 +30,6 @@ func pushOntoPQ(
 	}
 }
 
-// returns an array of static data, Each value represents the
-// things available in that number of moves.
-//	i.e. the first value in the array are the things that"
-//	     one move away, the second is 2 moves
-// Will search from the point pos to the maximum depth provided
-// a depth of any positive integer will max out at that integer and a depth of
-// any negative integer will allow any negative number
-func graphSearch(pos *Point, data *MoveRequest, currentDirec string) *StaticData {
-	// Create a priority queue, put the items in it, and
-	// establish the priority queue (heap) invariants.
-	pq := make(PriorityQueue, 0)
-	heap.Init(&pq)
-	if data.Direcs[currentDirec].KeySnakeData == nil {
-		data.Direcs[currentDirec].KeySnakeData = make(map[int]*SnakeData)
-	}
-
-	seen := make(map[string]bool)
-	// make the first item priority 1 so that if statement
-	// at the end of the loop is executed
-	pushOntoPQ(pos, seen, &pq, 1)
-	if pq.Len() == 0 {
-		return nil
-	}
-
-	t, err := getTail(data.MyIndex, data)
-	if err != nil {
-		return nil
-	}
-
-	priority := 1
-
-	totalMoves := 0
-
-	accumulator := &StaticData{}
-	accumulator.FoodHash = make(map[string]*FoodData)
-	for pq.Len() > 0 {
-		item := heap.Pop(&pq).(*Item)
-		if item.priority > priority {
-			priority = item.priority
-		}
-		p := item.value
-
-		// push all directions on priority queue
-		pushOntoPQ(p.Up(data), seen, &pq, item.priority)
-		pushOntoPQ(p.Down(data), seen, &pq, item.priority)
-		pushOntoPQ(p.Left(data), seen, &pq, item.priority)
-		pushOntoPQ(p.Right(data), seen, &pq, item.priority)
-
-		if data.FoodMap[p.String()] {
-			//fmt.Printf("food\n")
-			accumulator.Food += 1
-			foodptr := &FoodData{moves: priority - 1, pnt: &p}
-			accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
-			accumulator.FoodHash[foodptr.pnt.String()] = foodptr
-		}
-		// add 1 to the moves in this direction in this generation
-		accumulator.Moves += 1
-
-		FindMinSnakePointInSurroundingArea(&p, data, data.Direcs[currentDirec].KeySnakeData)
-
-		if p.isNeighbour(t) && priority > 2 {
-			data.Direcs[currentDirec].myTail = true
-
-		}
-
-		// add 1 to the total moves
-		totalMoves += 1
-
-	}
-	data.Direcs[currentDirec].TotalMoves = totalMoves
-
-	return accumulator
-}
-
 func GenerateMetaData(data *MoveRequest) error {
 	data.init()
 	data.Direcs = make(MoveMetaData)
@@ -126,11 +40,6 @@ func GenerateMetaData(data *MoveRequest) error {
 
 	tightSpace := true
 	for direc, direcMD := range data.Direcs {
-		sd, err := getStaticData(data, direc)
-		if err != nil {
-			return err
-		}
-
 		head, err := getMyHead(data)
 		if err != nil {
 			return err
@@ -141,12 +50,17 @@ func GenerateMetaData(data *MoveRequest) error {
 		}
 		stats := fullStats(newHead, data)
 		//fmt.Printf("%#v\n%#v\n", sd, direc)
-		if sd != nil {
-			direcMD.MovesVsSpace = stats.Moves - stats.Food - data.Direcs[direc].minKeySnakePart().lengthLeft
+		if stats != nil {
+			ksd := stats.KeySnakeData.minKeySnakePart()
+			if ksd != nil {
+				direcMD.MovesVsSpace = stats.Moves - stats.Food - ksd.lengthLeft
+			}
+			direcMD.KeySnakeData = stats.KeySnakeData
 			direcMD.TotalMoves = stats.Moves
 			direcMD.TotalFood = stats.Food
 			direcMD.sortedFood = stats.sortedFood
 			direcMD.FoodHash = stats.FoodHash
+			direcMD.myTail = stats.SeeTail
 			if direcMD.MovesVsSpace > 20 {
 				tightSpace = false
 			}

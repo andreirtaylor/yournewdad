@@ -76,9 +76,11 @@ type MetaDataDirec struct {
 	myTail     bool
 	// contains a map to the last accessable piece of a snake
 	// from your current location if you moved in this direction
-	KeySnakeData map[int]*SnakeData
+	KeySnakeData KeySnakeData
 	minMaxArr    MMArray
 }
+
+type KeySnakeData map[int]*SnakeData
 
 // StaticData
 // a list of found information in a direction is used in a breadth
@@ -90,7 +92,7 @@ type StaticData struct {
 	Snakes       int
 	Moves        int
 	SeeTail      bool
-	KeySnakeData map[int]*SnakeData
+	KeySnakeData KeySnakeData
 	// indexed by their point
 	FoodHash   map[string]*FoodData
 	sortedFood []*FoodData
@@ -101,9 +103,9 @@ type StaticData struct {
 // returns the snake data for the point you are waiting to open up
 // it is the least number of moves that anyone around you can make before
 // you are able to exit the area you are in
-func (m *MetaDataDirec) minKeySnakePart() *SnakeData {
+func (ksd KeySnakeData) minKeySnakePart() *SnakeData {
 	var min *SnakeData
-	for _, val := range m.KeySnakeData {
+	for _, val := range ksd {
 		if min == nil || min.lengthLeft > val.lengthLeft {
 			min = val
 		}
