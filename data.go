@@ -175,6 +175,32 @@ func (s *SnakeData) String() string {
 	return buffer.String()
 }
 
+func (m *MetaData) GenTailData(data *MoveRequest) {
+	for i, snake := range data.Snakes {
+		tail, _ := getTail(i, data)
+		head := snake.Coords[0]
+
+		m.Hazards[tail.String()] = false
+		d := head.Down(data)
+		if d != nil && m.FoodMap[d.String()] {
+			m.Hazards[tail.String()] = true
+		}
+		d = head.Up(data)
+		if d != nil && m.FoodMap[d.String()] {
+			m.Hazards[tail.String()] = true
+		}
+		d = head.Right(data)
+		if d != nil && m.FoodMap[d.String()] {
+			m.Hazards[tail.String()] = true
+		}
+		d = head.Left(data)
+		if d != nil && m.FoodMap[d.String()] {
+			m.Hazards[tail.String()] = true
+		}
+
+	}
+}
+
 // GenenSnakeHash
 //	generates a map of all the points in all the snakes
 //	is used to determine how much of the snake must move
@@ -216,10 +242,10 @@ func (m *MetaData) GenMinMax(data *MoveRequest) {
 func (m *MetaData) GenHazards(data *MoveRequest, snakeMovesAsHazards bool) {
 	m.Hazards = make(map[string]bool)
 	m.KillZones = make(map[string]bool)
+	m.GenTailData(data)
 	for _, snake := range data.Snakes {
 		snake.HeadPoint = &(snake.Coords[0])
-		snake.HeadStack = new(Stack)
-		snake.TailStack = new(Stack)
+
 		if len(snake.Coords) >= m.MyLength && data.You != snake.Id && snakeMovesAsHazards {
 			head := snake.Head()
 			d := head.Down(data)
@@ -259,9 +285,13 @@ func (m *MetaData) GenHazards(data *MoveRequest, snakeMovesAsHazards bool) {
 			}
 
 		}
-		for _, coord := range snake.Coords {
+		for i, coord := range snake.Coords {
+			if i == len(snake.Coords)-1 {
+				break
+			}
 			m.Hazards[coord.String()] = true
 		}
+
 	}
 }
 

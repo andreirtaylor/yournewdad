@@ -18,8 +18,8 @@ func Test_FullStats(t *testing.T) {
 		if stats.Food != 6 {
 			t.Errorf("All 6 pieces of food are accessable by all snakes got %v", stats.Food)
 		}
-		if stats.Moves != 336 {
-			t.Errorf("All 6 pieces of food are accessable by all snakes got %v", stats.Food)
+		if stats.Moves != 339 {
+			t.Errorf("Moves should be 337 got %v", stats.Moves)
 		}
 	}
 

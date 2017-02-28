@@ -13,9 +13,9 @@ func Test_GenerateMinMax(t *testing.T) {
 	}
 	testMap := make(map[string]map[int]MinMaxSnakeMD)
 	testMap[UP] = map[int]MinMaxSnakeMD{}
-	testMap[DOWN] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 215, ties: 0}, 2: MinMaxSnakeMD{moves: 64, ties: 3}, 1: MinMaxSnakeMD{moves: 2, ties: 3}}
-	testMap[LEFT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 220, ties: 0}, 1: MinMaxSnakeMD{moves: 0, ties: 63}, 2: MinMaxSnakeMD{moves: 1, ties: 63}}
-	testMap[RIGHT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 209, ties: 0}, 2: MinMaxSnakeMD{moves: 69, ties: 1}, 1: MinMaxSnakeMD{moves: 5, ties: 1}}
+	testMap[DOWN] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 222, ties: 0}, 2: MinMaxSnakeMD{moves: 59, ties: 3}, 1: MinMaxSnakeMD{moves: 2, ties: 3}}
+	testMap[LEFT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 227, ties: 0}, 1: MinMaxSnakeMD{moves: 0, ties: 58}, 2: MinMaxSnakeMD{moves: 1, ties: 58}}
+	testMap[RIGHT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 217, ties: 0}, 2: MinMaxSnakeMD{moves: 63, ties: 1}, 1: MinMaxSnakeMD{moves: 5, ties: 1}}
 
 	for direc, direcData := range data.Direcs {
 		stats := GenMinMaxStats(direcData.minMaxArr)
@@ -56,89 +56,6 @@ func Test_FindGuaranteedClosestFood(t *testing.T) {
 	}
 }
 
-func Test_MoveSnakeOntoFood(t *testing.T) {
-	data, err := NewMoveRequest(gameString4)
-
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
-
-	tail, err := getTail(0, data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	err = MoveSnakeForward(0, data, LEFT)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	p := &Point{X: 0, Y: 15}
-	// the head moves onto food meaning the tail stays where it is
-	if !data.Hazards[p.String()] || !data.Hazards[tail.String()] {
-		t.Errorf("If the head moves onto a food the tail should not move")
-	}
-
-	err = MoveSnakeBackward(0, data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	// the head moves back and the tail remains in the same spot
-	if data.Hazards[p.String()] || !data.Hazards[tail.String()] {
-		t.Errorf("If the head moves back from a food the tail should stay in the same spot")
-	}
-
-}
-
-func Test_MoveSnakeOntoBlankSpace(t *testing.T) {
-	data, err := NewMoveRequest(gameString4)
-
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
-
-	tail, err := getTail(0, data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	if data.Hazards[tail.String()] == false {
-		t.Errorf("The tail should be a hazard")
-	}
-
-	p := &Point{X: 1, Y: 16}
-	if data.Hazards[p.String()] == true {
-		t.Errorf("The position of the new head should not be a hazard")
-	}
-
-	err = MoveSnakeForward(0, data, DOWN)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	if data.Hazards[p.String()] == false {
-		t.Errorf("The new position of the head should be a hazzard")
-	}
-
-	if data.Hazards[tail.String()] == true {
-		t.Errorf("The tail should no longet be a hazard")
-	}
-	err = MoveSnakeBackward(0, data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	oldHead := &Point{X: 1, Y: 16}
-	if data.Hazards[oldHead.String()] == true {
-		t.Errorf("The old head should not be a hazard")
-	}
-
-	if data.Hazards[tail.String()] == true {
-		t.Errorf("The old tail should come back")
-	}
-
-}
 func Test_getMyHead(t *testing.T) {
 	data, err := NewMoveRequest(gameString3)
 

@@ -143,55 +143,6 @@ func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
 	return nil
 }
 
-// only handles valid moves right now
-func MoveSnakeForward(ind int, data *MoveRequest, direc string) error {
-	if (ind < 0) || (ind >= len(data.Snakes)) {
-		return errors.New("Index out of bounds")
-	}
-	head := data.Snakes[ind].Head()
-
-	p, err := GetPointInDirection(head, direc, data)
-	if err != nil {
-		return err
-	}
-	if p == nil {
-		return errors.New("Invalid move")
-	}
-	data.Hazards[p.String()] = true
-
-	data.Snakes[ind].HeadPoint = p
-
-	if !data.FoodMap[p.String()] {
-		t, err := getTail(ind, data)
-		if err != nil {
-			return err
-		}
-		data.Hazards[t.String()] = false
-		data.Snakes[ind].TailStack.Push(t)
-	}
-	// append the coords to the front of the snake
-	data.Snakes[ind].Coords = append([]Point{Point{X: p.X, Y: p.Y}}, (data.Snakes[ind].Coords)...)
-	return nil
-}
-
-func MoveSnakeBackward(ind int, data *MoveRequest) error {
-	if (ind < 0) || (ind >= len(data.Snakes)) {
-		return errors.New("Index out of bounds")
-	}
-	// assumes the snakes are all more than length 1
-	p := data.Snakes[ind].Head()
-
-	data.Hazards[p.String()] = false
-	data.Snakes[ind].Coords = data.Snakes[ind].Coords[1:]
-	//fmt.Printf("%v\n", data.Snakes[ind].Coords)
-	if !data.FoodMap[p.String()] {
-		t := data.Snakes[ind].TailStack.Pop()
-		data.Hazards[t.String()] = false
-		data.Snakes[ind].Coords = append(data.Snakes[ind].Coords, *t)
-	}
-	return nil
-}
-
 func getTail(ind int, data *MoveRequest) (*Point, error) {
 	if (ind < 0) || (ind >= len(data.Snakes)) {
 		return nil, errors.New("Index out of bounds")

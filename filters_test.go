@@ -6,6 +6,41 @@ import (
 	"testing"
 )
 
+func Test_FilterGoingOnTail2(t *testing.T) {
+	data, err := NewMoveRequest(gameString5)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	p := &Point{X: 7, Y: 9}
+
+	if data.Hazards[p.String()] {
+		t.Errorf("expected the tail to stay %v", err)
+	}
+}
+
+func Test_FilterGoingOnTail(t *testing.T) {
+	data, err := NewMoveRequest(gameString17)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	left := []string{LEFT}
+
+	// sort both of the strings so that deep equal will be able to see them
+
+	if !reflect.DeepEqual(directions, left) {
+		t.Errorf("expected left got, %v", directions)
+	}
+}
+
 func Test_FilterKillZones(t *testing.T) {
 	data, err := NewMoveRequest(gameString16)
 
