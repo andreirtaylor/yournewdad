@@ -133,24 +133,11 @@ func stringAllMinMAX(data *MoveRequest) string {
 }
 
 func findGuaranteedClosestFood(data *MoveRequest, direc string) *FoodData {
-	data.GenHazards(data, false)
-	defer data.GenHazards(data, true)
 	for _, food := range data.Direcs[direc].sortedFood {
-		allFarther := true
-		for i, snake := range data.Snakes {
-			if i == data.MyIndex {
-				continue
+		for _, id := range data.minMaxArr[food.pnt.Y][food.pnt.X].snakeIds {
+			if id == data.MyIndex {
+				return food
 			}
-			foodh := snake.FoodHash[food.pnt.String()]
-			if foodh == nil {
-				continue
-			}
-			if food.moves+1 > foodh.moves || ((food.moves > foodh.moves) && data.MyLength > len(snake.Coords)) {
-				allFarther = false
-			}
-		}
-		if allFarther {
-			return food
 		}
 	}
 	return nil

@@ -6,9 +6,28 @@ import (
 	"testing"
 )
 
+func Test_FilterKillZones(t *testing.T) {
+	data, err := NewMoveRequest(gameString16)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	for _, dir := range directions {
+		if dir == RIGHT {
+			t.Errorf("If you go right you kill yourself what is wrong with you", directions)
+		}
+	}
+
+}
+
 func Test_FilterPossibleMoves(t *testing.T) {
 	data, err := NewMoveRequest(gameString3)
-
 	if err != nil {
 		t.Errorf("%v", err)
 	}

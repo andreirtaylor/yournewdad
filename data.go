@@ -144,8 +144,6 @@ type MinMaxData struct {
 	moves    int
 	snakeIds []int
 	tie      bool
-
-	articulationPoint bool
 }
 
 type MinMaxSnakeMD struct {
@@ -279,8 +277,9 @@ func (m *MetaData) GenFoodMap(data *MoveRequest) {
 type MoveMetaData map[string]*MetaDataDirec
 
 type FoodData struct {
-	moves int
-	pnt   *Point
+	moves   int
+	pnt     *Point
+	closest int
 }
 
 // RESPONSE AND REQUEST STRUCTS

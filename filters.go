@@ -238,7 +238,19 @@ func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 	ret := []string{}
 	for _, direc := range directions {
 		if data.Direcs[direc].Moves > 0 {
-			ret = append(ret, direc)
+			head := data.Snakes[data.MyIndex].Head()
+			p, _ := GetPointInDirectionHazards(head, direc, data)
+
+			if p != nil && !data.Hazards[p.String()] {
+				ret = append(ret, direc)
+			}
+		}
+	}
+	if len(ret) == 0 {
+		for _, direc := range directions {
+			if data.Direcs[direc].Moves > 0 {
+				ret = append(ret, direc)
+			}
 		}
 	}
 	return ret

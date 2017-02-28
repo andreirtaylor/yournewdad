@@ -186,7 +186,7 @@ func TestPoint(t *testing.T) {
 
 	// test string
 	point = Point{X: 5, Y: 13}
-	if point.String() != "{5,13}" {
+	if point.String() != "5,13" {
 		t.Errorf("expected point to print %v got %v", "{5,13}", point)
 	}
 	data := &MoveRequest{

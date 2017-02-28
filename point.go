@@ -31,7 +31,7 @@ func (point *Point) UnmarshalJSON(data []byte) error {
 }
 
 func (point *Point) String() string {
-	return fmt.Sprintf("{%d,%d}", point.X, point.Y)
+	return fmt.Sprintf("%d,%d", point.X, point.Y)
 }
 
 func (p1 *Point) isNeighbour(p2 *Point) bool {
