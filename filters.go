@@ -74,9 +74,6 @@ func FilterTail(data *MoveRequest, moves []string) []string {
 }
 
 func FilterMinMax(data *MoveRequest, moves []string) []string {
-	if len(data.Snakes) > 4 {
-		return moves
-	}
 	ret := []string{}
 	currStats := GenMinMaxStats(data.minMaxArr)
 
@@ -86,7 +83,7 @@ func FilterMinMax(data *MoveRequest, moves []string) []string {
 			if key != data.MyIndex {
 				nextMoves := float64(val.moves)
 				currMoves := float64(currStats.snakes[key].moves)
-				if 1-nextMoves/currMoves > 0.3 {
+				if 1-nextMoves/currMoves >= 0.3 {
 					ret = append(ret, move)
 				}
 			}

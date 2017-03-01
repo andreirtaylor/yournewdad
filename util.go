@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"math"
 )
 
 func stringInSlice(a string, list []string) bool {
@@ -35,50 +34,18 @@ func MinMax(data *MoveRequest, direc string) {
 		}
 	}
 
-	ret := make(MMArray, data.Height)
-	for i := range ret {
-		ret[i] = make([]MinMaxData, data.Width)
-		for j := range ret[i] {
-			ret[i][j].moves = math.MaxInt64
-			ret[i][j].snakeIds = []int{}
-		}
+	stats := fullStatsMe(myHead, data)
+	if direc != "" {
+		data.Direcs[direc].ClosestFood = stats.ClosestFood
+		data.Direcs[direc].Food = stats.Food
+		data.Direcs[direc].Moves = stats.Moves
+		data.Direcs[direc].SeeTail = stats.SeeTail
+		data.Direcs[direc].KeySnakeData = stats.KeySnakeData
+		data.Direcs[direc].FoodHash = stats.FoodHash
+		data.Direcs[direc].sortedFood = stats.sortedFood
+		data.Direcs[direc].MoveHash = stats.MoveHash
 	}
-	for snakeId, snake := range data.Snakes {
-		var stats *MetaDataDirec
-		if snakeId == data.MyIndex {
-			stats = fullStatsMe(myHead, data)
-		} else {
-			head := snake.Head()
-			stats = fullStatsPnt(head, data)
-		}
-		if direc != "" && snakeId == data.MyIndex {
-			data.Direcs[direc].ClosestFood = stats.ClosestFood
-			data.Direcs[direc].Food = stats.Food
-			data.Direcs[direc].Moves = stats.Moves
-			data.Direcs[direc].SeeTail = stats.SeeTail
-			data.Direcs[direc].KeySnakeData = stats.KeySnakeData
-			data.Direcs[direc].FoodHash = stats.FoodHash
-			data.Direcs[direc].sortedFood = stats.sortedFood
-			data.Direcs[direc].MoveHash = stats.MoveHash
-		}
-		snake.FoodHash = stats.FoodHash
-		for i := range ret {
-			for j := range ret[i] {
-				p := &Point{X: i, Y: j}
-				if stats.MoveHash[p.String()] != nil {
-					if stats.MoveHash[p.String()].moves < ret[j][i].moves {
-						ret[j][i].moves = stats.MoveHash[p.String()].moves
-						ret[j][i].snakeIds = []int{snakeId}
-					} else if stats.MoveHash[p.String()].moves == ret[j][i].moves {
-						ret[j][i].snakeIds = append(ret[j][i].snakeIds, snakeId)
-						ret[j][i].tie = true
-
-					}
-				}
-			}
-		}
-	}
-	ret = quickStats2(data, direc).minMaxArr
+	ret := quickStats2(data, direc).minMaxArr
 
 	if direc != "" {
 		data.Direcs[direc].minMaxArr = ret

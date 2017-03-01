@@ -31,6 +31,7 @@ func AppendIfMissing(slice []int, i int) ([]int, bool) {
 // me is a boolean that basicly
 // a function that is to be used on other points
 func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
+	// generated the hazards without the hazards around the other snakes
 	data.GenHazards(data, false)
 	myHead := data.Snakes[data.MyIndex].Head()
 	if direc != "" {
@@ -46,7 +47,6 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 			data.Hazards[myHead.String()] = true
 		}
 	}
-	// generated the hazards without the hazards around the other snakes
 
 	q := Queue{}
 
@@ -55,11 +55,13 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 	// at the end of the loop is executed
 	for i, snake := range data.Snakes {
 		head := &snake.Coords[0]
+		moves := -1
 		if i == data.MyIndex {
+			moves = 0
 			head = myHead
 		}
 		mmd := &MinMaxData{
-			moves:    0,
+			moves:    moves,
 			snakeIds: []int{i},
 			tie:      false,
 			pnt:      head,
@@ -68,14 +70,14 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 		q.Push(mmd)
 	}
 
-	t, err := getTail(data.MyIndex, data)
-	if err != nil {
-		return nil
-	}
+	//t, err := getTail(data.MyIndex, data)
+	//if err != nil {
+	//	return nil
+	//}
 
 	accumulator := &MetaDataDirec{}
-	accumulator.FoodHash = make(map[string]*FoodData)
-	accumulator.MoveHash = make(map[string]*MinMaxData)
+	//accumulator.FoodHash = make(map[string]*FoodData)
+	//accumulator.MoveHash = make(map[string]*MinMaxData)
 	accumulator.minMaxArr = make(MMArray, data.Height)
 	for i := range accumulator.minMaxArr {
 		accumulator.minMaxArr[i] = make([]MinMaxData, data.Width)
@@ -140,25 +142,7 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 			}
 		}
 
-		if me {
-			//fmt.Printf("%v", p)
-			if data.FoodMap[p.String()] {
-				//fmt.Printf("food\n")
-				accumulator.ClosestFood = item.pnt
-				accumulator.Food += 1
-				foodptr := &FoodData{moves: item.moves, pnt: item.pnt}
-				accumulator.FoodHash[foodptr.pnt.String()] = foodptr
-				accumulator.sortedFood = append(accumulator.sortedFood, foodptr)
-			}
-			// add 1 to the moves in this direction in this generation
-			accumulator.Moves += 1
-			FindMinSnakePointInSurroundingArea(item.pnt, data, ksd)
-			if item.pnt.isNeighbour(t) && item.moves > 1 {
-				accumulator.SeeTail = true
-			}
-		}
-
-		if item.moves > 0 {
+		if (!me && item.moves >= 0) || (me && item.moves > 0) {
 			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].moves = item.moves
 			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].pnt = item.pnt
 			accumulator.minMaxArr[item.pnt.Y][item.pnt.X].snakeIds = item.snakeIds
