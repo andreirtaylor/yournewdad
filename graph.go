@@ -77,7 +77,7 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 
 	accumulator := &MetaDataDirec{}
 	//accumulator.FoodHash = make(map[string]*FoodData)
-	//accumulator.MoveHash = make(map[string]*MinMaxData)
+	accumulator.MoveHash = make(map[string]*MinMaxData)
 	accumulator.minMaxArr = make(MMArray, data.Height)
 	for i := range accumulator.minMaxArr {
 		accumulator.minMaxArr[i] = make([]MinMaxData, data.Width)
@@ -140,6 +140,10 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 			if sid == data.MyIndex {
 				me = true
 			}
+		}
+		if me {
+			accumulator.MoveHash[item.pnt.String()] = item
+			accumulator.Moves += 1
 		}
 
 		if (!me && item.moves >= 0) || (me && item.moves > 0) {

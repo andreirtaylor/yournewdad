@@ -13,9 +13,9 @@ func Test_GenerateMinMax(t *testing.T) {
 	}
 	testMap := make(map[string]map[int]MinMaxSnakeMD)
 	testMap[UP] = map[int]MinMaxSnakeMD{}
-	testMap[DOWN] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 222, ties: 0}, 2: MinMaxSnakeMD{moves: 59, ties: 3}, 1: MinMaxSnakeMD{moves: 2, ties: 3}}
-	testMap[LEFT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 227, ties: 0}, 1: MinMaxSnakeMD{moves: 0, ties: 58}, 2: MinMaxSnakeMD{moves: 1, ties: 58}}
-	testMap[RIGHT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 217, ties: 0}, 2: MinMaxSnakeMD{moves: 63, ties: 1}, 1: MinMaxSnakeMD{moves: 5, ties: 1}}
+	testMap[DOWN] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 222, ties: 5}, 2: MinMaxSnakeMD{moves: 54, ties: 5}, 1: MinMaxSnakeMD{moves: 5, ties: 0}}
+	testMap[LEFT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 227, ties: 0}, 1: MinMaxSnakeMD{moves: 58, ties: 0}, 2: MinMaxSnakeMD{moves: 1, ties: 0}}
+	testMap[RIGHT] = map[int]MinMaxSnakeMD{0: MinMaxSnakeMD{moves: 217, ties: 5}, 2: MinMaxSnakeMD{moves: 58, ties: 5}, 1: MinMaxSnakeMD{moves: 6, ties: 0}}
 
 	for direc, direcData := range data.Direcs {
 		stats := GenMinMaxStats(direcData.minMaxArr)

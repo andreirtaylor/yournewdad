@@ -22,13 +22,6 @@ func (ret MMArray) String() string {
 				}
 				buffer.WriteString(" ")
 			} else if len(ret[i][j].snakeIds) == 0 {
-				//p := &Point{X: j, Y: i}
-				//hd := data.SnakeHash[p.String()]
-				//if hd != nil {
-				//	buffer.WriteString(fmt.Sprintf("  S%d ", hd.id))
-				//} else {
-				//}
-
 				buffer.WriteString(" XX ")
 			} else {
 				//buffer.WriteString(fmt.Sprintf("  %d ", ret[i][j].moves))
@@ -57,6 +50,7 @@ type MetaData struct {
 	KillZones  map[string]bool
 	SnakeHeads map[string]bool
 	minMaxArr  MMArray
+	MinMaxMD   MinMaxMetaData
 }
 
 // MetaDataDirec
@@ -82,6 +76,7 @@ type MetaDataDirec struct {
 	FoodHash   map[string]*FoodData
 	sortedFood []*FoodData
 	MoveHash   map[string]*MinMaxData
+	MinMaxMD   MinMaxMetaData
 }
 
 type KeySnakeData map[int]*SnakeData
@@ -386,6 +381,10 @@ func (m *MoveRequest) init() {
 	m.GenSnakeHash(m)
 	m.GenMinMax(m)
 	m.GenHazards(m, true)
+	m.MinMaxMD = GenMinMaxStats(m.minMaxArr)
+	for _, val := range m.Direcs {
+		val.MinMaxMD = GenMinMaxStats(val.minMaxArr)
+	}
 }
 
 // de serializes the move request data into a string

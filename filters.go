@@ -16,6 +16,7 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
+	FilterTieAreas,
 	FilterMinMax,
 	FilterKillArea,
 	FilterTail,
@@ -33,8 +34,26 @@ var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterKeyArea,
 }
 
+var AGGRESSION = []func(*MoveRequest, []string) []string{
+	FilterPossibleMoves,
+	FilterMovesVsSpace,
+	FilterTieAreas,
+	FilterMinMax,
+	FilterKillArea,
+	FilterTail,
+}
+
 func GetFunctionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+}
+
+func imAgressive(data *MoveRequest) bool {
+	if !data.MetaData.tightSpace &&
+		data.Snakes[data.MyIndex].HealthPoints > data.Width &&
+		data.MyLength > 2*data.Width+len(data.Food) {
+		return true
+	}
+	return false
 }
 
 // A file for all of the filtering of moves
@@ -47,6 +66,9 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 
 	if data.MetaData.tightSpace || data.NoFood() {
 		funcArray = SPACE_SAVING_FUNCS
+	}
+	if imAgressive(data) {
+		funcArray = AGGRESSION
 	}
 
 	for _, filt := range funcArray {
@@ -73,17 +95,43 @@ func FilterTail(data *MoveRequest, moves []string) []string {
 	return ret
 }
 
-func FilterMinMax(data *MoveRequest, moves []string) []string {
+func FilterTieAreas(data *MoveRequest, moves []string) []string {
 	ret := []string{}
-	currStats := GenMinMaxStats(data.minMaxArr)
 
 	for _, move := range moves {
-		nextStats := GenMinMaxStats(data.Direcs[move].minMaxArr)
+		head := data.Snakes[data.MyIndex].Head()
+
+		p, _ := GetPointInDirection(head, move, data)
+
+		if p == nil {
+			continue
+		}
+		if data.minMaxArr[p.Y][p.X].tie {
+			ret = append(ret, move)
+		}
+	}
+	if len(ret) == 0 {
+		return moves
+	}
+	return ret
+}
+
+func FilterMinMax(data *MoveRequest, moves []string) []string {
+	ret := []string{}
+
+	lossThreshold := 0.3
+	if imAgressive(data) {
+		lossThreshold = 0.1
+	}
+	currStats := data.MinMaxMD
+
+	for _, move := range moves {
+		nextStats := data.Direcs[move].MinMaxMD
 		for key, val := range nextStats.snakes {
 			if key != data.MyIndex {
 				nextMoves := float64(val.moves)
 				currMoves := float64(currStats.snakes[key].moves)
-				if 1-nextMoves/currMoves >= 0.3 {
+				if 1-nextMoves/currMoves >= lossThreshold {
 					ret = append(ret, move)
 				}
 			}
@@ -119,6 +167,24 @@ func FilterKillArea(data *MoveRequest, moves []string) []string {
 
 }
 
+func FilterExpandArea(data *MoveRequest, moves []string) []string {
+	ret := []string{}
+	currStats := GenMinMaxStats(data.minMaxArr)
+
+	for _, move := range moves {
+		nextStats := GenMinMaxStats(data.Direcs[move].minMaxArr)
+		// if I increase my area by going this way go that way
+		if len(currStats.movesHash) < len(nextStats.movesHash) {
+			ret = append(ret, move)
+		}
+	}
+
+	if len(ret) == 0 {
+		return moves
+	}
+	return ret
+	return moves
+}
 func FilterKeyArea(data *MoveRequest, moves []string) []string {
 	ret := []string{}
 	head, err := getMyHead(data)

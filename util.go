@@ -34,23 +34,23 @@ func MinMax(data *MoveRequest, direc string) {
 		}
 	}
 
+	ret := quickStats2(data, direc)
 	stats := fullStatsMe(myHead, data)
 	if direc != "" {
 		data.Direcs[direc].ClosestFood = stats.ClosestFood
 		data.Direcs[direc].Food = stats.Food
-		data.Direcs[direc].Moves = stats.Moves
+		data.Direcs[direc].Moves = ret.Moves
 		data.Direcs[direc].SeeTail = stats.SeeTail
 		data.Direcs[direc].KeySnakeData = stats.KeySnakeData
-		data.Direcs[direc].FoodHash = stats.FoodHash
+		data.Direcs[direc].FoodHash = ret.FoodHash
 		data.Direcs[direc].sortedFood = stats.sortedFood
 		data.Direcs[direc].MoveHash = stats.MoveHash
 	}
-	ret := quickStats2(data, direc).minMaxArr
 
 	if direc != "" {
-		data.Direcs[direc].minMaxArr = ret
+		data.Direcs[direc].minMaxArr = ret.minMaxArr
 	} else if direc == "" {
-		data.minMaxArr = ret
+		data.minMaxArr = ret.minMaxArr
 	}
 
 }

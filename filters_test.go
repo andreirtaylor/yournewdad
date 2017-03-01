@@ -217,26 +217,3 @@ func Test_FilteringSpace(t *testing.T) {
 	}
 
 }
-
-func Test_CutOff(t *testing.T) {
-	data, err := NewMoveRequest(gameString10)
-
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
-
-	filteredMoves, err := bestMoves(data)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-
-	t.Logf("%v\n", stringAllMinMAX(data))
-
-	expectedDirection := []string{DOWN}
-	sort.Strings(filteredMoves)
-	sort.Strings(expectedDirection)
-
-	if !reflect.DeepEqual(expectedDirection, filteredMoves) {
-		t.Errorf("expected %v directions got %v", expectedDirection, filteredMoves)
-	}
-}
