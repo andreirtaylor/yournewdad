@@ -73,6 +73,7 @@ func Test_EfficientSpace(t *testing.T) {
 	}
 
 	totalMoves := data.Direcs[DOWN].Moves
+	t.Logf(stringAllMinMAX(data))
 	if totalMoves != 30 {
 		t.Errorf("Expected 30 total moves got, %v", totalMoves)
 	}
