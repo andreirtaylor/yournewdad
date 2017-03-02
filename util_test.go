@@ -167,3 +167,13 @@ func Test_NumberofNeighbours(t *testing.T) {
 		t.Errorf("Expected 2 neighbours got %v", n)
 	}
 }
+
+func Test_DistToFood(t *testing.T) {
+	data, err := NewMoveRequest(gameString7)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if data.DistToFood != 17 {
+		t.Errorf("expected 17 got %v", data.DistToFood)
+	}
+}

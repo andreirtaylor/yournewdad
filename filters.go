@@ -49,7 +49,7 @@ func GetFunctionName(i interface{}) string {
 
 func imAgressive(data *MoveRequest) bool {
 	if !data.MetaData.tightSpace &&
-		data.Snakes[data.MyIndex].HealthPoints > data.Width &&
+		data.Snakes[data.MyIndex].HealthPoints > 60 &&
 		data.MyLength > 2*data.Width+len(data.Food) {
 		return true
 	}
@@ -199,6 +199,11 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 			return []string{}
 		}
 
+		// if there isno key snake part in your area its a fine move
+		if data.Direcs[direc].KeySnakeData.minKeySnakePart() == nil {
+			ret = append(ret, direc)
+			continue
+		}
 		p2 := data.Direcs[direc].KeySnakeData.minKeySnakePart().pnt
 		distFromHead := head.Dist(p2)
 		distFromPnt := p.Dist(p2)

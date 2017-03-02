@@ -28,17 +28,18 @@ func TestClosestFoodWithFood(t *testing.T) {
 	}
 
 	direcs := data.Direcs
-	expected := &Point{X: 2, Y: 8}
-	if !reflect.DeepEqual(direcs[LEFT].sortedFood[0].pnt, expected) {
+	points := []*Point{&Point{X: 5, Y: 7}, &Point{X: 2, Y: 8}}
+	foods := []*Point{direcs[LEFT].sortedFood[0].pnt, direcs[LEFT].sortedFood[1].pnt}
+	if !reflect.DeepEqual(foods, points) {
 		t.Errorf("closest food LEFT is %v, got %v",
-			expected, direcs[LEFT].sortedFood[0].pnt)
+			points, direcs[LEFT].sortedFood[:2])
 	}
 
 	if len(direcs[RIGHT].sortedFood) != 0 {
 		t.Errorf("there is no food to the right thats your body")
 	}
 
-	expected = &Point{X: 5, Y: 7}
+	expected := &Point{X: 5, Y: 7}
 	if !reflect.DeepEqual(direcs[UP].sortedFood[0].pnt, expected) {
 		t.Errorf(
 			"closest food UP is %v moves away, got %v",
@@ -73,7 +74,6 @@ func Test_EfficientSpace(t *testing.T) {
 	}
 
 	totalMoves := data.Direcs[DOWN].Moves
-	t.Logf(stringAllMinMAX(data))
 	if totalMoves != 30 {
 		t.Errorf("Expected 30 total moves got, %v", totalMoves)
 	}

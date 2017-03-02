@@ -44,6 +44,7 @@ type MetaData struct {
 	Hazards    map[string]bool
 	FoodMap    map[string]bool
 	tightSpace bool
+	DistToFood int
 	// making this a pointer makes it able to be tested against
 	// nil so we might as well keep it like this
 	SnakeHash  map[string]*SnakeData

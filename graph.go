@@ -1,21 +1,12 @@
 package kaa
 
 import (
-	"container/heap"
 	"fmt"
 	"math"
 )
 
 func keepFMTforGraph() {
 	fmt.Printf("%v")
-}
-
-func fullStatsPnt(pos *Point, data *MoveRequest) *MetaDataDirec {
-	return quickStats(pos, data, math.MaxInt64, false)
-}
-
-func fullStatsMe(pos *Point, data *MoveRequest) *MetaDataDirec {
-	return quickStats(pos, data, math.MaxInt64, true)
 }
 
 func AppendIfMissing(slice []int, i int) ([]int, bool) {

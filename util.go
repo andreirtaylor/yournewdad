@@ -36,6 +36,9 @@ func MinMax(data *MoveRequest, direc string) {
 
 	ret := quickStats2(data, direc)
 	//stats := fullStatsMe(myHead, data)
+	if direc == "" && len(ret.sortedFood) > 0 {
+		data.DistToFood = ret.sortedFood[0].moves
+	}
 	if direc != "" {
 		data.Direcs[direc].ClosestFood = ret.ClosestFood
 		data.Direcs[direc].Food = ret.Food
