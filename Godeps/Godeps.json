@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/andreirtaylor/kaa",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": []
+}
