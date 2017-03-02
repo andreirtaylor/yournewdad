@@ -16,10 +16,10 @@ func keepFMTForFilters() {
 var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	FilterTieAreas,
 	FilterMinMax,
 	FilterKillArea,
 	FilterTail,
+	FilterTieAreas,
 	FilterClosestFoodDirections,
 	FilterMinimizeSpace,
 }
@@ -37,8 +37,8 @@ var SPACE_SAVING_FUNCS = []func(*MoveRequest, []string) []string{
 var AGGRESSION = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
-	FilterTieAreas,
 	FilterMinMax,
+	FilterTieAreas,
 	FilterKillArea,
 	FilterTail,
 }
