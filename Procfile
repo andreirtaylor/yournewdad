@@ -1,1 +1,2 @@
-web: battlesnake-go
+web: kaa
+
