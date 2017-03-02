@@ -1,4 +1,4 @@
-package kaa
+package main
 
 import (
 	"container/heap"

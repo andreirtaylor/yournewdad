@@ -1,9 +1,8 @@
-package kaa
+package main
 
 import (
 	"encoding/json"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
+	//"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -16,9 +15,9 @@ func respond(res http.ResponseWriter, obj interface{}) {
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	color := "gold"
-	if appengine.IsDevAppServer() {
-		color = "brown"
-	}
+	//if appengine.IsDevAppServer() {
+	//	color = "brown"
+	//}
 	respond(res, GameStartResponse{
 		Taunt:   toStringPointer("Dad 2.0 Ready"),
 		Color:   color,
@@ -28,13 +27,13 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 }
 
 func handleMove(res http.ResponseWriter, req *http.Request) {
-	ctx := appengine.NewContext(req)
+	//ctx := appengine.NewContext(req)
 	str := getMoveRequestString(req)
 
 	// log each and every json blob that comes in
-	if appengine.IsDevAppServer() {
-		log.Infof(ctx, str)
-	}
+	//if appengine.IsDevAppServer() {
+	//	log.Infof(ctx, str)
+	//}
 
 	data, err := NewMoveRequest(str)
 	if err != nil {
@@ -48,11 +47,11 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	// log move request
 	//log.Infof(ctx, "%v", data)
 	//log.Infof(ctx, stringAllMinMAX(data))
-	if appengine.IsDevAppServer() {
-		if imAgressive(data) {
-			log.Infof(ctx, stringAllMinMAX(data))
-		}
-	}
+	//if appengine.IsDevAppServer() {
+	//	if imAgressive(data) {
+	//		log.Infof(ctx, stringAllMinMAX(data))
+	//	}
+	//}
 
 	move, err := getMove(data, req)
 
@@ -61,7 +60,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			Move:  "up",
 			Taunt: "Couldn't parse",
 		})
-		log.Errorf(ctx, "Could not find a move for this data")
+		//log.Errorf(ctx, "Could not find a move for this data")
 		return
 	}
 	taunt := getTaunt(data.Turn)
@@ -72,18 +71,18 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 }
 
 func getMove(data *MoveRequest, req *http.Request) (string, error) {
-	ctx := appengine.NewContext(req)
+	//ctx := appengine.NewContext(req)
 
 	moves, err := bestMoves(data)
 
 	if err != nil {
-		log.Errorf(ctx, "generating MetaData: %v", err)
+		//log.Errorf(ctx, "generating MetaData: %v", err)
 		return "", err
 	}
 
-	if appengine.IsDevAppServer() {
-		log.Infof(ctx, "%v\n", moves)
-	}
+	//if appengine.IsDevAppServer() {
+	//	log.Infof(ctx, "%v\n", moves)
+	//}
 	if len(moves) < 1 {
 		return "", err
 	}
