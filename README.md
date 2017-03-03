@@ -10,13 +10,13 @@ goapp serve -host=192.168.0.33
 
 ## TODO
 
-- Follow your tail when you are large.
-- Do a basic minmax to see where I can get to vs other snakes. only count the places I can get to first in calculations of moves vs spaces
-make moves to trap other snakes
-
 - Make Snake a Pacifist Avoid other snakes entirely
-- make sure you dont move onto a spot that is right beside the tail
 - fix bug wehre you dont return a move on another snake being able to kill you or 
+- sort the snake array so that I dont go for food that is on the boundary of another snake
+- watch out for head on colisions
+    - test if the second thing on the snake is closer to me that the first thing
+    - i.e the distance from me to their head is 3 and their second thing is 4 or greater.
+- Clean up source code
 
 ![](assets/README-58f0d.png)
 ie. this shouldnt be a death

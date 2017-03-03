@@ -6,6 +6,10 @@ import (
 	"fmt"
 )
 
+func swap(arr []*Snake, a, b int) {
+	arr[b], arr[a] = arr[a], arr[b]
+}
+
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
