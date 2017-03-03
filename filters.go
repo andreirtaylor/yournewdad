@@ -19,7 +19,7 @@ var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterMinMax,
 	FilterKillArea,
 	FilterTail,
-	FilterTieAreas,
+	//FilterTieAreas,
 	FilterClosestFoodDirections,
 	FilterMinimizeSpace,
 }
@@ -38,7 +38,7 @@ var AGGRESSION = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
 	FilterMinMax,
-	FilterTieAreas,
+	//FilterTieAreas,
 	FilterKillArea,
 	FilterTail,
 }
