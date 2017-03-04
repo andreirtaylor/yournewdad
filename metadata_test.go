@@ -88,8 +88,8 @@ func Test_MovesVsSpace(t *testing.T) {
 	}
 
 	mvs := data.Direcs[LEFT].MovesVsSpace
-	if mvs != 11 {
-		t.Errorf("Expected 30 total moves got, %v", mvs)
+	if mvs != 13 {
+		t.Errorf("Expected 13 total moves got, %v", mvs)
 	}
 
 }

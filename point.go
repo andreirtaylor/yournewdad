@@ -121,7 +121,7 @@ func (point *Point) Right(data *MoveRequest) *Point {
 // valid moves
 // returns nil if the point is a wall
 func (point *Point) DownHazard(data *MoveRequest) *Point {
-	return point.getDown(data, false)
+	return point.getDown(data, true)
 }
 
 func (point *Point) UpHazard(data *MoveRequest) *Point {

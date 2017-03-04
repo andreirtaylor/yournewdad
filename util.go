@@ -39,7 +39,7 @@ func MinMax(data *MoveRequest, direc string) {
 	}
 
 	ret := quickStats2(data, direc)
-	//stats := fullStatsMe(myHead, data)
+
 	if direc == "" && len(ret.sortedFood) > 0 {
 		data.DistToFood = ret.sortedFood[0].moves
 	}
@@ -58,6 +58,7 @@ func MinMax(data *MoveRequest, direc string) {
 		data.Direcs[direc].minMaxArr = ret.minMaxArr
 	} else if direc == "" {
 		data.minMaxArr = ret.minMaxArr
+		data.KSD = ret.KeySnakeData
 	}
 
 }
@@ -160,8 +161,7 @@ func FindMinSnakePointInSurroundingArea(p *Point, data *MoveRequest, KeySnakeDat
 		if pt != nil {
 			sd := data.SnakeHash[pt.String()]
 			if sd != nil {
-				if KeySnakeData[sd.id] == nil ||
-					sd.lengthLeft < KeySnakeData[sd.id].lengthLeft {
+				if KeySnakeData[sd.id] == nil || sd.lengthLeft < KeySnakeData[sd.id].lengthLeft {
 					KeySnakeData[sd.id] = sd
 				}
 			}

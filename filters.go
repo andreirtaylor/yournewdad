@@ -191,6 +191,7 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 	if err != nil {
 		return []string{}
 	}
+	maxDist := 0
 	for _, direc := range moves {
 		// we know this is a valid move because all moves are filterd to be vaild
 		// this is the location you are moving to
@@ -200,24 +201,36 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 		}
 
 		// if there isno key snake part in your area its a fine move
-		if data.Direcs[direc].KeySnakeData.minKeySnakePart() == nil {
+		if data.KSD.minKeySnakePart() == nil {
 			ret = append(ret, direc)
 			continue
 		}
-		p2 := data.Direcs[direc].KeySnakeData.minKeySnakePart().pnt
+		p2 := data.KSD.minKeySnakePart().pnt
 		distFromHead := head.Dist(p2)
 		distFromPnt := p.Dist(p2)
 
 		// prefer to move in the opposite direction
-		if distFromPnt.X > distFromHead.X || distFromPnt.Y > distFromHead.Y {
+		//fmt.Printf("%v %v %v %v %v %v %v\n", distFromPnt.X, distFromHead.X, distFromPnt.Y, distFromHead.Y, p2, direc, maxDist)
+		if distFromPnt.X < maxDist && distFromPnt.Y < maxDist {
+			continue
+		}
+
+		// prefer to move in the opposite direction
+		if distFromPnt.X > distFromHead.X {
+			maxDist = distFromPnt.X
+			ret = append(ret, direc)
+		} else if distFromPnt.Y > distFromHead.Y {
+			maxDist = distFromPnt.Y
 			ret = append(ret, direc)
 		} else if distFromHead.X > distFromHead.Y {
 			if direc == UP || direc == DOWN {
 				ret = append(ret, direc)
+				maxDist = distFromPnt.X
 			}
 		} else if distFromHead.X < distFromHead.Y {
 			if direc == RIGHT || direc == LEFT {
 				ret = append(ret, direc)
+				maxDist = distFromPnt.Y
 			}
 		}
 

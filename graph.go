@@ -144,9 +144,7 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 			accumulator.MoveHash[item.pnt.String()] = item
 			accumulator.Moves += 1
 
-			//fmt.Printf("%v", p)
 			if data.FoodMap[p.String()] {
-				//fmt.Printf("food\n")
 				if accumulator.ClosestFood == nil {
 					accumulator.ClosestFood = p
 				}
@@ -158,11 +156,9 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 				}
 			}
 			// add 1 to the moves in this direction in this generation
-			if me {
-				FindMinSnakePointInSurroundingArea(p, data, ksd)
-				if p.isNeighbour(t) && item.moves > 1 {
-					accumulator.SeeTail = true
-				}
+			FindMinSnakePointInSurroundingArea(p, data, ksd)
+			if p.isNeighbour(t) && item.moves > 1 {
+				accumulator.SeeTail = true
 			}
 		}
 
