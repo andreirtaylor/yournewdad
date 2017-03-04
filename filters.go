@@ -208,6 +208,9 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 		}
 		p2 := data.KSD.minKeySnakePart().pnt
 		distFromHead := head.Dist(p2)
+		if p == nil {
+			continue
+		}
 		distFromPnt := p.Dist(p2)
 
 		// prefer to move in the opposite direction
