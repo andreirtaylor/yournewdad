@@ -19,7 +19,7 @@ var GROW_FUNCS = []func(*MoveRequest, []string) []string{
 	FilterMinMax,
 	FilterKillArea,
 	FilterTail,
-	//FilterTieAreas,
+	FilterTieAreas,
 	FilterClosestFoodDirections,
 	FilterMinimizeSpace,
 }
@@ -38,7 +38,7 @@ var AGGRESSION = []func(*MoveRequest, []string) []string{
 	FilterPossibleMoves,
 	FilterMovesVsSpace,
 	FilterMinMax,
-	//FilterTieAreas,
+	FilterTieAreas,
 	FilterKillArea,
 	FilterTail,
 }
@@ -49,7 +49,7 @@ func GetFunctionName(i interface{}) string {
 
 func imAgressive(data *MoveRequest) bool {
 	if !data.MetaData.tightSpace &&
-		data.Snakes[data.MyIndex].HealthPoints > 60 &&
+		data.Snakes[data.MyIndex].HealthPoints > 80 &&
 		data.MyLength > 2*data.Width+len(data.Food) {
 		return true
 	}
