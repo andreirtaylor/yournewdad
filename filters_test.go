@@ -41,6 +41,27 @@ func Test_FilterGoingOnTail(t *testing.T) {
 	}
 }
 
+func Test_FilterGoingIntoPotentialHazard(t *testing.T) {
+	data, err := NewMoveRequest(gameString22)
+
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	directions, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	left := []string{UP}
+
+	// sort both of the strings so that deep equal will be able to see them
+
+	if !reflect.DeepEqual(directions, left) {
+		t.Errorf("expected left got, %v", directions)
+	}
+}
+
 func Test_FilterKillZones(t *testing.T) {
 	data, err := NewMoveRequest(gameString16)
 

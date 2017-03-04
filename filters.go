@@ -129,12 +129,15 @@ func FilterMinMax(data *MoveRequest, moves []string) []string {
 	for _, move := range moves {
 		nextStats := data.Direcs[move].MinMaxMD
 		for key, val := range nextStats.snakes {
-			if key != data.MyIndex {
-				nextMoves := float64(val.moves)
-				currMoves := float64(currStats.snakes[key].moves)
-				if 1-nextMoves/currMoves >= lossThreshold {
-					ret = append(ret, move)
-				}
+			// dont look at yourself or people you are going head on with
+			//|| headOn(data, key) {
+			if key == data.MyIndex {
+				continue
+			}
+			nextMoves := float64(val.moves)
+			currMoves := float64(currStats.snakes[key].moves)
+			if 1-nextMoves/currMoves >= lossThreshold {
+				ret = append(ret, move)
 			}
 		}
 	}
@@ -332,12 +335,15 @@ func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 			}
 		}
 	}
+
 	if len(ret) == 0 {
+		data.GenHazards(data, false)
 		for _, direc := range directions {
 			if data.Direcs[direc].Moves > 0 {
 				ret = append(ret, direc)
 			}
 		}
 	}
+	data.GenHazards(data, true)
 	return ret
 }
