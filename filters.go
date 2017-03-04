@@ -67,6 +67,7 @@ func bestMoves(data *MoveRequest) ([]string, error) {
 	if data.MetaData.tightSpace || data.NoFood() {
 		funcArray = SPACE_SAVING_FUNCS
 	}
+
 	if imAgressive(data) {
 		funcArray = AGGRESSION
 	}

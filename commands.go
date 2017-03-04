@@ -19,10 +19,12 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 	//	color = "brown"
 	//}
 	respond(res, GameStartResponse{
-		Taunt:   toStringPointer("Dad 2.0 Ready"),
-		Color:   color,
-		Name:    "Your New Dad",
-		HeadUrl: toStringPointer("http://i.imgur.com/MLo4AQI.png"),
+		Taunt:    toStringPointer("Dad 2.0 Ready"),
+		Color:    color,
+		Name:     "Your New Dad",
+		HeadType: "sand-worm",
+		TailType: "freckled",
+		HeadUrl:  toStringPointer("http://i.imgur.com/MLo4AQI.png"),
 	})
 }
 

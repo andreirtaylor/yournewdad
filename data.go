@@ -229,6 +229,7 @@ func (m *MetaData) GenMinMax(data *MoveRequest) {
 		MinMax(data, direc)
 		//fmt.Printf(direc)
 		ksd := direcData.KeySnakeData.minKeySnakePart()
+
 		if ksd != nil {
 			direcData.MovesVsSpace = direcData.Moves - direcData.Food - ksd.lengthLeft
 		}
@@ -333,10 +334,12 @@ func NewGameStartRequest(req *http.Request) (*GameStartRequest, error) {
 }
 
 type GameStartResponse struct {
-	Color   string  `json:"color"`
-	HeadUrl *string `json:"head_url,omitempty"`
-	Name    string  `json:"name"`
-	Taunt   *string `json:"taunt,omitempty"`
+	Color    string  `json:"color"`
+	HeadUrl  *string `json:"head_url,omitempty"`
+	Name     string  `json:"name"`
+	Taunt    *string `json:"taunt,omitempty"`
+	HeadType string  `json:head_type`
+	TailType string  `json:tail_type`
 }
 
 type MoveRequest struct {
