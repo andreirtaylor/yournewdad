@@ -197,6 +197,26 @@ func TestDontMoveOntoTheKeyArea(t *testing.T) {
 
 }
 
+func TestDontMoveOntoTheKeyArea2(t *testing.T) {
+	data, err := NewMoveRequest(gameString19)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	filteredMoves, err := bestMoves(data)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	expectedDirection := []string{UP}
+	sort.Strings(filteredMoves)
+	sort.Strings(expectedDirection)
+
+	if !reflect.DeepEqual(expectedDirection, filteredMoves) {
+		t.Errorf("expected %v directions got %v", expectedDirection, filteredMoves)
+	}
+}
+
 func Test_FilteringSpace(t *testing.T) {
 	data, err := NewMoveRequest(gameString11)
 	if err != nil {
