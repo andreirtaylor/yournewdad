@@ -52,6 +52,7 @@ type MetaData struct {
 	SnakeHeads map[string]bool
 	minMaxArr  MMArray
 	MinMaxMD   MinMaxMetaData
+	KSD        KeySnakeData
 }
 
 // MetaDataDirec
@@ -127,7 +128,6 @@ func (m *MetaDataDirec) String() string {
 // used to find and set the length of your snake globally in the
 // metatdata object
 func (m *MetaData) SetMyLength(data *MoveRequest) {
-	fmt.Printf("%v\n", data.You)
 	for i, snake := range data.Snakes {
 		if snake.Id == data.You && len(data.You) > 0 {
 			m.MyLength = len(snake.Coords)
@@ -136,8 +136,6 @@ func (m *MetaData) SetMyLength(data *MoveRequest) {
 			//m.MyIndex = i
 		}
 	}
-	fmt.Printf("%v\n", data.Snakes[len(data.Snakes)-1].Id)
-	fmt.Printf("\n")
 }
 
 // a little struct used to see the length left after this portion of a
