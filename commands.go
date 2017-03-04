@@ -22,8 +22,8 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 		Taunt:    toStringPointer("Dad 2.0 Ready"),
 		Color:    color,
 		Name:     "Your New Dad",
-		HeadType: "sand-worm",
-		TailType: "freckled",
+		HeadType: "shades",
+		TailType: "fat-rattle",
 		HeadUrl:  toStringPointer("http://i.imgur.com/MLo4AQI.png"),
 	})
 }

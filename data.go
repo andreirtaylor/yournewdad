@@ -339,7 +339,7 @@ type GameStartResponse struct {
 	Name     string  `json:"name"`
 	Taunt    *string `json:"taunt,omitempty"`
 	HeadType string  `json:"head_type"`
-	TailType string  `json::tail_type""`
+	TailType string  `json:"tail_type"`
 }
 
 type MoveRequest struct {
