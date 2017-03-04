@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	//"log"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -31,9 +31,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	str := getMoveRequestString(req)
 
 	// log each and every json blob that comes in
-	//if appengine.IsDevAppServer() {
-	//	log.Infof(ctx, str)
-	//}
+	log.Printf(str)
 
 	data, err := NewMoveRequest(str)
 	if err != nil {
@@ -46,7 +44,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 
 	// log move request
 	//log.Infof(ctx, "%v", data)
-	//log.Infof(ctx, stringAllMinMAX(data))
 	//if appengine.IsDevAppServer() {
 	//	if imAgressive(data) {
 	//		log.Infof(ctx, stringAllMinMAX(data))
@@ -80,9 +77,7 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 		return "", err
 	}
 
-	//if appengine.IsDevAppServer() {
-	//	log.Infof(ctx, "%v\n", moves)
-	//}
+	log.Printf("%v\n", moves)
 	if len(moves) < 1 {
 		return "", err
 	}
