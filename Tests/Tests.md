@@ -102,3 +102,7 @@ You are the red snake
 ## gameString20
 
 ![](assets/Tests-1546b.png)
+
+## gameString21
+
+![](assets/Tests-be962.png)
