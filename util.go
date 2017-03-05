@@ -142,6 +142,14 @@ func getTaunt(turn int) string {
 		return "My god you've grown"
 	} else if turn < 90 {
 		return "Let me get my glasses"
+	} else if turn < 120 {
+		return "Great googaly moogaly you're stil here?"
+	} else if turn < 150 {
+		return "You sure your parents are ok with this?"
+	} else if turn < 180 {
+		return "You wanna play with my snake, son?"
+	} else if turn < 180 {
+		return "Dont tell your mom about this."
 	}
 	return "I need to go to bed"
 }
