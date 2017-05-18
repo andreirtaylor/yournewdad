@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	//"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -33,7 +33,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	str := getMoveRequestString(req)
 
 	// log each and every json blob that comes in
-	log.Printf(str)
+	//log.Printf(str)
 
 	data, err := NewMoveRequest(str)
 	if err != nil {
@@ -79,7 +79,7 @@ func getMove(data *MoveRequest, req *http.Request) (string, error) {
 		return "", err
 	}
 
-	log.Printf("%v\n", moves)
+	//log.Printf("%v\n", moves)
 	if len(moves) < 1 {
 		return "", err
 	}
