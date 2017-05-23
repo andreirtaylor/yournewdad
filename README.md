@@ -51,6 +51,8 @@ if err != nil {
 
 The snake typically dies by running head on into other snakes or by starving if you can find a way to detect head on colisions that would be a major improvement into the usability of the snake.
 
+The beginnings of my headon collision implemetaion can be found in `headon.go` and the corresponding failing tests can be found in `headon_test_skip.go`
+
 It would also be really nice to have more metrics about the win loss rate of the snake overallI want to implement some sort of mechanism that tests if you have won or lost the game then stores this information so that you can view the win loss and kill ratio of the snake.
 
 
