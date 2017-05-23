@@ -1,12 +1,11 @@
 {
-  "name": "battlesnake-go",
-  "description": "A simple BattleSnake AI written in Go..",
+  "name": "YourNewDad",
+  "description": "2017 entry into battlesnake",
   "keywords": [
-    "battlesnake",
-    "sendwithus"
+    "battlesnake"
   ],
   "website": "http://battlesnake.io",
-  "repository": "https://github.com/sendwithus/battlesnake-go",
+  "repository": "https://github.com/andreirtaylor/yournewdad",
   "env": {
     "BUILDPACK_URL": "https://github.com/kr/heroku-buildpack-go"
   }
