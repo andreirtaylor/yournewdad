@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	//"log"
+	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -14,13 +15,9 @@ func respond(res http.ResponseWriter, obj interface{}) {
 }
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
-	color := "gold"
-	//if appengine.IsDevAppServer() {
-	//	color = "brown"
-	//}
 	respond(res, GameStartResponse{
 		Taunt:    toStringPointer("Dad 2.0 Ready"),
-		Color:    color,
+		Color:    "gold",
 		Name:     "Your New Dad",
 		HeadType: "shades",
 		TailType: "fat-rattle",
@@ -32,8 +29,11 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	//ctx := appengine.NewContext(req)
 	str := getMoveRequestString(req)
 
-	// log each and every json blob that comes in
-	//log.Printf(str)
+	// log the json blob that comes in if requested
+	logging := os.Getenv("YND_LOG")
+	if len(logging) > 0 {
+		log.Printf(str)
+	}
 
 	data, err := NewMoveRequest(str)
 	if err != nil {
