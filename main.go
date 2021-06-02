@@ -9,6 +9,7 @@ import (
 func main() {
 	http.HandleFunc("/start", handleStart)
 	http.HandleFunc("/move", handleMove)
+	http.HandleFunc("/", handleStart)
 
 	port := os.Getenv("PORT")
 	if port == "" {
